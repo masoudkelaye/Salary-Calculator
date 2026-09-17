@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EU Net Salary Calculator 2026 | DE FR IT NL</title>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <style>
+    :root { --bg:#0f172a; --card:#1e293b; --accent:#38bdf8; --text:#e2e8f0; --muted:#94a3b8; --success:#22c55e; --danger:#ef4444; --border:#334155; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;padding:1.25rem;max-width:1100px;margin:0 auto}
+    [dir=rtl] body{font-family:'Segoe UI',Tahoma,system-ui,sans-serif}
+    h1{font-size:1.4rem;color:var(--accent);margin-bottom:.3rem}
+    .subtitle{color:var(--muted);font-size:.88rem;margin-bottom:1.1rem}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.05rem;margin-bottom:1rem}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.85rem}
+    label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:.22rem}
+    input,select{width:100%;padding:.5rem .65rem;border-radius:8px;border:1px solid var(--border);background:#0f172a;color:var(--text);font-size:.92rem}
+    input:focus,select:focus{outline:2px solid var(--accent)}
+    .radio-group{display:flex;gap:.9rem;flex-wrap:wrap;margin-top:.3rem}
+    .radio-group label{display:flex;align-items:center;gap:.3rem;cursor:pointer;color:var(--text);font-size:.88rem}
+    button{background:var(--accent);color:#0f172a;border:none;padding:.65rem 1.2rem;border-radius:8px;font-weight:600;cursor:pointer;font-size:.92rem}
+    button:hover{filter:brightness(1.08)}
+    button.secondary{background:transparent;border:1px solid var(--accent);color:var(--accent)}
+    .result-box{background:#0f172a;border:1px solid var(--success);border-radius:10px;padding:1rem;margin-top:.7rem}
+    .net-value{font-size:1.8rem;font-weight:700;color:var(--success)}
+    table{width:100%;border-collapse:collapse;margin-top:.8rem;font-size:.88rem}
+    th,td{padding:.4rem .6rem;text-align:start;border-bottom:1px solid var(--border)}
+    [dir=rtl] th,[dir=rtl] td{text-align:right}
+    th{color:var(--muted);font-weight:500}
+    .disclaimer{font-size:.76rem;color:var(--muted);margin-top:1.1rem;padding:.85rem;background:#1e293b;border-radius:8px;border-inline-start:3px solid var(--danger)}
+    .hidden{display:none!important}
+    .flex{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:.45rem}
+    .lang-switch{display:flex;gap:.35rem;margin-bottom:.9rem}
+    .lang-switch button{padding:.3rem .65rem;font-size:.78rem}
+    .lang-switch button.active{background:var(--accent);color:#0f172a}
+    .country-note{font-size:.75rem;color:var(--muted);margin-top:.4rem}
+  </style>
+</head>
+<body>
+  <div class="lang-switch">
+    <button type="button" data-lang="fa" class="active" onclick="setLang('fa')">فارسی</button>
+    <button type="button" data-lang="en" onclick="setLang('en')">English</button>
+    <button type="button" data-lang="de" onclick="setLang('de')">Deutsch</button>
+    <button type="button" data-lang="fr" onclick="setLang('fr')">Français</button>
+    <button type="button" data-lang="it" onclick="setLang('it')">Italiano</button>
+    <button type="button" data-lang="nl" onclick="setLang('nl')">Nederlands</button>
+  </div>
+
+  <h1 id="t-title">محاسبه‌گر حقوق خالص اروپا ۲۰۲۶</h1>
+  <p class="subtitle" id="t-subtitle">آلمان (دقیق PAP)، فرانسه، ایتالیا، هلند — بر اساس نرخ‌های رسمی ۲۰۲۶</p>
+
+  <div class="card">
+    <div class="grid">
+      <div>
+        <label id="t-country">کشور</label>
+        <select id="country" onchange="onCountryChange()">
+          <option value="DE">🇩🇪 Deutschland / Germany / آلمان</option>
+          <option value="FR">🇫🇷 France / فرانسه</option>
+          <option value="IT">🇮🇹 Italia / Italy / ایتالیا</option>
+          <option value="NL">🇳🇱 Nederland / Netherlands / هلند</option>
+          <option value="UK">🇬🇧 United Kingdom / England / انگلستان</option>
+          <option value="US">🇺🇸 United States / آمریکا</option>
+          <option value="CA">🇨🇦 Canada / کانادا</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 style="font-size:1rem;margin-bottom:.7rem" id="t-inputType">نوع ورودی حقوق</h2>
+    <div class="radio-group">
+      <label><input type="radio" name="inputType" value="monthly" checked onchange="toggleInput()"> <span id="t-monthly">ماهانه</span></label>
+      <label><input type="radio" name="inputType" value="weekly" onchange="toggleInput()"> <span id="t-weekly">هفتگی</span></label>
+      <label><input type="radio" name="inputType" value="hourly" onchange="toggleInput()"> <span id="t-hourly">ساعتی</span></label>
+    </div>
+    <div class="grid" style="margin-top:.9rem">
+      <div id="monthlyBox"><label id="t-monthlyGross">حقوق ناخالص ماهانه (€)</label><input type="number" id="monthlyGross" value="3500" min="0" step="10"></div>
+      <div id="weeklyBox" class="hidden"><label id="t-weeklyGross">حقوق ناخالص هفتگی (€)</label><input type="number" id="weeklyGross" value="800" min="0" step="10"></div>
+      <div id="hourlyBox" class="hidden">
+        <label id="t-hourlyWage">حقوق ساعتی (€)</label><input type="number" id="hourlyWage" value="20" min="0" step="0.5">
+        <label style="margin-top:.55rem" id="t-hoursWeek">ساعات کار در هفته</label><input type="number" id="hoursPerWeek" value="40" min="1" max="60" step="0.5">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 style="font-size:1rem;margin-bottom:.7rem" id="t-personal">اطلاعات شخصی و مالیاتی</h2>
+    <div class="grid">
+      <div id="taxClassBox">
+        <label id="t-taxClass">کلاس مالیاتی (DE)</label>
+        <select id="taxClass"><option value="1">I</option><option value="2">II</option><option value="3">III</option><option value="4">IV</option><option value="5">V</option><option value="6">VI</option></select>
+      </div>
+      <div id="stateBox">
+        <label id="t-state">ایالت / منطقه</label>
+        <select id="state">
+          <option value="NW">Nordrhein-Westfalen</option><option value="BY">Bayern</option><option value="BW">Baden-Württemberg</option>
+          <option value="BE">Berlin</option><option value="HH">Hamburg</option><option value="HE">Hessen</option>
+          <option value="NI">Niedersachsen</option><option value="SN">Sachsen</option><option value="OTHER">Other / سایر</option>
+        </select>
+      </div>
+      <div id="churchBox">
+        <label id="t-church">عضویت کلیسا؟ (DE)</label>
+        <select id="church"><option value="0">No / خیر</option><option value="1">Yes / بله</option></select>
+      </div>
+      <div>
+        <label id="t-children">تعداد فرزندان</label>
+        <input type="number" id="children" value="0" min="0" max="10">
+      </div>
+      <div>
+        <label id="t-age">سن</label>
+        <input type="number" id="age" value="30" min="16" max="70">
+      </div>
+      <div id="zusatzBox">
+        <label id="t-zusatz">Zusatzbeitrag GKV % (DE)</label>
+        <input type="number" id="zusatz" value="2.9" min="0" max="5" step="0.01">
+      </div>
+      <div id="statusBox" class="hidden">
+        <label id="t-status">وضعیت تأهل / Parts (FR/IT)</label>
+        <select id="familyStatus">
+          <option value="1">Single / 1 part</option>
+          <option value="2">Married / Couple (2 parts)</option>
+          <option value="2.5">Single parent +1 child</option>
+          <option value="3">Couple +1 child</option>
+        </select>
+      </div>
+      <div id="ukRegionBox" class="hidden">
+        <label>UK Region</label>
+        <select id="ukRegion">
+          <option value="rUK">England / Wales / NI</option>
+          <option value="Scotland">Scotland</option>
+        </select>
+      </div>
+      <div id="ukStudentBox" class="hidden">
+        <label>Student Loan</label>
+        <select id="ukStudent">
+          <option value="none">None</option>
+          <option value="plan1">Plan 1 (9%)</option>
+          <option value="plan2">Plan 2 (9%)</option>
+          <option value="plan4">Plan 4 Scotland (9%)</option>
+          <option value="plan5">Plan 5 (9%)</option>
+          <option value="pg">Postgraduate (6%)</option>
+        </select>
+      </div>
+      <div id="ukPensionBox" class="hidden">
+        <label>Pension contribution %</label>
+        <input type="number" id="ukPension" value="0" min="0" max="100" step="0.5" />
+      </div>
+      <div id="ukBlindBox" class="hidden">
+        <label>Blind Person's Allowance?</label>
+        <select id="ukBlind">
+          <option value="0">No</option>
+          <option value="1">Yes (+£3,250)</option>
+        </select>
+      </div>
+      <div id="ukMarriageBox" class="hidden">
+        <label>Marriage Allowance received?</label>
+        <select id="ukMarriage">
+          <option value="0">No</option>
+          <option value="1">Yes (+£1,260 PA)</option>
+        </select>
+      </div>
+      <div id="ukSPABox" class="hidden">
+        <label>Reached State Pension age?</label>
+        <select id="ukSPA">
+          <option value="0">No (pay NI)</option>
+          <option value="1">Yes (no employee NI)</option>
+        </select>
+      </div>
+      <div id="usFilingBox" class="hidden">
+        <label>US Filing Status</label>
+        <select id="usFiling">
+          <option value="single">Single</option>
+          <option value="mfj">Married Filing Jointly</option>
+          <option value="hoh">Head of Household</option>
+        </select>
+      </div>
+      <div id="usStateBox" class="hidden">
+        <label>State income tax % (0 for TX/FL/WA…)</label>
+        <input type="number" id="usStateRate" value="0" min="0" max="15" step="0.1" />
+      </div>
+      <div id="caProvinceBox" class="hidden">
+        <label>Province</label>
+        <select id="caProvince">
+          <option value="ON">Ontario</option>
+          <option value="AB">Alberta</option>
+          <option value="BC">British Columbia</option>
+          <option value="other">Other (use rate below)</option>
+        </select>
+      </div>
+      <div id="caProvRateBox" class="hidden">
+        <label>Other province effective rate %</label>
+        <input type="number" id="caProvRate" value="10" min="0" max="25" step="0.1" />
+      </div>
+    </div>
+    <p class="country-note" id="countryNote"></p>
+  </div>
+
+  <div class="flex">
+    <button onclick="calculate()" id="t-calc">محاسبه</button>
+    <button class="secondary" onclick="exportExcel()" id="t-excel">دانلود اکسل</button>
+    <button class="secondary" onclick="showUpdateInfo()" id="t-update">بررسی به‌روزرسانی</button>
+  </div>
+
+  <div id="results" class="card hidden">
+    <h2 style="font-size:1rem;margin-bottom:.55rem" id="t-result">نتیجه</h2>
+    <div class="result-box">
+      <div id="t-netLabel">حقوق خالص ماهانه</div>
+      <div class="net-value" id="netMonthly">—</div>
+      <div style="margin-top:.35rem;color:var(--muted)" id="netYearly"></div>
+      <div style="margin-top:.3rem;font-size:.78rem" id="taxSource"></div>
+    </div>
+    <table>
+      <thead><tr><th id="t-item">مورد</th><th id="t-monthlyCol">ماهانه (€)</th><th id="t-yearlyCol">سالانه (€)</th></tr></thead>
+      <tbody id="breakdown"></tbody>
+    </table>
+  </div>
+
+  <div class="disclaimer" id="t-disclaimer"></div>
+
+  <script type="module">
+    import { calculate as papCalculate } from "https://cdn.jsdelivr.net/npm/lohnsteuerrechner@1.0.7/+esm";
+
+    const i18n = {
+      fa: {
+        title: "محاسبه‌گر حقوق خالص اروپا ۲۰۲۶",
+        subtitle: "آلمان (دقیق PAP)، فرانسه، ایتالیا، هلند — نرخ‌های رسمی ۲۰۲۶",
+        country: "کشور", inputType: "نوع ورودی حقوق", monthly: "ماهانه", weekly: "هفتگی", hourly: "ساعتی",
+        monthlyGross: "حقوق ناخالص ماهانه (€)", weeklyGross: "حقوق ناخالص هفتگی (€)", hourlyWage: "حقوق ساعتی (€)", hoursWeek: "ساعات کار در هفته",
+        personal: "اطلاعات شخصی و مالیاتی", taxClass: "کلاس مالیاتی (DE)", state: "ایالت / منطقه", church: "عضویت کلیسا؟ (DE)",
+        children: "تعداد فرزندان", age: "سن", zusatz: "Zusatzbeitrag GKV % (DE)", status: "وضعیت تأهل / Parts",
+        calc: "محاسبه", excel: "دانلود اکسل", update: "بررسی به‌روزرسانی", result: "نتیجه", netLabel: "حقوق خالص ماهانه",
+        item: "مورد", monthlyCol: "ماهانه (€)", yearlyCol: "سالانه (€)",
+        disclaimer: "<strong>هشدار:</strong> آلمان با PAP رسمی BMF محاسبه می‌شود. فرانسه، ایتالیا و هلند با نرخ‌ها و بازه‌های رسمی ۲۰۲۶ (تقریب خوب برای مقایسه). جزئیات منطقه‌ای، اعتبار مالیاتی و موارد خاص ممکن است نتیجه واقعی را تغییر دهد. جایگزین مشاوره مالیاتی نیست."
+      },
+      en: {
+        title: "EU Net Salary Calculator 2026",
+        subtitle: "Germany (exact PAP), France, Italy, Netherlands — official 2026 rates",
+        country: "Country", inputType: "Salary input type", monthly: "Monthly", weekly: "Weekly", hourly: "Hourly",
+        monthlyGross: "Monthly gross (€)", weeklyGross: "Weekly gross (€)", hourlyWage: "Hourly wage (€)", hoursWeek: "Hours per week",
+        personal: "Personal & tax details", taxClass: "Tax class (DE)", state: "State / Region", church: "Church membership? (DE)",
+        children: "Number of children", age: "Age", zusatz: "GKV additional % (DE)", status: "Marital status / Parts",
+        calc: "Calculate", excel: "Download Excel", update: "Check updates", result: "Result", netLabel: "Monthly net salary",
+        item: "Item", monthlyCol: "Monthly (€)", yearlyCol: "Yearly (€)",
+        disclaimer: "<strong>Disclaimer:</strong> Germany uses official BMF PAP. France, Italy and Netherlands use official 2026 rates/brackets (good approximation for comparison). Regional details, tax credits and special cases can change the real result. Not a substitute for tax advice."
+      },
+      de: {
+        title: "EU-Nettogehalt-Rechner 2026",
+        subtitle: "Deutschland (exakter PAP), Frankreich, Italien, Niederlande — offizielle Sätze 2026",
+        country: "Land", inputType: "Eingabeart", monthly: "Monatlich", weekly: "Wöchentlich", hourly: "Stündlich",
+        monthlyGross: "Bruttomonatsgehalt (€)", weeklyGross: "Bruttowochengehalt (€)", hourlyWage: "Stundenlohn (€)", hoursWeek: "Wochenstunden",
+        personal: "Persönliche Angaben", taxClass: "Steuerklasse (DE)", state: "Bundesland / Region", church: "Kirche? (DE)",
+        children: "Anzahl Kinder", age: "Alter", zusatz: "Zusatzbeitrag GKV % (DE)", status: "Familienstand / Parts",
+        calc: "Berechnen", excel: "Excel herunterladen", update: "Aktualisierung prüfen", result: "Ergebnis", netLabel: "Monatliches Nettogehalt",
+        item: "Position", monthlyCol: "Monatlich (€)", yearlyCol: "Jährlich (€)",
+        disclaimer: "<strong>Hinweis:</strong> Deutschland nutzt den offiziellen BMF-PAP. Frankreich, Italien und Niederlande verwenden offizielle 2026-Sätze/Tarife (gute Näherung). Regionale Details und Freibeträge können das Ergebnis ändern. Kein Ersatz für Steuerberatung."
+      },
+      fr: {
+        title: "Calculateur de salaire net UE 2026",
+        subtitle: "Allemagne (PAP exact), France, Italie, Pays-Bas — taux officiels 2026",
+        country: "Pays", inputType: "Type de saisie", monthly: "Mensuel", weekly: "Hebdomadaire", hourly: "Horaire",
+        monthlyGross: "Brut mensuel (€)", weeklyGross: "Brut hebdomadaire (€)", hourlyWage: "Salaire horaire (€)", hoursWeek: "Heures par semaine",
+        personal: "Informations personnelles et fiscales", taxClass: "Classe d'impôt (DE)", state: "Land / Région", church: "Appartenance religieuse ? (DE)",
+        children: "Nombre d'enfants", age: "Âge", zusatz: "Zusatzbeitrag GKV % (DE)", status: "Situation familiale / Parts",
+        calc: "Calculer", excel: "Télécharger Excel", update: "Vérifier les mises à jour", result: "Résultat", netLabel: "Salaire net mensuel",
+        item: "Poste", monthlyCol: "Mensuel (€)", yearlyCol: "Annuel (€)",
+        disclaimer: "<strong>Avertissement :</strong> L'Allemagne utilise le PAP officiel BMF. La France, l'Italie et les Pays-Bas utilisent les taux et barèmes officiels 2026 (bonne approximation pour comparaison). Les détails régionaux, crédits d'impôt et cas particuliers peuvent modifier le résultat réel. Ne remplace pas un conseil fiscal."
+      },
+      it: {
+        title: "Calcolatore stipendio netto UE 2026",
+        subtitle: "Germania (PAP esatto), Francia, Italia, Paesi Bassi — aliquote ufficiali 2026",
+        country: "Paese", inputType: "Tipo di input", monthly: "Mensile", weekly: "Settimanale", hourly: "Orario",
+        monthlyGross: "Lordo mensile (€)", weeklyGross: "Lordo settimanale (€)", hourlyWage: "Retribuzione oraria (€)", hoursWeek: "Ore a settimana",
+        personal: "Dati personali e fiscali", taxClass: "Classe fiscale (DE)", state: "Land / Regione", church: "Appartenenza religiosa? (DE)",
+        children: "Numero di figli", age: "Età", zusatz: "Zusatzbeitrag GKV % (DE)", status: "Stato civile / Parti",
+        calc: "Calcola", excel: "Scarica Excel", update: "Controlla aggiornamenti", result: "Risultato", netLabel: "Stipendio netto mensile",
+        item: "Voce", monthlyCol: "Mensile (€)", yearlyCol: "Annuale (€)",
+        disclaimer: "<strong>Avvertenza:</strong> La Germania usa il PAP ufficiale BMF. Francia, Italia e Paesi Bassi usano aliquote e scaglioni ufficiali 2026 (buona approssimazione per confronto). Dettagli regionali, detrazioni e casi particolari possono modificare il risultato reale. Non sostituisce una consulenza fiscale."
+      },
+      nl: {
+        title: "EU Netto Salaris Calculator 2026",
+        subtitle: "Duitsland (exacte PAP), Frankrijk, Italië, Nederland — officiële tarieven 2026",
+        country: "Land", inputType: "Invoertype", monthly: "Maandelijks", weekly: "Wekelijks", hourly: "Uurloon",
+        monthlyGross: "Bruto maandsalaris (€)", weeklyGross: "Bruto weeksalaris (€)", hourlyWage: "Uurloon (€)", hoursWeek: "Uren per week",
+        personal: "Persoonlijke & fiscale gegevens", taxClass: "Belastingklasse (DE)", state: "Bundesland / Regio", church: "Kerkelijke bijdrage? (DE)",
+        children: "Aantal kinderen", age: "Leeftijd", zusatz: "Zusatzbeitrag GKV % (DE)", status: "Burgerlijke staat / Parts",
+        calc: "Berekenen", excel: "Excel downloaden", update: "Updates controleren", result: "Resultaat", netLabel: "Netto maandsalaris",
+        item: "Post", monthlyCol: "Maandelijks (€)", yearlyCol: "Jaarlijks (€)",
+        disclaimer: "<strong>Disclaimer:</strong> Duitsland gebruikt de officiële BMF-PAP. Frankrijk, Italië en Nederland gebruiken officiële 2026-tarieven/schijven (goede benadering voor vergelijking). Regionale details, heffingskortingen en bijzondere gevallen kunnen het werkelijke resultaat wijzigen. Geen vervanging voor fiscaal advies."
+      }
+    };
+
+    let currentLang = 'fa';
+
+    window.setLang = function(lang) {
+      currentLang = lang;
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
+      document.querySelectorAll('.lang-switch button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+      const t = i18n[lang];
+      const ids = ['title','subtitle','country','inputType','monthly','weekly','hourly','monthlyGross','weeklyGross','hourlyWage','hoursWeek','personal','taxClass','state','church','children','age','zusatz','status','calc','excel','update','result','netLabel','item','monthlyCol','yearlyCol'];
+      ids.forEach(k => { const el = document.getElementById('t-' + k); if (el) el.textContent = t[k]; });
+      document.getElementById('t-disclaimer').innerHTML = t.disclaimer;
+      onCountryChange();
+    };
+
+    function onCountryChange() {
+      const c = document.getElementById('country').value;
+      document.getElementById('taxClassBox').classList.toggle('hidden', c !== 'DE');
+      document.getElementById('stateBox').classList.toggle('hidden', c !== 'DE' && c !== 'IT');
+      document.getElementById('churchBox').classList.toggle('hidden', c !== 'DE');
+      document.getElementById('zusatzBox').classList.toggle('hidden', c !== 'DE');
+      document.getElementById('statusBox').classList.toggle('hidden', c !== 'FR' && c !== 'IT');
+      document.getElementById('ukRegionBox').classList.toggle('hidden', c !== 'UK');
+      document.getElementById('ukStudentBox').classList.toggle('hidden', c !== 'UK');
+      document.getElementById('ukPensionBox').classList.toggle('hidden', c !== 'UK');
+      document.getElementById('ukBlindBox').classList.toggle('hidden', c !== 'UK');
+      document.getElementById('ukMarriageBox').classList.toggle('hidden', c !== 'UK');
+      document.getElementById('ukSPABox').classList.toggle('hidden', c !== 'UK');
+      document.getElementById('usFilingBox').classList.toggle('hidden', c !== 'US');
+      document.getElementById('usStateBox').classList.toggle('hidden', c !== 'US');
+      document.getElementById('caProvinceBox').classList.toggle('hidden', c !== 'CA');
+      document.getElementById('caProvRateBox').classList.toggle('hidden', c !== 'CA');
+      const notes = {
+        DE: currentLang==='fa' ? 'آلمان: محاسبه دقیق با PAP رسمی BMF + بیمه‌های اجتماعی ۲۰۲۶' : currentLang==='de' ? 'DE: Exakte PAP-Berechnung + SV 2026' : 'DE: Exact official PAP + 2026 social rates',
+        FR: currentLang==='fa' ? 'فرانسه: cotisations ~20.8% + IR با quotient familial (تقریب)' : currentLang==='de' ? 'FR: Cotisations ~20,8 % + IR (Näherung)' : 'FR: ~20.8% social + IR with family quotient (approx.)',
+        IT: currentLang==='fa' ? 'ایتالیا: INPS ~9.19% + IRPEF 23/33/43% + addizionali (تقریب)' : currentLang==='de' ? 'IT: INPS ~9,19 % + IRPEF 23/33/43 % (Näherung)' : 'IT: INPS ~9.19% + IRPEF 23/33/43% + regional (approx.)',
+        NL: currentLang==='fa' ? 'هلند: Box 1 نرخ‌های ترکیبی + heffingskortingen تقریبی' : currentLang==='de' ? 'NL: Box-1-Tarife + Heffingskortingen (Näherung)' : 'NL: Box 1 combined rates + tax credits (approx.)'
+      };
+      document.getElementById('countryNote').textContent = notes[c] || '';
+    }
+    window.onCountryChange = onCountryChange;
+
+    function toggleInput() {
+      const type = document.querySelector('input[name="inputType"]:checked').value;
+      document.getElementById('monthlyBox').classList.toggle('hidden', type !== 'monthly');
+      document.getElementById('weeklyBox').classList.toggle('hidden', type !== 'weekly');
+      document.getElementById('hourlyBox').classList.toggle('hidden', type !== 'hourly');
+    }
+    window.toggleInput = toggleInput;
+
+    function getMonthlyGross() {
+      const type = document.querySelector('input[name="inputType"]:checked').value;
+      if (type === 'monthly') return parseFloat(document.getElementById('monthlyGross').value) || 0;
+      if (type === 'weekly') return (parseFloat(document.getElementById('weeklyGross').value) || 0) * 52 / 12;
+      const h = parseFloat(document.getElementById('hourlyWage').value) || 0;
+      const hours = parseFloat(document.getElementById('hoursPerWeek').value) || 40;
+      return h * hours * 52 / 12;
+    }
+
+    // ---------- Country calculators ----------
+    function calcGermany(monthlyGross) {
+      const taxClass = parseInt(document.getElementById('taxClass').value);
+      const state = document.getElementById('state').value;
+      const hasChurch = document.getElementById('church').value === '1';
+      const children = parseInt(document.getElementById('children').value) || 0;
+      const age = parseInt(document.getElementById('age').value) || 30;
+      const zusatz = parseFloat(document.getElementById('zusatz').value) || 2.9;
+      const isSachsen = state === 'SN';
+
+      const pensionCeil = 8450, healthCeil = 5812.50;
+      const pension = Math.min(monthlyGross, pensionCeil) * 0.093;
+      const unemployment = Math.min(monthlyGross, pensionCeil) * 0.013;
+      const health = Math.min(monthlyGross, healthCeil) * (0.073 + zusatz / 200);
+      let careRate = 0.018;
+      if (children === 0 && age >= 23) careRate += 0.006;
+      else if (children >= 2) careRate = Math.max(0.008, 0.018 - Math.min(children - 1, 4) * 0.0025);
+      if (isSachsen) careRate += 0.005;
+      const care = Math.min(monthlyGross, healthCeil) * careRate;
+      const social = pension + unemployment + health + care;
+
+      const re4 = Math.round(monthlyGross * 100);
+      let lst = 0, soli = 0, churchBase = 0;
+      try {
+        const res = papCalculate(2026, { LZZ: 2, RE4: re4, STKL: taxClass, KVZ: zusatz, PVZ: (children === 0 && age >= 23) ? 1 : 0 });
+        lst = (res.LSTLZZ || 0) / 100;
+        soli = (res.SOLZLZZ || 0) / 100;
+        churchBase = (res.BK || res.LSTLZZ || 0) / 100;
+      } catch (e) { console.error(e); }
+      const churchRate = (state === 'BW' || state === 'BY') ? 0.08 : 0.09;
+      const church = hasChurch ? churchBase * churchRate : 0;
+      const net = monthlyGross - social - lst - soli - church;
+      return {
+        social, tax: lst, soli, church, net,
+        rows: [
+          ['Gross / Brutto', monthlyGross],
+          ['Pension (RV)', pension],
+          ['Unemployment (ALV)', unemployment],
+          ['Health (KV)', health],
+          ['Care (PV)', care],
+          ['Total social', social],
+          ['Lohnsteuer', lst],
+          ['Soli', soli],
+          ['Church tax', church],
+          ['Net', net]
+        ],
+        source: 'BMF PAP 2026 (exact) + official SV rates'
+      };
+    }
+
+    function calcFrance(monthlyGross) {
+      // Official 2026 rates - private sector employee (non-cadre)
+      // Sources: service-public.fr F2302, CLEISS, URSSAF, BOFiP barème IR 2026
+      const PMSS = 4005;          // Plafond mensuel SS 2026
+      const PASS_ANNUAL = 48060;
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+
+      // --- 1. Cotisations salariales (detailed) ---
+      const t1 = Math.min(monthlyGross, PMSS);
+      const t2 = Math.max(0, Math.min(monthlyGross, PMSS * 8) - PMSS);
+
+      const vieillessePlaf = t1 * 0.0690;
+      const vieillesseDeplaf = monthlyGross * 0.0040;
+      const agircT1 = t1 * 0.0315;
+      const cegT1 = t1 * 0.0086;
+      const agircT2 = t2 * 0.0864;
+      const cegT2 = t2 * 0.0108;
+      const cet = (monthlyGross > PMSS) ? (t1 + t2) * 0.0014 : 0;
+
+      // CSG/CRDS on 98.25% of gross (abatement 1.75%, capped at 4 PASS)
+      const csgBase = Math.min(monthlyGross * 0.9825, 4 * PMSS * 0.9825);
+      const csgDeductible = csgBase * 0.0680;
+      const csgNonDed = csgBase * 0.0240;
+      const crds = csgBase * 0.0050;
+
+      const social = vieillessePlaf + vieillesseDeplaf + agircT1 + cegT1 + agircT2 + cegT2 + cet + csgDeductible + csgNonDed + crds;
+      const netAvantImpot = monthlyGross - social;
+
+      // Net imposable ≈ net avant impôt + CSG non déductible + CRDS (simplified)
+      // + abattement 10% for professional expenses (capped)
+      const annualGross = monthlyGross * 12;
+      const annualSocialDeductible = (vieillessePlaf + vieillesseDeplaf + agircT1 + cegT1 + agircT2 + cegT2 + cet + csgDeductible) * 12;
+      let revenuBrutFiscal = annualGross - annualSocialDeductible;
+      // Abattement 10% (min ~509, max ~14555 for 2025/2026)
+      const abattement10 = Math.min(Math.max(revenuBrutFiscal * 0.10, 509), 14555);
+      let revenuImposable = Math.max(0, revenuBrutFiscal - abattement10);
+
+      // --- 2. IR with quotient familial ---
+      const parts = parseFloat(document.getElementById('familyStatus')?.value) || 1;
+      const quotient = revenuImposable / parts;
+
+      // Official barème 2026 (revenus 2025)
+      let taxPerPart = 0;
+      if (quotient > 11600) taxPerPart += (Math.min(quotient, 29579) - 11600) * 0.11;
+      if (quotient > 29579) taxPerPart += (Math.min(quotient, 84577) - 29579) * 0.30;
+      if (quotient > 84577) taxPerPart += (Math.min(quotient, 181917) - 84577) * 0.41;
+      if (quotient > 181917) taxPerPart += (quotient - 181917) * 0.45;
+
+      let impotBrut = taxPerPart * parts;
+
+      // Décote 2026
+      // Single: 897 - 45.25% * tax  (if tax < ~1982)
+      // Couple: 1483 - 45.25% * tax (if tax < ~3277)
+      let decote = 0;
+      if (parts <= 1.5) {
+        if (impotBrut < 1982) decote = Math.max(0, 897 - 0.4525 * impotBrut);
+      } else {
+        if (impotBrut < 3277) decote = Math.max(0, 1483 - 0.4525 * impotBrut);
+      }
+      impotBrut = Math.max(0, impotBrut - decote);
+
+      // Note: plafonnement QF is complex; for standard cases under ceiling we skip full simulation
+      const monthlyTax = impotBrut / 12;
+      const net = netAvantImpot - monthlyTax;
+
+      return {
+        social: r2(social),
+        tax: r2(monthlyTax),
+        soli: 0,
+        church: 0,
+        net: r2(net),
+        rows: [
+          ['Gross / Brut', r2(monthlyGross)],
+          ['Vieillesse plafonnée (6.90%)', r2(vieillessePlaf)],
+          ['Vieillesse déplafonnée (0.40%)', r2(vieillesseDeplaf)],
+          ['Agirc-Arrco + CEG', r2(agircT1 + cegT1 + agircT2 + cegT2 + cet)],
+          ['CSG + CRDS', r2(csgDeductible + csgNonDed + crds)],
+          ['Total cotisations salariales', r2(social)],
+          ['Net avant impôt', r2(netAvantImpot)],
+          ['IR (barème 2026 + décote)', r2(monthlyTax)],
+          ['Net / Net à payer (approx.)', r2(net)]
+        ],
+        source: 'Official 2026: PMSS 4005, cotisations service-public/CLEISS + barème IR BOFiP + décote'
+      };
+    }
+
+    function calcItaly(monthlyGross) {
+      // Official 2026 Italy - private sector employee
+      // Sources: INPS Circolare 6/2026, Legge di bilancio 2026 (IRPEF 23/33/43), art.13 TUIR detrazioni
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      const annualGross = monthlyGross * 12;
+
+      // --- INPS employee ---
+      // Base 9.19% up to massimale 122 295
+      // +1% additional on portion above prima fascia 56 224
+      const massimale = 122295;
+      const primaFascia = 56224;
+      let inpsAnnual = 0;
+      const base = Math.min(annualGross, massimale);
+      inpsAnnual = base * 0.0919;
+      if (annualGross > primaFascia) {
+        const extra = Math.min(annualGross, massimale) - primaFascia;
+        inpsAnnual += extra * 0.01;
+      }
+      const inpsMonthly = inpsAnnual / 12;
+
+      // Reddito imponibile IRPEF
+      const taxable = annualGross - inpsAnnual;
+
+      // --- IRPEF 2026 ---
+      let irpef = 0;
+      if (taxable > 0) irpef += Math.min(taxable, 28000) * 0.23;
+      if (taxable > 28000) irpef += (Math.min(taxable, 50000) - 28000) * 0.33;
+      if (taxable > 50000) irpef += (taxable - 50000) * 0.43;
+
+      // --- Detrazione lavoro dipendente (art.13 TUIR 2026) ---
+      let detrazione = 0;
+      if (taxable <= 15000) {
+        detrazione = 1955;
+      } else if (taxable <= 28000) {
+        detrazione = 1910 + 1190 * ((28000 - taxable) / 13000);
+      } else if (taxable <= 50000) {
+        detrazione = 1910 * ((50000 - taxable) / 22000);
+      } else {
+        detrazione = 0;
+      }
+      // Bonus 65€ for 25k-35k range (simplified)
+      if (taxable >= 25000 && taxable <= 35000) detrazione += 65;
+      detrazione = Math.max(0, detrazione);
+      // Minimum 690 in some cases, but for simplicity we use formula result
+
+      const irpefNetta = Math.max(0, irpef - detrazione);
+
+      // --- Addizionali (average regional ~1.7% + municipal ~0.6%) ---
+      const addizionali = taxable * 0.023;
+
+      const annualTax = irpefNetta + addizionali;
+      const monthlyTax = annualTax / 12;
+      const net = monthlyGross - inpsMonthly - monthlyTax;
+
+      return {
+        social: r2(inpsMonthly),
+        tax: r2(monthlyTax),
+        soli: 0,
+        church: 0,
+        net: r2(net),
+        rows: [
+          ['Gross / Lordo', r2(monthlyGross)],
+          ['INPS dipendente (9.19% + eventuale 1%)', r2(inpsMonthly)],
+          ['IRPEF lorda', r2(irpef / 12)],
+          ['Detrazione lavoro dipendente', r2(detrazione / 12)],
+          ['IRPEF netta', r2(irpefNetta / 12)],
+          ['Addizionali reg./com. (media ~2.3%)', r2(addizionali / 12)],
+          ['Net / Netto', r2(net)]
+        ],
+        source: 'INPS Circ. 6/2026 (9.19% + massimale 122295) + IRPEF 23/33/43 + detrazione art.13 TUIR + avg addizionali'
+      };
+    }
+
+    function calcNetherlands(monthlyGross) {
+      // Exact official Belastingdienst 2026 formulas (under AOW age)
+      // Source: https://www.belastingdienst.nl (tarieven 2026)
+      const annual = monthlyGross * 12;
+
+      // --- Box 1 combined rates 2026 ---
+      // 0 – 38 883 : 35.75% (income tax 8.10% + volksverzekeringen 27.65%)
+      // 38 883 – 78 426 : 37.56%
+      // > 78 426 : 49.50%
+      let taxBeforeCredits = 0;
+      if (annual > 0) taxBeforeCredits += Math.min(annual, 38883) * 0.3575;
+      if (annual > 38883) taxBeforeCredits += (Math.min(annual, 78426) - 38883) * 0.3756;
+      if (annual > 78426) taxBeforeCredits += (annual - 78426) * 0.4950;
+
+      // --- Algemene heffingskorting 2026 ---
+      // Max €3 115 up to €29 736; phase-out 6.398% to €0 at €78 426
+      let algemene = 0;
+      if (annual <= 29736) {
+        algemene = 3115;
+      } else if (annual < 78426) {
+        algemene = 3115 - 0.06398 * (annual - 29736);
+      } else {
+        algemene = 0;
+      }
+      algemene = Math.max(0, algemene);
+
+      // --- Arbeidskorting 2026 (exact steps) ---
+      // 0 – 11 965 : 8.324%
+      // 11 965 – 25 845 : €996 + 31.009% of excess
+      // 25 845 – 45 592 : €5 300 + 1.950% of excess
+      // 45 592 – 132 920 : €5 685 – 6.510% of excess
+      // > 132 920 : €0
+      let arbeid = 0;
+      if (annual <= 11965) {
+        arbeid = 0.08324 * annual;
+      } else if (annual <= 25845) {
+        arbeid = 996 + 0.31009 * (annual - 11965);
+      } else if (annual <= 45592) {
+        arbeid = 5300 + 0.01950 * (annual - 25845);
+      } else if (annual <= 132920) {
+        arbeid = 5685 - 0.06510 * (annual - 45592);
+      } else {
+        arbeid = 0;
+      }
+      arbeid = Math.max(0, Math.min(arbeid, 5685));
+
+      const totalCredit = algemene + arbeid;
+      const annualTax = Math.max(0, taxBeforeCredits - totalCredit);
+      const monthlyTax = annualTax / 12;
+      const net = monthlyGross - monthlyTax;
+
+      // Round to cents
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+
+      return {
+        social: 0,
+        tax: r2(monthlyTax),
+        soli: 0,
+        church: 0,
+        net: r2(net),
+        rows: [
+          ['Gross / Bruto', r2(monthlyGross)],
+          ['Box 1 tax before credits', r2(taxBeforeCredits / 12)],
+          ['Algemene heffingskorting', r2(algemene / 12)],
+          ['Arbeidskorting', r2(arbeid / 12)],
+          ['Total tax credits', r2(totalCredit / 12)],
+          ['Income tax (after credits)', r2(monthlyTax)],
+          ['Net / Netto', r2(net)]
+        ],
+        source: 'Belastingdienst 2026 official Box 1 rates + exact heffingskortingen formulas'
+      };
+    }
+
+    function calcUK(monthlyGross) {
+      // HMRC 2026/27 official – improved accuracy
+      // Sources: GOV.UK rates, gov.scot Scottish bands, Blind PA £3250, Marriage Allowance £1260
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      let annual = monthlyGross * 12;
+
+      // Pension (net pay arrangement approximation – reduces taxable & NI-able pay)
+      const pensionPct = parseFloat(document.getElementById('ukPension')?.value) || 0;
+      const pensionAnnual = annual * (pensionPct / 100);
+      const payForTax = annual - pensionAnnual;
+      const payForNI = annual - pensionAnnual;
+
+      // Personal Allowance base £12,570 + optional allowances
+      let pa = 12570;
+      const blind = document.getElementById('ukBlind')?.value === '1';
+      if (blind) pa += 3250; // Blind Person's Allowance 2026/27
+      const marriage = document.getElementById('ukMarriage')?.value === '1';
+      if (marriage) pa += 1260; // Marriage Allowance received
+
+      // PA taper: £1 reduction for every £2 over £100,000 (on adjusted net income ≈ payForTax)
+      if (payForTax > 100000) {
+        pa = Math.max(0, pa - (payForTax - 100000) / 2);
+      }
+
+      const region = document.getElementById('ukRegion')?.value || 'rUK';
+      const taxable = Math.max(0, payForTax - pa);
+      let tax = 0;
+
+      if (region === 'Scotland') {
+        // Official Scottish bands 2026/27 (on total income after PA)
+        // Taxable slices relative to PA:
+        // Starter 19%: income 12571–16537 → taxable 0–3967
+        // Basic 20%: 16538–29526 → taxable 3968–16956
+        // Intermediate 21%: 29527–43662 → taxable 16957–31092
+        // Higher 42%: 43663–75000 → taxable 31093–62430
+        // Advanced 45%: 75001–125140 → taxable 62431–112570
+        // Top 48%: over 125140
+        const bands = [
+          [3967, 0.19],
+          [16956, 0.20],
+          [31092, 0.21],
+          [62430, 0.42],
+          [112570, 0.45],
+          [Infinity, 0.48]
+        ];
+        let remaining = taxable, prev = 0;
+        for (const [limit, rate] of bands) {
+          const slice = Math.min(remaining, limit - prev);
+          if (slice > 0) tax += slice * rate;
+          remaining -= slice;
+          prev = limit;
+          if (remaining <= 0) break;
+        }
+      } else {
+        // England / Wales / Northern Ireland
+        // Basic 20% on first £37,700 of taxable (when full PA)
+        // Higher 40% from taxable corresponding to income £50,271–£125,140
+        // Additional 45% above
+        const basicLimit = 37700; // when PA = 12570
+        // Adjust if PA changed (blind/marriage/taper)
+        // Higher rate starts at income 50270 → taxable = 50270 - pa
+        const higherStart = Math.max(0, 50270 - pa);
+        const additionalStart = Math.max(0, 125140 - pa);
+        if (taxable > 0) tax += Math.min(taxable, higherStart) * 0.20;
+        if (taxable > higherStart) tax += (Math.min(taxable, additionalStart) - higherStart) * 0.40;
+        if (taxable > additionalStart) tax += (taxable - additionalStart) * 0.45;
+      }
+
+      // Employee NI Class 1 – stops at State Pension age
+      const spa = document.getElementById('ukSPA')?.value === '1';
+      let ni = 0;
+      if (!spa) {
+        if (payForNI > 12570) ni += (Math.min(payForNI, 50270) - 12570) * 0.08;
+        if (payForNI > 50270) ni += (payForNI - 50270) * 0.02;
+      }
+
+      // Student Loan
+      const studentPlan = document.getElementById('ukStudent')?.value || 'none';
+      const thresholds = {
+        plan1: { t: 26900, r: 0.09 },
+        plan2: { t: 29385, r: 0.09 },
+        plan4: { t: 33795, r: 0.09 },
+        plan5: { t: 25000, r: 0.09 },
+        pg: { t: 21000, r: 0.06 }
+      };
+      let studentLoan = 0;
+      if (studentPlan !== 'none' && thresholds[studentPlan]) {
+        const { t, r } = thresholds[studentPlan];
+        if (annual > t) studentLoan = (annual - t) * r;
+      }
+
+      const monthlyTax = tax / 12;
+      const monthlyNI = ni / 12;
+      const monthlySL = studentLoan / 12;
+      const monthlyPension = pensionAnnual / 12;
+      const net = monthlyGross - monthlyTax - monthlyNI - monthlySL - monthlyPension;
+
+      const rows = [
+        ['Gross / Gross pay', r2(monthlyGross)],
+        ['Pension contribution', r2(monthlyPension)],
+        ['Personal Allowance used (annual)', r2(pa)],
+        ['Income Tax (PAYE)', r2(monthlyTax)],
+        ['National Insurance (employee)', r2(monthlyNI)]
+      ];
+      if (studentLoan > 0) rows.push(['Student Loan', r2(monthlySL)]);
+      rows.push(['Net / Take-home', r2(net)]);
+
+      return {
+        social: r2(monthlyNI + monthlySL),
+        tax: r2(monthlyTax),
+        soli: 0,
+        church: 0,
+        net: r2(net),
+        rows,
+        source: region === 'Scotland'
+          ? 'gov.scot 2026/27 Scottish bands + HMRC NI/Student Loan + Blind/Marriage Allowance'
+          : 'HMRC 2026/27 England/Wales/NI + Blind PA £3250 + Marriage Allowance £1260 + SPA NI exemption'
+      };
+    }
+
+    function calcUS(monthlyGross) {
+      // Official IRS 2026 + SSA FICA 2026
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      const annual = monthlyGross * 12;
+      const filing = document.getElementById('usFiling')?.value || 'single';
+      const stateRate = (parseFloat(document.getElementById('usStateRate')?.value) || 0) / 100;
+
+      // Standard deduction 2026
+      let stdDed = 16100; // single / MFS
+      if (filing === 'mfj') stdDed = 32200;
+      else if (filing === 'hoh') stdDed = 24150;
+
+      const taxable = Math.max(0, annual - stdDed);
+
+      // Federal brackets 2026
+      let brackets;
+      if (filing === 'mfj') {
+        brackets = [
+          [24800, 0.10], [100800, 0.12], [211400, 0.22],
+          [403550, 0.24], [512450, 0.32], [768700, 0.35], [Infinity, 0.37]
+        ];
+      } else if (filing === 'hoh') {
+        brackets = [
+          [17700, 0.10], [67450, 0.12], [105700, 0.22],
+          [201750, 0.24], [256200, 0.32], [640600, 0.35], [Infinity, 0.37]
+        ];
+      } else {
+        // Single
+        brackets = [
+          [12400, 0.10], [50400, 0.12], [105700, 0.22],
+          [201775, 0.24], [256225, 0.32], [640600, 0.35], [Infinity, 0.37]
+        ];
+      }
+
+      let federal = 0;
+      let prev = 0;
+      let remaining = taxable;
+      for (const [limit, rate] of brackets) {
+        const slice = Math.min(remaining, limit - prev);
+        if (slice > 0) federal += slice * rate;
+        remaining -= slice;
+        prev = limit;
+        if (remaining <= 0) break;
+      }
+
+      // FICA 2026
+      const ssWageBase = 184500;
+      const ss = Math.min(annual, ssWageBase) * 0.062;
+      const medicare = annual * 0.0145;
+      // Additional Medicare 0.9% over threshold
+      let addMedicare = 0;
+      const addThresh = filing === 'mfj' ? 250000 : 200000;
+      if (annual > addThresh) addMedicare = (annual - addThresh) * 0.009;
+
+      const fica = ss + medicare + addMedicare;
+      const stateTax = annual * stateRate; // simplified flat effective rate
+
+      const monthlyFederal = federal / 12;
+      const monthlyFica = fica / 12;
+      const monthlyState = stateTax / 12;
+      const net = monthlyGross - monthlyFederal - monthlyFica - monthlyState;
+
+      return {
+        social: r2(monthlyFica),
+        tax: r2(monthlyFederal + monthlyState),
+        soli: 0,
+        church: 0,
+        net: r2(net),
+        rows: [
+          ['Gross pay', r2(monthlyGross)],
+          ['Standard deduction (annual)', r2(stdDed)],
+          ['Federal income tax', r2(monthlyFederal)],
+          ['Social Security (6.2%)', r2(ss / 12)],
+          ['Medicare (1.45% + addl)', r2((medicare + addMedicare) / 12)],
+          ['State income tax', r2(monthlyState)],
+          ['Net / Take-home', r2(net)]
+        ],
+        source: 'IRS Rev. Proc. 2025-32 (2026 brackets) + SSA wage base $184,500 + FICA rates'
+      };
+    }
+
+
+    function calcCanada(monthlyGross) {
+      // Official CRA 2026 federal + CPP/EI + simplified provincial
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      const annual = monthlyGross * 12;
+
+      // Federal brackets 2026
+      const fedBrackets = [
+        [58523, 0.14], [117045, 0.205], [181440, 0.26],
+        [258482, 0.29], [Infinity, 0.33]
+      ];
+      let federal = 0, prev = 0, rem = annual;
+      for (const [lim, rate] of fedBrackets) {
+        const slice = Math.min(rem, lim - prev);
+        if (slice > 0) federal += slice * rate;
+        rem -= slice; prev = lim;
+        if (rem <= 0) break;
+      }
+      // Basic Personal Amount credit ~ $16,452 × 14%
+      const bpaCredit = 16452 * 0.14;
+      federal = Math.max(0, federal - bpaCredit);
+
+      // CPP 2026
+      const ympe = 74600, exemption = 3500, cppRate = 0.0595;
+      const cppBase = Math.max(0, Math.min(annual, ympe) - exemption) * cppRate;
+      const yampe = 85000;
+      const cpp2 = annual > ympe ? (Math.min(annual, yampe) - ympe) * 0.04 : 0;
+      const cppTotal = Math.min(cppBase, 4230.45) + Math.min(cpp2, 416);
+
+      // EI 2026
+      const eiMax = 68900;
+      const ei = Math.min(annual, eiMax) * 0.0163;
+
+      // Provincial (simplified)
+      const prov = document.getElementById('caProvince')?.value || 'ON';
+      let provincial = 0;
+      if (prov === 'ON') {
+        // Ontario 2026 simplified
+        const onB = [[53891,0.0505],[107785,0.0915],[150000,0.1116],[220000,0.1216],[Infinity,0.1316]];
+        let p=0, pr=0, rr=annual;
+        for (const [l,r] of onB) {
+          const s = Math.min(rr, l-pr);
+          if (s>0) p += s*r;
+          rr -= s; pr = l;
+          if (rr<=0) break;
+        }
+        // rough surtax approx for higher incomes
+        if (p > 7446) p += (p - 7446) * 0.56 + (7446 - 5818) * 0.20;
+        else if (p > 5818) p += (p - 5818) * 0.20;
+        provincial = p;
+      } else if (prov === 'AB') {
+        const abB = [[61200,0.08],[154259,0.10],[185111,0.12],[246813,0.13],[370220,0.14],[Infinity,0.15]];
+        let p=0, pr=0, rr=annual;
+        for (const [l,r] of abB) {
+          const s = Math.min(rr, l-pr);
+          if (s>0) p += s*r;
+          rr -= s; pr = l;
+          if (rr<=0) break;
+        }
+        provincial = p;
+      } else if (prov === 'BC') {
+        const bcB = [[50363,0.056],[100728,0.077],[115648,0.105],[140430,0.1229],[190405,0.147],[265545,0.168],[Infinity,0.205]];
+        let p=0, pr=0, rr=annual;
+        for (const [l,r] of bcB) {
+          const s = Math.min(rr, l-pr);
+          if (s>0) p += s*r;
+          rr -= s; pr = l;
+          if (rr<=0) break;
+        }
+        provincial = p;
+      } else {
+        const rate = (parseFloat(document.getElementById('caProvRate')?.value) || 10) / 100;
+        provincial = annual * rate;
+      }
+
+      const monthlyFed = federal / 12;
+      const monthlyCPP = cppTotal / 12;
+      const monthlyEI = ei / 12;
+      const monthlyProv = provincial / 12;
+      const net = monthlyGross - monthlyFed - monthlyCPP - monthlyEI - monthlyProv;
+
+      return {
+        social: r2(monthlyCPP + monthlyEI),
+        tax: r2(monthlyFed + monthlyProv),
+        soli: 0, church: 0,
+        net: r2(net),
+        rows: [
+          ['Gross', r2(monthlyGross)],
+          ['Federal income tax (after BPA)', r2(monthlyFed)],
+          ['Provincial tax', r2(monthlyProv)],
+          ['CPP (incl. CPP2)', r2(monthlyCPP)],
+          ['EI', r2(monthlyEI)],
+          ['Net / Take-home', r2(net)]
+        ],
+        source: 'CRA 2026 federal brackets + BPA, CPP/EI official rates, simplified ON/AB/BC provincial'
+      };
+    }
+
+    window.calculate = function() {
+      const monthlyGross = getMonthlyGross();
+      if (monthlyGross <= 0) {
+        alert(currentLang === 'fa' ? 'لطفاً مقدار حقوق را وارد کنید' : currentLang === 'de' ? 'Bitte Gehalt eingeben' : 'Please enter salary');
+        return;
+      }
+      const country = document.getElementById('country').value;
+      let result;
+      if (country === 'DE') result = calcGermany(monthlyGross);
+      else if (country === 'FR') result = calcFrance(monthlyGross);
+      else if (country === 'IT') result = calcItaly(monthlyGross);
+      else if (country === 'NL') result = calcNetherlands(monthlyGross);
+      else if (country === 'UK') result = calcUK(monthlyGross);
+      else if (country === 'US') result = calcUS(monthlyGross);
+      else if (country === 'CA') result = calcCanada(monthlyGross);
+      else result = calcNetherlands(monthlyGross);
+
+      document.getElementById('results').classList.remove('hidden');
+      const loc = currentLang === 'fa' ? 'fa-IR' : currentLang === 'de' ? 'de-DE' : 'en-US';
+      document.getElementById('netMonthly').textContent = result.net.toLocaleString(loc, {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €';
+      document.getElementById('netYearly').textContent = (currentLang==='fa'?'سالانه: ':currentLang==='de'?'Jährlich: ':'Yearly: ') + (result.net*12).toLocaleString(currentLang==='de'?'de-DE':'en-US', {maximumFractionDigits:0}) + ' €';
+      document.getElementById('taxSource').textContent = result.source;
+
+      const tbody = document.getElementById('breakdown');
+      tbody.innerHTML = result.rows.map(([name, val]) =>
+        `<tr><td>${name}</td><td>${val.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td>${(val*12).toLocaleString('de-DE',{maximumFractionDigits:0})}</td></tr>`
+      ).join('');
+
+      window.lastResult = { country, monthlyGross, ...result, annualNet: result.net * 12 };
+    };
+
+    window.exportExcel = function() {
+      if (!window.lastResult) { alert(currentLang==='fa'?'ابتدا محاسبه کنید':currentLang==='de'?'Bitte zuerst berechnen':'Please calculate first'); return; }
+      const r = window.lastResult;
+      const data = [['EU Net Salary 2026'], ['Country', r.country], ['Monthly Gross', r.monthlyGross], ['Monthly Net', r.net], ['Yearly Net', r.annualNet], [], ['Source', r.source]];
+      r.rows.forEach(([n,v]) => data.push([n, v]));
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Netto');
+      XLSX.writeFile(wb, 'eu-net-salary-2026.xlsx');
+    };
+
+    window.showUpdateInfo = function() {
+      alert(currentLang==='fa' ?
+        'داده‌ها ۲۰۲۶:\n• DE: BMF PAP + SV\n• FR: cotisations + IR barème\n• IT: INPS + IRPEF 23/33/43%\n• NL: Belastingdienst Box 1\n\nمنابع رسمی را همیشه بررسی کنید.' :
+        currentLang==='de' ?
+        'Daten 2026:\n• DE: BMF PAP + SV\n• FR: Cotisations + IR\n• IT: INPS + IRPEF\n• NL: Belastingdienst Box 1\n\nOffizielle Quellen prüfen.' :
+        'Data 2026:\n• DE: BMF PAP + SV\n• FR: cotisations + IR\n• IT: INPS + IRPEF\n• NL: Belastingdienst Box 1\n\nAlways verify official sources.');
+    };
+
+    toggleInput();
+    setLang('fa');
+    onCountryChange();
+  </script>
+</body>
+</html>
