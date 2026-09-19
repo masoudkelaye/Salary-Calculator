@@ -1,8 +1,13 @@
 /* Net Salary Calculator — Service Worker */
-const CACHE = 'net-salary-v1';
+const CACHE = 'net-salary-v2';
 const ASSETS = [
   './',
   './index.html',
+  './styles.css',
+  './app.js',
+  './calc-core.js',
+  './calc-west.js',
+  './calc-b.js',
   './manifest.webmanifest',
   './icon-192.svg',
   './icon-512.svg'
@@ -25,7 +30,6 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
-
   event.respondWith(
     caches.match(req).then((cached) => {
       const fetched = fetch(req)
