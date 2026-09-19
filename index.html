@@ -1,1 +1,73 @@
-<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" /><meta name="description" content="Multi-country net salary calculator 2026" /><meta name="theme-color" content="#0c1222" /><meta name="mobile-web-app-capable" content="yes" /><meta name="apple-mobile-web-app-capable" content="yes" /><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" /><meta name="apple-mobile-web-app-title" content="Net Salary" /><link rel="manifest" href="manifest.webmanifest" /><link rel="apple-touch-icon" href="icon-192.svg" /><link rel="icon" type="image/svg+xml" href="icon-192.svg" /><title>Net Salary Calculator 2026</title><script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css"></head><body><div class="app"><div class="topbar"><div class="lang-switch"><span class="lang-label" id="t-langLabel">Language</span><select id="langSelect" onchange="setLang(this.value)" aria-label="Language"><option value="fa">فارسی</option><option value="en">English</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="it">Italiano</option><option value="nl">Nederlands</option><option value="es">Español</option></select></div></div><header class="hero"><h1 id="t-title">محاسبه‌گر حقوق خالص ۲۰۲۶</h1><p class="subtitle" id="t-subtitle">آلمان، فرانسه، ایتالیا، هلند و ۲۰+ کشور — بر اساس نرخ‌های رسمی ۲۰۲۶</p></header><p class="country-note">Loading full form from app.js… If calculations fail, open the complete single-file build locally.</p><div id="app-root"></div><div class="actions flex"><button onclick="typeof calculate==='function'&&calculate()" id="t-calc">محاسبه</button><button class="secondary" onclick="typeof exportExcel==='function'&&exportExcel()" id="t-excel">دانلود اکسل</button></div><div id="results" class="card hidden"><h2 class="section-title" id="t-result">نتیجه</h2><div class="result-box"><div id="t-netLabel">حقوق خالص ماهانه</div><div class="net-value" id="netMonthly">—</div><div id="netYearly"></div><div id="taxSource"></div></div><table><thead><tr><th id="t-item">مورد</th><th id="t-monthlyCol">ماهانه</th><th id="t-yearlyCol">سالانه</th></tr></thead><tbody id="breakdown"></tbody></table></div><div class="disclaimer" id="t-disclaimer"></div></div><script type="module" src="app.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Multi-country net salary calculator 2026" />
+  <meta name="theme-color" content="#0c1222" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Net Salary" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icon-192.svg" />
+  <link rel="icon" type="image/svg+xml" href="icon-192.svg" />
+  <title>Net Salary Calculator 2026</title>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="lang-switch">
+        <span class="lang-label" id="t-langLabel">Language</span>
+        <select id="langSelect" onchange="setLang(this.value)" aria-label="Language">
+          <option value="fa">فارسی</option>
+          <option value="en">English</option>
+          <option value="de">Deutsch</option>
+          <option value="fr">Français</option>
+          <option value="it">Italiano</option>
+          <option value="nl">Nederlands</option>
+          <option value="es">Español</option>
+        </select>
+      </div>
+    </div>
+    <header class="hero">
+      <h1 id="t-title">محاسبه‌گر حقوق خالص ۲۰۲۶</h1>
+      <p class="subtitle" id="t-subtitle">آلمان، فرانسه، ایتالیا، هلند و ۲۰+ کشور — بر اساس نرخ‌های رسمی ۲۰۲۶</p>
+    </header>
+    <div id="formMount"><p class="country-note">Loading…</p></div>
+    <div class="actions flex">
+      <button onclick="typeof calculate==='function'&&calculate()" id="t-calc">محاسبه</button>
+      <button class="secondary" onclick="typeof exportExcel==='function'&&exportExcel()" id="t-excel">دانلود اکسل</button>
+      <button class="secondary" onclick="typeof showUpdateInfo==='function'&&showUpdateInfo()" id="t-update">بررسی به‌روزرسانی</button>
+    </div>
+    <div id="results" class="card hidden">
+      <h2 class="section-title" id="t-result">نتیجه</h2>
+      <div class="result-box">
+        <div id="t-netLabel">حقوق خالص ماهانه</div>
+        <div class="net-value" id="netMonthly">—</div>
+        <div id="netYearly"></div>
+        <div id="taxSource"></div>
+      </div>
+      <table>
+        <thead><tr><th id="t-item">مورد</th><th id="t-monthlyCol">ماهانه</th><th id="t-yearlyCol">سالانه</th></tr></thead>
+        <tbody id="breakdown"></tbody>
+      </table>
+    </div>
+    <div class="disclaimer" id="t-disclaimer"></div>
+  </div>
+  <script>
+    fetch('form.html').then(function(r){ return r.text(); }).then(function(h){
+      document.getElementById('formMount').innerHTML = h;
+      var s = document.createElement('script');
+      s.type = 'module';
+      s.src = 'app.js';
+      document.body.appendChild(s);
+    }).catch(function(e){ document.getElementById('formMount').innerHTML = '<p class="disclaimer">Failed to load form.html</p>'; console.error(e); });
+  </script>
+</body>
+</html>
