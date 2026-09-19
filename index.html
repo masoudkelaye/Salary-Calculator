@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="description" content="Multi-country net salary calculator 2026" />
   <meta name="theme-color" content="#0c1222" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -61,13 +60,17 @@
     <div class="disclaimer" id="t-disclaimer"></div>
   </div>
   <script>
-    fetch('form.html').then(function(r){ return r.text(); }).then(function(h){
-      document.getElementById('formMount').innerHTML = h;
-      var s = document.createElement('script');
-      s.type = 'module';
-      s.src = 'app.js';
-      document.body.appendChild(s);
-    }).catch(function(e){ document.getElementById('formMount').innerHTML = '<p class="disclaimer">Failed to load form.html</p>'; console.error(e); });
+    Promise.all([fetch('form-a.html').then(r=>r.text()), fetch('form-b.html').then(r=>r.text())])
+      .then(function(parts){
+        document.getElementById('formMount').innerHTML = parts[0] + parts[1];
+        var s = document.createElement('script');
+        s.type = 'module';
+        s.src = 'app.js';
+        document.body.appendChild(s);
+      }).catch(function(e){
+        document.getElementById('formMount').innerHTML = '<p class="disclaimer">Failed to load form</p>';
+        console.error(e);
+      });
   </script>
 </body>
 </html>
