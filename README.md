@@ -1,52 +1,37 @@
-# Net Salary Calculator 2026
+# Salary Calculator 2026
 
-Multi-country net salary (take-home pay) calculator with **Liquid Glass** UI.
+Multi-country net salary calculator with Liquid Glass UI and PWA support.
 
-**Repo:** https://github.com/masoudkelaye/net-salary-calculator
-
-## Supported countries
-Germany · France · Italy · Netherlands · UK · USA · Canada · Belgium · Spain · Iran · Australia · New Zealand · Sweden · Norway · Denmark · Finland · Iceland · Ukraine
+**Repo:** https://github.com/masoudkelaye/Salary-Calculator
 
 ## Features
-- Official 2026 tax rates and social contributions (where available)
-- Hourly / weekly / monthly input
-- Excel export (SheetJS)
-- Multi-language: FA, EN, DE, FR, IT, NL, ES
-- Second job + country-specific optional overrides
-- Liquid Glass modern UI
+- 18 countries (DE, FR, IT, NL, UK, US, CA, BE, ES, IR, AU, NZ, SE, NO, DK, FI, IS, UA)
+- Language dropdown (FA / EN / DE / FR / IT / NL / ES)
+- Installable PWA (iPhone & Android)
+- Excel export
 
-## Quick start
-
-The full single-file app lives at:
-
-```text
-artifacts/german-net-salary/index.html
-```
-
-### Option A — open locally
-1. Download `index.html` from this repo (or from your local build).
-2. Open it in a browser (double-click or `npx serve .`).
-
-### Option B — GitHub Pages
-1. Push the full `index.html` to `main`.
-2. Settings → Pages → Deploy from branch `main` / root.
-
-### Option C — replace placeholder
-If you only see a shell page, replace `index.html` with the complete calculator file from your local artifacts folder:
+## Local full build
+The complete single-file calculator is in the project artifacts:
 
 ```bash
-git clone https://github.com/masoudkelaye/net-salary-calculator.git
-cd net-salary-calculator
-# copy your full index.html here, then:
-git add index.html styles.css
-git commit -m "Add full calculator"
+# Clone
+git clone https://github.com/masoudkelaye/Salary-Calculator.git
+cd Salary-Calculator
+
+# To restore the full calculator from your local build:
+cp /path/to/artifacts/german-net-salary/index.html .
+# (the local index.html is a complete single-file app ~160KB)
+
+git add -A
+git commit -m "Full calculator with language dropdown and PWA"
 git push
 ```
 
-## Stack
-- Vanilla HTML / CSS / JS (single file or split)
-- [lohnsteuerrechner](https://www.npmjs.com/package/lohnsteuerrechner) for German PAP
-- SheetJS for Excel export
+## Enable GitHub Pages
+Settings → Pages → Deploy from branch `main` / root.
+Then open `https://masoudkelaye.github.io/Salary-Calculator/`
 
-## License
-MIT — use freely for personal or commercial projects.
+## PWA install
+- **Android Chrome:** menu → Install app
+- **iPhone Safari:** Share → Add to Home Screen
+(Requires HTTPS — GitHub Pages is fine.)
