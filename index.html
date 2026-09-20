@@ -92,6 +92,8 @@
       justify-content: space-between;
       gap: 1rem;
       margin-bottom: 1.75rem;
+      position: relative;
+      z-index: 10000;
     }
 
     .lang-switch {
@@ -160,7 +162,7 @@
       top: calc(100% + 6px);
       inset-inline-start: 0;
       min-width: 100%;
-      z-index: 1000;
+      z-index: 10001;
       padding: 0.35rem;
       border-radius: 14px;
       background: #0c1222;
@@ -168,6 +170,8 @@
       box-shadow: 0 12px 40px rgba(0,0,0,0.55);
       backdrop-filter: blur(20px);
     }
+    .lang-dd { z-index: 10001; }
+    .lang-switch { position: relative; z-index: 10001; }
     .lang-dd.open .lang-dd-menu { display: block; }
     .lang-dd-item {
       display: block;
@@ -588,7 +592,7 @@
           <span class="chev" aria-hidden="true" style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid #38bdf8;"></span>
         </button>
         <div class="lang-dd-menu" role="listbox" id="langDdMenu"
-          style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:9999;padding:0.4rem;border-radius:14px;background:#0c1222;border:1px solid rgba(255,255,255,0.25);box-shadow:0 12px 40px rgba(0,0,0,0.7);">
+          style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:10001;padding:0.4rem;border-radius:14px;background:#0c1222;border:1px solid rgba(255,255,255,0.25);box-shadow:0 12px 40px rgba(0,0,0,0.7);">
           <button type="button" class="lang-dd-item active" data-lang="fa" role="option"
             style="display:block;width:100%;text-align:start;padding:0.6rem 0.8rem;margin:0.15rem 0;border:none;border-radius:10px;background:#1e293b;color:#f8fafc;font-size:0.9rem;font-weight:500;font-family:inherit;cursor:pointer;">فارسی</button>
           <button type="button" class="lang-dd-item" data-lang="en" role="option"
@@ -3539,7 +3543,7 @@ window.calculate = function() {
       XLSX.writeFile(wb, 'eu-net-salary-2026.xlsx');
     };
 
-    window.showUpdateInfo = async function() {
+    window.showUpdateInfo = async function(silent) {
       const ratesUrl = (function() {
         try {
           const u = localStorage.getItem('ratesUrl');
@@ -3551,7 +3555,7 @@ window.calculate = function() {
       const t = (fa, en) => (currentLang === 'fa' ? fa : en);
       const btn = document.getElementById('t-update');
       const prev = btn ? btn.textContent : '';
-      if (btn) btn.textContent = t('در حال بررسی…', 'Checking…');
+      if (btn && !silent) btn.textContent = t('در حال بررسی…', 'Checking…');
 
       try {
         const res = await fetch(ratesUrl + (ratesUrl.includes('?') ? '&' : '?') + 't=' + Date.now(), {
@@ -3588,18 +3592,47 @@ window.calculate = function() {
             ? '✓ New rates applied for this session.'
             : 'Up to date (or first save).\\n\\nHost rates.json on your server next to index.html,\\nor: localStorage.setItem(\"ratesUrl\", \"https://YOUR-SERVER/rates.json\")')
         );
-        alert(msg);
+        if (!silent) {
+          alert(msg);
+        } else if (changed) {
+          const note = document.getElementById('countryNote');
+          if (note) {
+            note.textContent = currentLang === 'fa'
+              ? ('✓ قوانین مالیاتی به‌روز شد (نسخه ' + remote.version + ')')
+              : ('✓ Tax rates updated (version ' + remote.version + ')');
+          }
+        }
+        return { ok: true, version: remote.version, changed: !!changed };
       } catch (err) {
-        alert(t(
-          'خطا در بررسی به‌روزرسانی:\\n' + err.message + '\\n\\nآدرس فعلی: ' + ratesUrl + '\\n\\nمطمئن شوید rates.json روی سرور در دسترس است و CORS اجازه می‌دهد.',
-          'Update check failed:\\n' + err.message + '\\n\\nURL: ' + ratesUrl + '\\n\\nEnsure rates.json is reachable (and CORS allows it).'
-        ));
+        if (!silent) {
+          alert(currentLang === 'fa'
+            ? ('خطا در بررسی به‌روزرسانی:\n' + err.message + '\n\nآدرس: ' + ratesUrl)
+            : ('Update check failed:\n' + err.message + '\n\nURL: ' + ratesUrl));
+        }
+        return { ok: false, error: String(err.message || err) };
       } finally {
-        if (btn) btn.textContent = prev;
+        if (btn && !silent) btn.textContent = prev;
       }
     };
 
-    // Load cached rates on startup
+    // Auto-check every 3 or 6 months (default: 3)
+    // To use 6 months: localStorage.setItem('ratesCheckMonths', '6')
+    window.scheduleRatesAutoCheck = function() {
+      let months = 3;
+      try {
+        const m = parseInt(localStorage.getItem('ratesCheckMonths') || '3', 10);
+        if (m === 6 || m === 3) months = m;
+      } catch (e) {}
+      const intervalMs = months * 30 * 24 * 60 * 60 * 1000;
+      let last = null;
+      try { last = localStorage.getItem('taxRatesCheckedAt'); } catch (e) {}
+      const due = !last || (Date.now() - new Date(last).getTime() >= intervalMs);
+      if (due) {
+        showUpdateInfo(true).catch(function () {});
+      }
+    };
+
+        // Load cached rates on startup
     (function loadCachedRates() {
       try {
         const raw = localStorage.getItem('taxRatesCache');
@@ -3637,7 +3670,11 @@ window.calculate = function() {
       function openMenu() {
         dd.classList.add('open');
         menu.style.display = 'block';
+        menu.style.zIndex = '10001';
         btn.setAttribute('aria-expanded', 'true');
+        // Prevent cards below from covering the menu
+        const topbar = document.querySelector('.topbar');
+        if (topbar) topbar.style.zIndex = '10000';
       }
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -3668,6 +3705,9 @@ window.calculate = function() {
     try { savedLang = localStorage.getItem('netSalaryLang') || 'fa'; } catch (e) {}
     setLang(savedLang);
     onCountryChange();
+    // Auto tax-rates check (every 3 or 6 months)
+    try { scheduleRatesAutoCheck(); } catch (e) {}
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(() => {});
