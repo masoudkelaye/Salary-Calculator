@@ -1,7 +1,7 @@
 {
   "version": "2026.09.20",
-  "updated": "2026-09-20T18:00:00Z",
-  "notes": "Official reference year 2026. Host this file on your server and set window.RATES_URL.",
+  "updated": "2026-09-20T19:35:10.932Z",
+  "notes": "Auto-updated by update-rates.mjs on the server. Browser loads this file.",
   "ratesUrlHint": "Put rates.json next to index.html or set localStorage key ratesUrl",
   "countries": {
     "DE": {
@@ -12,10 +12,13 @@
       "av": 0.026,
       "pv": 0.034,
       "minijob_limit": 603,
-      "midijob_upper": 2000
+      "midijob_upper": 2000,
+      "source": "embedded-2026-defaults + check timestamp",
+      "fetchedAt": "2026-09-20T19:35:10.931Z",
+      "note": "BMF PAP is applied in the app via lohnsteuerrechner; SV rates are defaults for 2026"
     },
     "UK": {
-      "year": "2026/27",
+      "year": "from GOV.UK",
       "personalAllowance": 12570,
       "basicRate": 0.2,
       "higherRate": 0.4,
@@ -25,7 +28,9 @@
       "niPrimary": 0.08,
       "niUpper": 0.02,
       "niPT_weekly": 242,
-      "niUEL_weekly": 967
+      "niUEL_weekly": 967,
+      "source": "https://www.gov.uk/income-tax-rates",
+      "fetchedAt": "2026-09-20T19:35:10.929Z"
     },
     "US": {
       "year": 2026,
@@ -64,7 +69,9 @@
     "UA": {
       "year": 2026,
       "pit": 0.18,
-      "military": 0.05
+      "military": 0.05,
+      "source": "statutory flat rates",
+      "fetchedAt": "2026-09-20T19:35:10.932Z"
     },
     "AU": {
       "year": "2026-27",
@@ -93,6 +100,7 @@
     }
   },
   "changelog": [
+    "2026.09.20 – auto update: UK: OK (https://www.gov.uk/income-tax-rates); DE: OK (embedded-2026-defaults + check timestamp); UA: OK (statutory flat rates)",
     "2026.09.20 – Initial external rates package for live update checks"
   ]
 }
