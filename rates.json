@@ -1,0 +1,94 @@
+{
+  "version": "2026.09.20",
+  "updated": "2026-09-20T18:00:00Z",
+  "notes": "Official reference year 2026. Host this file on your server and set window.RATES_URL.",
+  "ratesUrlHint": "Put rates.json next to index.html or set localStorage key ratesUrl",
+  "countries": {
+    "DE": {
+      "year": 2026,
+      "kv_allgemein": 0.146,
+      "zusatz_default": 0.025,
+      "rv": 0.186,
+      "av": 0.026,
+      "pv": 0.034,
+      "minijob_limit": 603,
+      "midijob_upper": 2000
+    },
+    "UK": {
+      "year": "2026/27",
+      "personalAllowance": 12570,
+      "basicRate": 0.2,
+      "higherRate": 0.4,
+      "additionalRate": 0.45,
+      "basicThreshold": 37700,
+      "higherThreshold": 125140,
+      "niPrimary": 0.08,
+      "niUpper": 0.02,
+      "niPT_weekly": 242,
+      "niUEL_weekly": 967
+    },
+    "US": {
+      "year": 2026,
+      "ssRate": 0.062,
+      "medicare": 0.0145,
+      "ssWageBase": 176100
+    },
+    "CA": {
+      "year": 2026,
+      "cppRate": 0.0595,
+      "eiRate": 0.0164
+    },
+    "FR": {
+      "year": 2026,
+      "csg_crds_approx": 0.097,
+      "note": "PAS personal rate recommended"
+    },
+    "IT": {
+      "year": 2026,
+      "irpef": [0.23, 0.35, 0.43],
+      "inps_employee_approx": 0.0919
+    },
+    "NL": {
+      "year": 2026,
+      "box1_note": "progressive Box 1 + credits"
+    },
+    "IR": {
+      "year": 1405,
+      "insuranceEmployee": 0.07,
+      "exemptionMonthlyToman": 40000000
+    },
+    "UA": {
+      "year": 2026,
+      "pit": 0.18,
+      "military": 0.05
+    },
+    "AU": {
+      "year": "2026-27",
+      "medicare": 0.02
+    },
+    "NZ": {
+      "year": "2026-27",
+      "acc": 0.0175
+    },
+    "BE": {
+      "onssEmployee": 0.1307
+    },
+    "ES": {
+      "ssEmployeeApprox": 0.065
+    },
+    "SE": {},
+    "NO": {},
+    "DK": {
+      "amBidrag": 0.08
+    },
+    "FI": {
+      "tyelEmployee": 0.073
+    },
+    "IS": {
+      "pensionEmployeeMin": 0.04
+    }
+  },
+  "changelog": [
+    "2026.09.20 – Initial external rates package for live update checks"
+  ]
+}
