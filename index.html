@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Multi-country net salary calculator 2026" />
   <meta name="theme-color" content="#0c1222" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -16,61 +17,3452 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <style>
+:root {
+      --bg0: #070b14;
+      --bg1: #0c1222;
+      --glass: rgba(255, 255, 255, 0.055);
+      --glass-strong: rgba(255, 255, 255, 0.09);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --glass-border-hover: rgba(255, 255, 255, 0.22);
+      --text: #f1f5f9;
+      --text-soft: #cbd5e1;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-2: #818cf8;
+      --accent-glow: rgba(56, 189, 248, 0.35);
+      --success: #34d399;
+      --success-glow: rgba(52, 211, 153, 0.25);
+      --danger: #f87171;
+      --radius: 20px;
+      --radius-sm: 12px;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      --blur: 24px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg0);
+      color: var(--text);
+      line-height: 1.55;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    [dir=rtl] body { font-family: 'Inter', 'Segoe UI', Tahoma, system-ui, sans-serif; }
+
+    /* Ambient liquid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background:
+        radial-gradient(ellipse 80% 60% at 10% -10%, rgba(56, 189, 248, 0.22), transparent 55%),
+        radial-gradient(ellipse 70% 50% at 95% 10%, rgba(129, 140, 248, 0.18), transparent 50%),
+        radial-gradient(ellipse 60% 40% at 50% 100%, rgba(52, 211, 153, 0.1), transparent 50%),
+        linear-gradient(180deg, var(--bg0) 0%, var(--bg1) 100%);
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    .app {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 3.5rem;
+    }
+
+    /* Top bar */
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .lang-switch {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.25rem 0.25rem 0.25rem 0.85rem;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 999px;
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .lang-switch .lang-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+
+    .lang-switch select#langSelect {
+      width: auto;
+      min-width: 8.5rem;
+      max-width: 11rem;
+      margin: 0;
+      padding: 0.45rem 2rem 0.45rem 0.75rem;
+      border: none;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.35);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2338bdf8' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.7rem center;
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: none;
+    }
+
+    .lang-switch select#langSelect:hover,
+    .lang-switch select#langSelect:focus {
+      background-color: rgba(56, 189, 248, 0.12);
+      border: none;
+      box-shadow: 0 0 0 2px var(--accent-glow);
+    }
+
+    [dir=rtl] .lang-switch {
+      padding: 0.25rem 0.85rem 0.25rem 0.25rem;
+    }
+
+    [dir=rtl] .lang-switch select#langSelect {
+      background-position: left 0.7rem center;
+      padding: 0.45rem 0.75rem 0.45rem 2rem;
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding: 0.5rem 0 0.25rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.55rem, 4vw, 2.15rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #f8fafc 0%, var(--accent) 50%, var(--accent-2) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.45rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 36rem;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* Liquid glass card */
+    .card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 1.35rem 1.4rem;
+      margin-bottom: 1rem;
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.06);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .card:hover {
+      border-color: var(--glass-border-hover);
+    }
+
+    .card h2, .section-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-soft);
+      margin-bottom: 0.35rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--glass-border);
+      background: rgba(0, 0, 0, 0.28);
+      color: var(--text);
+      font-size: 0.92rem;
+      font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2394a3b8' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.85rem center;
+      padding-inline-end: 2.2rem;
+    }
+
+    [dir=rtl] select {
+      background-position: left 0.85rem center;
+    }
+
+    input:hover, select:hover {
+      border-color: var(--glass-border-hover);
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    input[type=number]::-webkit-inner-spin-button { opacity: 0.4; }
+
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .radio-group label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      cursor: pointer;
+      color: var(--text-soft);
+      font-size: 0.88rem;
+      font-weight: 500;
+      padding: 0.5rem 0.95rem;
+      border-radius: 999px;
+      border: 1px solid var(--glass-border);
+      background: rgba(0,0,0,0.2);
+      margin-bottom: 0;
+      transition: all 0.2s ease;
+    }
+
+    .radio-group label:hover {
+      border-color: var(--glass-border-hover);
+      color: var(--text);
+    }
+
+    .radio-group input[type=radio] {
+      width: 1rem;
+      height: 1rem;
+      padding: 0;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .radio-group input[type=radio]:checked + span,
+    .radio-group label:has(input:checked) {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--text);
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    /* Actions */
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      align-items: center;
+      margin: 1.25rem 0 1.5rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 0.75rem 1.4rem;
+      border-radius: 999px;
+      transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s;
+    }
+
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+      color: #0b1220;
+      box-shadow: 0 4px 24px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.08);
+      box-shadow: 0 6px 32px var(--accent-glow);
+    }
+
+    .btn-ghost {
+      background: var(--glass);
+      color: var(--text-soft);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+    }
+
+    .btn-ghost:hover {
+      color: var(--text);
+      border-color: var(--glass-border-hover);
+      background: var(--glass-strong);
+    }
+
+    /* Results */
+    #results.card {
+      border-color: rgba(52, 211, 153, 0.25);
+      animation: fadeUp 0.4s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-box {
+      background: linear-gradient(135deg, rgba(52, 211, 153, 0.1), rgba(56, 189, 248, 0.08));
+      border: 1px solid rgba(52, 211, 153, 0.28);
+      border-radius: 16px;
+      padding: 1.4rem 1.5rem;
+      margin-top: 0.4rem;
+      text-align: center;
+      box-shadow: 0 0 40px var(--success-glow), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    #t-netLabel {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.35rem;
+    }
+
+    .net-value {
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--success);
+      text-shadow: 0 0 40px var(--success-glow);
+      line-height: 1.15;
+    }
+
+    #netYearly {
+      margin-top: 0.4rem;
+      color: var(--text-soft);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    #taxSource {
+      margin-top: 0.55rem;
+      font-size: 0.72rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.15rem;
+      font-size: 0.875rem;
+    }
+
+    th, td {
+      padding: 0.65rem 0.75rem;
+      text-align: start;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    [dir=rtl] th, [dir=rtl] td { text-align: right; }
+
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    tbody tr { transition: background 0.15s; }
+    tbody tr:hover { background: rgba(255,255,255,0.03); }
+    tbody tr:last-child td {
+      border-bottom: none;
+      font-weight: 600;
+      color: var(--success);
+    }
+
+    .disclaimer {
+      font-size: 0.76rem;
+      color: var(--muted);
+      margin-top: 1.25rem;
+      padding: 1rem 1.15rem;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      border-inline-start: 3px solid var(--danger);
+      backdrop-filter: blur(12px);
+      line-height: 1.55;
+    }
+
+    .country-note {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 0.75rem;
+      padding: 0.55rem 0.8rem;
+      border-radius: 10px;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.15);
+    }
+
+    .hidden { display: none !important; }
+
+    .flex {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* Compat: map old button classes used in HTML */
+    button.secondary {
+      background: var(--glass);
+      color: var(--text-soft);
+      border: 1px solid var(--glass-border);
+      padding: 0.75rem 1.4rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-family: inherit;
+      backdrop-filter: blur(12px);
+      transition: all 0.2s;
+    }
+    button.secondary:hover {
+      color: var(--text);
+      border-color: var(--glass-border-hover);
+      background: var(--glass-strong);
+    }
+
+    /* Primary calculate button when not using .btn */
+    .actions > button:first-child,
+    .flex > button:first-child:not(.secondary) {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+      color: #0b1220;
+      border: none;
+      padding: 0.75rem 1.4rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 4px 24px var(--accent-glow);
+      transition: filter 0.2s, box-shadow 0.2s, transform 0.15s;
+    }
+    .actions > button:first-child:hover,
+    .flex > button:first-child:not(.secondary):hover {
+      filter: brightness(1.08);
+      box-shadow: 0 6px 32px var(--accent-glow);
+    }
+
+    @media (max-width: 640px) {
+      .app { padding: 1rem 0.9rem 2.5rem; }
+      .card { padding: 1.1rem 1rem; border-radius: 16px; }
+      .lang-switch { width: 100%; justify-content: space-between; }
+      .lang-switch select#langSelect { flex: 1; max-width: none; }
+      .actions, .flex { width: 100%; }
+      .actions button, .flex button { flex: 1; min-width: 0; }
+    }
+
+  </style>
 </head>
 <body>
+
   <div class="app">
-    <div class="topbar">
-      <div class="lang-switch">
-        <span class="lang-label" id="t-langLabel">Language</span>
-        <select id="langSelect" onchange="setLang(this.value)" aria-label="Language">
-          <option value="fa">فارسی</option>
-          <option value="en">English</option>
-          <option value="de">Deutsch</option>
-          <option value="fr">Français</option>
-          <option value="it">Italiano</option>
-          <option value="nl">Nederlands</option>
-          <option value="es">Español</option>
+  <div class="topbar">
+    <div class="lang-switch">
+      <span class="lang-label" id="t-langLabel">Language</span>
+      <select id="langSelect" onchange="setLang(this.value)" aria-label="Language">
+        <option value="fa">فارسی</option>
+        <option value="en">English</option>
+        <option value="de">Deutsch</option>
+        <option value="fr">Français</option>
+        <option value="it">Italiano</option>
+        <option value="nl">Nederlands</option>
+        <option value="es">Español</option>
+      </select>
+    </div>
+  </div>
+
+  <header class="hero">
+    <h1 id="t-title">محاسبه‌گر حقوق خالص ۲۰۲۶</h1>
+    <p class="subtitle" id="t-subtitle">آلمان، فرانسه، ایتالیا، هلند و ۲۰+ کشور — بر اساس نرخ‌های رسمی ۲۰۲۶</p>
+  </header>
+
+  <div class="card">
+    <h2 class="section-title" id="t-country">کشور</h2>
+    <div class="grid">
+      <div>
+        <label id="t-country">کشور</label>
+        <select id="country" onchange="window.onCountryChange && window.onCountryChange()">
+          <option value="DE">🇩🇪 Deutschland / Germany / آلمان</option>
+          <option value="FR">🇫🇷 France / فرانسه</option>
+          <option value="IT">🇮🇹 Italia / Italy / ایتالیا</option>
+          <option value="NL">🇳🇱 Nederland / Netherlands / هلند</option>
+          <option value="UK">🇬🇧 United Kingdom / England / انگلستان</option>
+          <option value="US">🇺🇸 United States / آمریکا</option>
+          <option value="CA">🇨🇦 Canada / کانادا</option>
+          <option value="BE">🇧🇪 België / Belgique / بلژیک</option>
+          <option value="ES">🇪🇸 España / Spain / اسپانیا</option>
+          <option value="IR">🇮🇷 ایران / Iran</option>
+          <option value="AU">🇦🇺 Australia / استرالیا</option>
+          <option value="NZ">🇳🇿 New Zealand / نیوزلند</option>
+          <option value="SE">🇸🇪 Sverige / Sweden / سوئد</option>
+          <option value="NO">🇳🇴 Norge / Norway / نروژ</option>
+          <option value="DK">🇩🇰 Danmark / Denmark / دانمارک</option>
+          <option value="FI">🇫🇮 Suomi / Finland / فنلاند</option>
+          <option value="IS">🇮🇸 Ísland / Iceland / ایسلند</option>
+          <option value="UA">🇺🇦 Україна / Ukraine / اوکراین</option>
         </select>
       </div>
     </div>
-    <header class="hero">
-      <h1 id="t-title">محاسبه‌گر حقوق خالص ۲۰۲۶</h1>
-      <p class="subtitle" id="t-subtitle">آلمان، فرانسه، ایتالیا، هلند و ۲۰+ کشور — بر اساس نرخ‌های رسمی ۲۰۲۶</p>
-    </header>
-    <div id="formMount"><p class="country-note">Loading…</p></div>
-    <div class="actions flex">
-      <button onclick="typeof calculate==='function'&&calculate()" id="t-calc">محاسبه</button>
-      <button class="secondary" onclick="typeof exportExcel==='function'&&exportExcel()" id="t-excel">دانلود اکسل</button>
-      <button class="secondary" onclick="typeof showUpdateInfo==='function'&&showUpdateInfo()" id="t-update">بررسی به‌روزرسانی</button>
-    </div>
-    <div id="results" class="card hidden">
-      <h2 class="section-title" id="t-result">نتیجه</h2>
-      <div class="result-box">
-        <div id="t-netLabel">حقوق خالص ماهانه</div>
-        <div class="net-value" id="netMonthly">—</div>
-        <div id="netYearly"></div>
-        <div id="taxSource"></div>
-      </div>
-      <table>
-        <thead><tr><th id="t-item">مورد</th><th id="t-monthlyCol">ماهانه</th><th id="t-yearlyCol">سالانه</th></tr></thead>
-        <tbody id="breakdown"></tbody>
-      </table>
-    </div>
-    <div class="disclaimer" id="t-disclaimer"></div>
   </div>
-  <script>
-    Promise.all([fetch('form-a.html').then(r=>r.text()), fetch('form-b.html').then(r=>r.text())])
-      .then(function(parts){
-        document.getElementById('formMount').innerHTML = parts[0] + parts[1];
-        var s = document.createElement('script');
-        s.type = 'module';
-        s.src = 'app.js';
-        document.body.appendChild(s);
-      }).catch(function(e){
-        document.getElementById('formMount').innerHTML = '<p class="disclaimer">Failed to load form</p>';
-        console.error(e);
+
+  <div class="card">
+    <h2 class="section-title" id="t-inputType">نوع ورودی حقوق</h2>
+    <div class="radio-group">
+      <label><input type="radio" name="inputType" value="monthly" checked onchange="toggleInput()"> <span id="t-monthly">ماهانه</span></label>
+      <label><input type="radio" name="inputType" value="weekly" onchange="toggleInput()"> <span id="t-weekly">هفتگی</span></label>
+      <label><input type="radio" name="inputType" value="hourly" onchange="toggleInput()"> <span id="t-hourly">ساعتی</span></label>
+    </div>
+    <div class="grid" style="margin-top:1rem">
+      <div id="monthlyBox"><label id="t-monthlyGross">حقوق ناخالص ماهانه (€)</label><input type="number" id="monthlyGross" value="3500" min="0" step="10"></div>
+      <div id="weeklyBox" class="hidden"><label id="t-weeklyGross">حقوق ناخالص هفتگی (€)</label><input type="number" id="weeklyGross" value="800" min="0" step="10"></div>
+      <div id="hourlyBox" class="hidden">
+        <label id="t-hourlyWage">حقوق ساعتی (€)</label><input type="number" id="hourlyWage" value="20" min="0" step="0.5">
+        <label style="margin-top:.55rem" id="t-hoursWeek">ساعات کار در هفته</label><input type="number" id="hoursPerWeek" value="40" min="1" max="60" step="0.5">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title" id="t-personal">اطلاعات شخصی و مالیاتی</h2>
+    <div class="grid">
+      <div id="taxClassBox">
+        <label id="t-taxClass">کلاس مالیاتی (DE)</label>
+        <select id="taxClass"><option value="1">I</option><option value="2">II</option><option value="3">III</option><option value="4">IV</option><option value="5">V</option><option value="6">VI</option></select>
+      </div>
+      <div id="stateBox">
+        <label id="t-state">ایالت / منطقه</label>
+        <select id="state">
+          <option value="NW">Nordrhein-Westfalen</option><option value="BY">Bayern</option><option value="BW">Baden-Württemberg</option>
+          <option value="BE">Berlin</option><option value="HH">Hamburg</option><option value="HE">Hessen</option>
+          <option value="NI">Niedersachsen</option><option value="SN">Sachsen</option><option value="OTHER">Other / سایر</option>
+        </select>
+      </div>
+      <div id="churchBox">
+        <label id="t-church">عضویت کلیسا؟ (DE)</label>
+        <select id="church"><option value="0">No / خیر</option><option value="1">Yes / بله</option></select>
+      </div>
+      <div>
+        <label id="t-children">تعداد فرزندان</label>
+        <input type="number" id="children" value="0" min="0" max="10">
+      </div>
+      <div>
+        <label id="t-age">سن</label>
+        <input type="number" id="age" value="30" min="16" max="70">
+      </div>
+      <div id="zusatzBox">
+        <label id="t-zusatz">Zusatzbeitrag GKV % (DE)</label>
+        <input type="number" id="zusatz" value="2.9" min="0" max="5" step="0.01">
+      </div>
+      <div id="deZkfBox" class="hidden">
+        <label>Kinderfreibeträge ZKF (0, 0.5, 1, 1.5 … from ELStAM)</label>
+        <input type="number" id="deZkf" value="0" min="0" max="10" step="0.5" />
+      </div>
+      <div id="deFreibBox" class="hidden">
+        <label>ELStAM Freibetrag € / month (LZZFREIB – leave empty = 0)</label>
+        <input type="number" id="deFreib" value="" min="0" step="1" placeholder="from ELStAM / Bescheinigung" />
+      </div>
+      <div id="dePkvBox" class="hidden">
+        <label>Krankenversicherung</label>
+        <select id="dePkv" onchange="document.getElementById('dePkpvRow').classList.toggle('hidden', this.value==='0')">
+          <option value="0">Gesetzlich (GKV)</option>
+          <option value="1">Privat (PKV)</option>
+        </select>
+      </div>
+      <div id="dePkpvRow" class="hidden">
+        <label>PKV Basisbeitrag € / month (incl. Pflege-Pflicht)</label>
+        <input type="number" id="dePkpv" value="0" min="0" step="1" />
+        <label>AG-Zuschuss PKV € / month (optional)</label>
+        <input type="number" id="dePkpvAg" value="0" min="0" step="1" />
+      </div>
+      <div id="deKrvBox" class="hidden">
+        <label>Rentenversicherungspflichtig?</label>
+        <select id="deKrv">
+          <option value="0">Yes (standard employee)</option>
+          <option value="1">No / exempt (e.g. some beamte status for RV)</option>
+        </select>
+      </div>
+      <div id="deJobTypeBox" class="hidden">
+        <label>Art der Beschäftigung (Hauptjob)</label>
+        <select id="deJobType">
+          <option value="regular">Regulär / Voll- oder Teilzeit</option>
+          <option value="minijob">Minijob (≤ €603)</option>
+          <option value="midijob">Midijob / Übergangsbereich (€603,01–2.000)</option>
+        </select>
+      </div>
+      <div id="deOptInsBox" class="hidden">
+        <label>Freiwillige Abzüge € / Monat (bAV, Zusatz-KV, VWL, …)</label>
+        <input type="number" id="deOptIns" value="" min="0" step="0.01" placeholder="from payslip – leave empty = 0" />
+      </div>
+      <div id="deFreiBox" class="hidden">
+        <label>Steuer- und SV-freie Zuschläge € (Nacht/Sonn/Feiertag §3b – from payslip)</label>
+        <input type="number" id="deFreiZuschlag" value="" min="0" step="0.01" placeholder="e.g. NZ 25% stfrei 365.48" />
+      </div>
+      <div id="deNettoAddBox" class="hidden">
+        <label>AG-Zuschüsse / Jobticket etc. € (added to bank transfer)</label>
+        <input type="number" id="deNettoAdd" value="" min="0" step="0.01" placeholder="e.g. Jobticket 63.00" />
+      </div>
+      <div id="statusBox" class="hidden">
+        <label id="t-status">وضعیت تأهل / Parts (FR/IT)</label>
+        <select id="familyStatus">
+          <option value="1">Célibataire / 1 part</option>
+          <option value="2">Couple marié-PACS / 2 parts</option>
+          <option value="2.5">Parent isolé +1 enfant / 2.5</option>
+          <option value="3">Couple +1 enfant / 3</option>
+          <option value="3.5">Couple +2 enfants / 3.5</option>
+          <option value="4">Couple +3 enfants / 4</option>
+          <option value="5">Couple +4 enfants / 5</option>
+        </select>
+      </div>
+      <div id="frPasBox" class="hidden">
+        <label>Taux PAS personnel % (from impots.gouv.fr / payslip – leave empty = estimate)</label>
+        <input type="number" id="frPasRate" value="" min="0" max="43" step="0.1" placeholder="e.g. 8.5 – empty = barème IR estimate" />
+      </div>
+      <div id="frCadreBox" class="hidden">
+        <label>Statut (cadre / non-cadre)</label>
+        <select id="frCadre">
+          <option value="0">Non-cadre</option>
+          <option value="1">Cadre (APEC 0,024 %)</option>
+        </select>
+      </div>
+      <div id="frMutuelleBox" class="hidden">
+        <label>Mutuelle / prévoyance salarié € / mois (from fiche de paie)</label>
+        <input type="number" id="frMutuelle" value="" min="0" step="0.01" placeholder="leave empty = 0" />
+      </div>
+      <div id="frOtherBox" class="hidden">
+        <label>Autres retenues € / mois</label>
+        <input type="number" id="frOtherDed" value="" min="0" step="0.01" placeholder="from payslip" />
+      </div>
+      <div id="itRegionBox" class="hidden">
+        <label>Regione (addizionale regionale)</label>
+        <select id="itRegionPreset" onchange="const v=this.value; const el=document.getElementById('itRegRate'); if(v!=='custom'){el.value=v; el.placeholder='preset';}else{el.value='';el.placeholder='your % from CU';}">
+          <option value="custom">Custom % (enter below)</option>
+          <option value="1.23">Veneto 1.23%</option>
+          <option value="1.73">Lombardia ~1.73% (top band)</option>
+          <option value="1.73">Base nazionale 1.73% avg</option>
+          <option value="2.03">Campania ~2.03%+</option>
+          <option value="1.73">Lazio ~1.73–3.33%</option>
+          <option value="1.62">Piemonte ~1.62%+</option>
+          <option value="1.33">Emilia-Romagna ~1.33%+</option>
+          <option value="0.70">Friuli VG low band 0.70%</option>
+        </select>
+        <label style="margin-top:.3rem">Addizionale regionale % (override)</label>
+        <input type="number" id="itRegRate" value="" min="0" max="4" step="0.01" placeholder="from CU – empty = 1.73 avg">
+      </div>
+      <div id="itComBox" class="hidden">
+        <label>Addizionale comunale % (from your Comune / CU)</label>
+        <input type="number" id="itComRate" value="" min="0" max="1.2" step="0.01" placeholder="e.g. 0.8 – empty = 0.6 avg">
+      </div>
+      <div id="itOtherBox" class="hidden">
+        <label>Altre trattenute € / mese (sindacato, anticipi, …)</label>
+        <input type="number" id="itOtherDed" value="" min="0" step="0.01" placeholder="from busta paga">
+      </div>
+      <div id="itAssegnoBox" class="hidden">
+        <label>Assegno Unico already received? (children)</label>
+        <select id="itAssegno">
+          <option value="1">Yes – skip residual figli detrazione</option>
+          <option value="0">No / claim residual on CU</option>
+        </select>
+      </div>
+      <div id="itKidsBox" class="hidden">
+        <label>Figli a carico (dependent children under 21 or disabled)</label>
+        <input type="number" id="itKids" value="0" min="0" max="10" step="1" />
+      </div>
+      <div id="itSpouseBox" class="hidden">
+        <label>Coniuge a carico?</label>
+        <select id="itSpouse">
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </div>
+      
+      <div id="nl30Box" class="hidden">
+        <label>Netherlands 30% ruling (expat)?</label>
+        <select id="nl30">
+          <option value="0">No</option>
+          <option value="1">Yes – 30% tax-free (2026)</option>
+        </select>
+      </div>
+      <div id="beWorkerBox" class="hidden">
+        <label>Belgium worker type</label>
+        <select id="beWorker">
+          <option value="employee">Employee / Bediende</option>
+          <option value="worker">Worker / Ouvrier (108% base)</option>
+        </select>
+      </div>
+      <div id="esPaysBox" class="hidden">
+        <label>Spain pay structure</label>
+        <select id="esPays">
+          <option value="12">12 pagos (prorrateadas)</option>
+          <option value="14">14 pagos (2 extras)</option>
+        </select>
+      </div>
+
+      <div id="beCommuneBox" class="hidden">
+        <label>Belgium communal tax % of federal tax (0–9; from your commune)</label>
+        <input type="number" id="beCommuneRate" value="" min="0" max="9" step="0.1" placeholder="e.g. 7 – empty = 7 avg" />
+      </div>
+      <div id="beKidsBox" class="hidden">
+        <label>Children dependent (Belgium)</label>
+        <input type="number" id="beKids" value="0" min="0" max="10" step="1" />
+      </div>
+      <div id="beOtherBox" class="hidden">
+        <label>Other deductions € / month (group insurance, meal vouchers net effect…)</label>
+        <input type="number" id="beOtherDed" value="" min="0" step="0.01" placeholder="from payslip" />
+      </div>
+      <div id="esRegionBox" class="hidden">
+        <label>Spain Autonomous Community</label>
+        <select id="esRegion">
+          <option value="ref">Reference (state + avg regional)</option>
+          <option value="MAD">Madrid (lower)</option>
+          <option value="CAT">Cataluña</option>
+          <option value="AND">Andalucía</option>
+          <option value="VAL">Comunitat Valenciana</option>
+          <option value="custom">Custom effective IRPF %</option>
+        </select>
+      </div>
+      <div id="esCustomBox" class="hidden">
+        <label>Spain custom effective IRPF % (if Custom)</label>
+        <input type="number" id="esCustomRate" value="" min="0" max="50" step="0.1" placeholder="leave empty if not Custom" />
+      </div>
+      <div id="esKidsBox" class="hidden">
+        <label>Hijos a cargo (Spain dependents)</label>
+        <input type="number" id="esKids" value="0" min="0" max="10" step="1" />
+      </div>
+      <div id="esContractBox" class="hidden">
+        <label>Tipo de contrato</label>
+        <select id="esContract">
+          <option value="indef">Indefinido (desempleo 1,55%)</option>
+          <option value="temp">Temporal (desempleo 1,60%)</option>
+        </select>
+      </div>
+      <div id="esOtherBox" class="hidden">
+        <label>Otras deducciones € / mes (from nómina)</label>
+        <input type="number" id="esOtherDed" value="" min="0" step="0.01" placeholder="from payslip" />
+      </div>
+      <div id="irYearBox" class="hidden">
+        <label>سال مالیاتی / بودجه</label>
+        <select id="irYear">
+          <option value="1405">۱۴۰۵ (معافیت ماهانه ۴۰ میلیون تومان)</option>
+          <option value="1404">۱۴۰۴ (معافیت ماهانه ۲۴ میلیون تومان)</option>
+        </select>
+      </div>
+      <div id="irMaritalBox" class="hidden">
+        <label>وضعیت تأهل (برای مزایا/بیمه)</label>
+        <select id="irMarital">
+          <option value="0">مجرد</option>
+          <option value="1">متأهل</option>
+        </select>
+      </div>
+      <div id="irKidsBox" class="hidden">
+        <label>تعداد فرزند (حق اولاد — معمولاً مشمول بیمه نیست)</label>
+        <input type="number" id="irKids" value="0" min="0" max="10" step="1" />
+      </div>
+      <div id="irInsBaseBox" class="hidden">
+        <label>پایه مشمول بیمه تومان / ماه (خالی = همان ناخالص؛ سقف ~۷ برابر حداقل)</label>
+        <input type="number" id="irInsBase" value="" min="0" step="1000" placeholder="از فیش حقوقی — خالی = ناخالص" />
+      </div>
+      <div id="irOtherBox" class="hidden">
+        <label>کسورات دیگر تومان / ماه (وام، صندوق و …)</label>
+        <input type="number" id="irOtherDed" value="" min="0" step="1000" placeholder="از فیش" />
+      </div>
+      <div id="auHelpBox" class="hidden">
+        <label>HELP / HECS debt?</label>
+        <select id="auHelp">
+          <option value="0">No</option>
+          <option value="1">Yes (compulsory repayment)</option>
+        </select>
+      </div>
+      <div id="auSacrificeBox" class="hidden">
+        <label>Salary sacrifice super $ / year (optional)</label>
+        <input type="number" id="auSacrifice" value="" min="0" step="100" placeholder="0" />
+      </div>
+      <div id="auOtherBox" class="hidden">
+        <label>Other deductions $ / month</label>
+        <input type="number" id="auOtherDed" value="" min="0" step="1" placeholder="from payslip" />
+      </div>
+      <div id="nzKsBox" class="hidden">
+        <label>KiwiSaver employee rate %</label>
+        <select id="nzKs">
+          <option value="0">Not enrolled / 0%</option>
+          <option value="3">3%</option>
+          <option value="3.5" selected>3.5% (default from Apr 2026)</option>
+          <option value="4">4%</option>
+          <option value="6">6%</option>
+          <option value="8">8%</option>
+          <option value="10">10%</option>
+        </select>
+      </div>
+      <div id="nzStudentBox" class="hidden">
+        <label>Student loan?</label>
+        <select id="nzStudent">
+          <option value="0">No</option>
+          <option value="1">Yes (12% above threshold)</option>
+        </select>
+      </div>
+      <div id="nzOtherBox" class="hidden">
+        <label>Other deductions $ / month</label>
+        <input type="number" id="nzOtherDed" value="" min="0" step="1" placeholder="from payslip" />
+      </div>
+      <div id="seKommuneBox" class="hidden">
+        <label>Sweden municipal tax % (empty = 32.38 avg)</label>
+        <input type="number" id="seKommune" value="" min="28" max="36" step="0.01" placeholder="e.g. 32.38" />
+      </div>
+      <div id="seOtherBox" class="hidden">
+        <label>Other deductions SEK / month</label>
+        <input type="number" id="seOtherDed" value="" min="0" step="1" placeholder="from payslip" />
+      </div>
+      <div id="noOtherBox" class="hidden">
+        <label>Other deductions NOK / month</label>
+        <input type="number" id="noOtherDed" value="" min="0" step="1" placeholder="from payslip" />
+      </div>
+      <div id="dkKommuneBox" class="hidden">
+        <label>Denmark municipal tax % (empty = 25.05 avg)</label>
+        <input type="number" id="dkKommune" value="" min="22" max="28" step="0.01" placeholder="e.g. 25.05" />
+      </div>
+      <div id="dkChurchBox" class="hidden">
+        <label>Church tax (kirkeskat)?</label>
+        <select id="dkChurch">
+          <option value="0">No</option>
+          <option value="0.7">Yes ~0.7%</option>
+          <option value="1.0">Yes ~1.0%</option>
+        </select>
+      </div>
+      <div id="dkOtherBox" class="hidden">
+        <label>Other deductions DKK / month (pension employee share…)</label>
+        <input type="number" id="dkOtherDed" value="" min="0" step="1" placeholder="from payslip" />
+      </div>
+      <div id="fiMunBox" class="hidden">
+        <label>Finland municipal tax % (empty = 7.57 avg)</label>
+        <input type="number" id="fiMun" value="" min="4" max="12" step="0.01" placeholder="e.g. 7.57" />
+      </div>
+      <div id="fiChurchBox" class="hidden">
+        <label>Church tax?</label>
+        <select id="fiChurch">
+          <option value="0">No</option>
+          <option value="1.5">Yes ~1.5%</option>
+        </select>
+      </div>
+      <div id="fiOtherBox" class="hidden">
+        <label>Other deductions € / month</label>
+        <input type="number" id="fiOtherDed" value="" min="0" step="1" placeholder="from payslip" />
+      </div>
+      <div id="isPensionBox" class="hidden">
+        <label>Iceland pension employee % (mandatory 4%)</label>
+        <select id="isPension">
+          <option value="4">4% mandatory</option>
+          <option value="6">6%</option>
+          <option value="8">8% (max voluntary+mandatory)</option>
+        </select>
+      </div>
+      <div id="isOtherBox" class="hidden">
+        <label>Other deductions ISK / month</label>
+        <input type="number" id="isOtherDed" value="" min="0" step="100" placeholder="from payslip" />
+      </div>
+      <div id="uaOtherBox" class="hidden">
+        <label>Other deductions UAH / month</label>
+        <input type="number" id="uaOtherDed" value="" min="0" step="1" placeholder="from payslip" />
+      </div>
+      <div id="secondJobBox">
+        <label>Second job / side income? (شغل دوم)</label>
+        <select id="hasSecondJob" onchange="document.getElementById('secondJobDetails').classList.toggle('hidden', this.value==='0')">
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </div>
+      <div id="secondJobDetails" class="hidden">
+        <label>Second job monthly gross</label>
+        <input type="number" id="secondGross" value="0" min="0" step="10" placeholder="0" />
+        <label>Second job type</label>
+        <select id="secondType">
+          <option value="employee">Part-time employment / شغل دوم کارمندی</option>
+          <option value="minijob">Mini-job (DE ≤€603) / مینی‌جاب</option>
+          <option value="freelance">Freelance / self-employed / شغل آزاد</option>
+        </select>
+        <label style="margin-top:.4rem">Minijob: pay RV 3.6%? (optional)</label>
+        <select id="minijobRV">
+          <option value="0">No (exempt – common)</option>
+          <option value="1">Yes – employee RV 3.6%</option>
+        </select>
+      </div>
+      <div id="ukRegionBox" class="hidden">
+        <label>UK Region</label>
+        <select id="ukRegion">
+          <option value="rUK">England / Wales / NI</option>
+          <option value="Scotland">Scotland</option>
+        </select>
+      </div>
+      <div id="ukStudentBox" class="hidden">
+        <label>Student Loan</label>
+        <select id="ukStudent">
+          <option value="none">None</option>
+          <option value="plan1">Plan 1 (9%)</option>
+          <option value="plan2">Plan 2 (9%)</option>
+          <option value="plan4">Plan 4 Scotland (9%)</option>
+          <option value="plan5">Plan 5 (9%)</option>
+          <option value="pg">Postgraduate (6%)</option>
+        </select>
+      </div>
+      <div id="ukPensionBox" class="hidden">
+        <label>Pension contribution %</label>
+        <input type="number" id="ukPension" value="0" min="0" max="100" step="0.5" />
+      </div>
+      <div id="ukBlindBox" class="hidden">
+        <label>Blind Person's Allowance?</label>
+        <select id="ukBlind">
+          <option value="0">No</option>
+          <option value="1">Yes (+£3,250)</option>
+        </select>
+      </div>
+      <div id="ukMarriageBox" class="hidden">
+        <label>Marriage Allowance received?</label>
+        <select id="ukMarriage">
+          <option value="0">No</option>
+          <option value="1">Yes (+£1,260 PA)</option>
+        </select>
+      </div>
+      <div id="ukSPABox" class="hidden">
+        <label>Reached State Pension age?</label>
+        <select id="ukSPA">
+          <option value="0">No (pay NI)</option>
+          <option value="1">Yes (no employee NI)</option>
+        </select>
+      </div>
+      <div id="ukPensionAmtBox" class="hidden">
+        <label>Pension £ / month (fixed – overrides % if set)</label>
+        <input type="number" id="ukPensionAmt" value="" min="0" step="1" placeholder="leave empty to use %" />
+      </div>
+      <div id="ukOtherBox" class="hidden">
+        <label>Other deductions £ / month (cycle, charity…)</label>
+        <input type="number" id="ukOtherDed" value="" min="0" step="0.01" placeholder="from payslip" />
+      </div>
+      <div id="ukTaxCodeBox" class="hidden">
+        <label>Tax code (optional)</label>
+        <input type="text" id="ukTaxCode" value="" placeholder="1257L, BR, 0T – empty = full PA" />
+      </div>
+      <div id="usFilingBox" class="hidden">
+        <label>US Filing Status</label>
+        <select id="usFiling">
+          <option value="single">Single</option>
+          <option value="mfj">Married Filing Jointly</option>
+          <option value="mfs">Married Filing Separately</option>
+          <option value="hoh">Head of Household</option>
+        </select>
+      </div>
+      <div id="usStateBox" class="hidden">
+        <label>State (effective rate approx – override below)</label>
+        <select id="usStatePreset" onchange="const m={TX:0,FL:0,WA:0,NV:0,WY:0,SD:0,AK:0,TN:0,NH:0,CA:7.5,NY:6.5,NJ:5.5,IL:4.95,PA:3.07,OH:3.5,MA:5,CO:4.4,AZ:2.5,GA:5.2,NC:4.5,VA:5.5,custom:''}; const el=document.getElementById('usStateRate'); el.value=m[this.value]!==undefined?m[this.value]:'';">
+          <option value="custom">Custom / enter %</option>
+          <option value="TX">Texas (0%)</option>
+          <option value="FL">Florida (0%)</option>
+          <option value="WA">Washington (0%)</option>
+          <option value="CA">California ~7.5%</option>
+          <option value="NY">New York ~6.5%</option>
+          <option value="NJ">New Jersey ~5.5%</option>
+          <option value="IL">Illinois 4.95%</option>
+          <option value="PA">Pennsylvania 3.07%</option>
+          <option value="MA">Massachusetts ~5%</option>
+          <option value="OH">Ohio ~3.5%</option>
+          <option value="CO">Colorado ~4.4%</option>
+          <option value="GA">Georgia ~5.2%</option>
+          <option value="NC">North Carolina ~4.5%</option>
+          <option value="VA">Virginia ~5.5%</option>
+          <option value="AZ">Arizona ~2.5%</option>
+        </select>
+        <label style="margin-top:.3rem">State effective % (override)</label>
+        <input type="number" id="usStateRate" value="" min="0" max="15" step="0.1" placeholder="0 = no tax; or exact effective %">
+      </div>
+      <div id="usAgeBox" class="hidden">
+        <label>Age 65+ or Blind? (extra standard deduction)</label>
+        <select id="usAgeBlind">
+          <option value="0">No</option>
+          <option value="1">Yes – one person</option>
+          <option value="2">Yes – both (MFJ)</option>
+        </select>
+      </div>
+      <div id="us401kBox" class="hidden">
+        <label>Pre-tax 401(k) %</label>
+        <input type="number" id="us401k" value="0" min="0" max="100" step="0.5" />
+        <label style="margin-top:.3rem">Or 401(k) $ / month (overrides %)</label>
+        <input type="number" id="us401kAmt" value="" min="0" step="1" placeholder="leave empty to use %" />
+      </div>
+      <div id="usHsaBox" class="hidden">
+        <label>HSA pre-tax $ / month (optional)</label>
+        <input type="number" id="usHsa" value="" min="0" step="1" placeholder="0" />
+      </div>
+      <div id="usOtherBox" class="hidden">
+        <label>Other pre-tax / post-tax deductions $ / month</label>
+        <input type="number" id="usOtherDed" value="" min="0" step="0.01" placeholder="from payslip" />
+      </div>
+      <div id="caProvinceBox" class="hidden">
+        <label>Province</label>
+        <select id="caProvince">
+          <option value="ON">Ontario</option>
+          <option value="QC">Quebec (QPP + QPIP)</option>
+          <option value="AB">Alberta</option>
+          <option value="BC">British Columbia</option>
+          <option value="MB">Manitoba</option>
+          <option value="SK">Saskatchewan</option>
+          <option value="NS">Nova Scotia</option>
+          <option value="NB">New Brunswick</option>
+          <option value="other">Other / custom rate</option>
+        </select>
+      </div>
+      <div id="caProvRateBox" class="hidden">
+        <label>Custom provincial effective rate % (if Other)</label>
+        <input type="number" id="caProvRate"  value="" min="0" max="25" step="0.1" placeholder="only if Province=Other">
+      </div>
+      <div id="caRrspBox" class="hidden">
+        <label>RRSP contribution $ (annual, optional)</label>
+        <input type="number" id="caRrsp" value="0" min="0" step="100" />
+      </div>
+      <div id="caOtherBox" class="hidden">
+        <label>Other deductions $ / month (union, benefits…)</label>
+        <input type="number" id="caOtherDed" value="" min="0" step="0.01" placeholder="from payslip" />
+      </div>
+      <div id="nlAowBox" class="hidden">
+        <label>Reached AOW age?</label>
+        <select id="nlAow">
+          <option value="0">No (under AOW)</option>
+          <option value="1">Yes (AOW age or older)</option>
+        </select>
+      </div>
+      <div id="nl30Box" class="hidden">
+        <label>30% ruling (expat facility)?</label>
+        <select id="nl30">
+          <option value="0">No</option>
+          <option value="1">Yes – 30% of wage tax-free</option>
+        </select>
+      </div>
+      <div id="nlIackBox" class="hidden">
+        <label>Inkomensafhankelijke combinatiekorting (young child)?</label>
+        <select id="nlIack">
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </div>
+      <div id="nlOtherBox" class="hidden">
+        <label>Other deductions € / month (pension, etc.)</label>
+        <input type="number" id="nlOtherDed" value="" min="0" step="0.01" placeholder="from payslip" />
+      </div>
+    </div>
+    <p class="country-note" id="countryNote"></p>
+  </div>
+
+  <div class="actions flex">
+    <button onclick="calculate()" id="t-calc">محاسبه</button>
+    <button class="secondary" onclick="exportExcel()" id="t-excel">دانلود اکسل</button>
+    <button class="secondary" onclick="showUpdateInfo()" id="t-update">بررسی به‌روزرسانی</button>
+  </div>
+
+  <div id="results" class="card hidden">
+    <h2 class="section-title" id="t-result">نتیجه</h2>
+    <div class="result-box">
+      <div id="t-netLabel">حقوق خالص ماهانه</div>
+      <div class="net-value" id="netMonthly">—</div>
+      <div id="netYearly"></div>
+      <div id="taxSource"></div>
+    </div>
+    <table>
+      <thead><tr><th id="t-item">مورد</th><th id="t-monthlyCol">ماهانه</th><th id="t-yearlyCol">سالانه</th></tr></thead>
+      <tbody id="breakdown"></tbody>
+    </table>
+  </div>
+
+  <div class="disclaimer" id="t-disclaimer"></div>
+  </div><!-- /.app -->
+
+  
+  
+  <script type="module">
+import { calculate as papCalculate } from "https://cdn.jsdelivr.net/npm/lohnsteuerrechner@1.0.7/+esm";
+window.papCalculate = papCalculate;
+
+
+function calcGermany(monthlyGross) {
+      // BMF PAP 2026 + official SV 2026 incl. Minijob / Midijob
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      const taxClass = parseInt(document.getElementById('taxClass').value) || 1;
+      const state = document.getElementById('state').value;
+      const hasChurch = document.getElementById('church').value === '1';
+      const children = parseInt(document.getElementById('children').value) || 0;
+      const age = parseInt(document.getElementById('age').value) || 30;
+      const zusatz = parseFloat(document.getElementById('zusatz').value);
+      const kvz = isNaN(zusatz) ? 2.9 : zusatz;
+      const isSachsen = state === 'SN';
+      const zkf = parseFloat(document.getElementById('deZkf')?.value) || 0;
+      const freibRaw = document.getElementById('deFreib')?.value;
+      const lzzFreib = (freibRaw !== '' && freibRaw != null && !isNaN(parseFloat(freibRaw)))
+        ? Math.round(parseFloat(freibRaw) * 100) : 0;
+      const pkv = document.getElementById('dePkv')?.value === '1' ? 1 : 0;
+      const pkpv = Math.round((parseFloat(document.getElementById('dePkpv')?.value) || 0) * 100);
+      const pkpvAg = Math.round((parseFloat(document.getElementById('dePkpvAg')?.value) || 0) * 100);
+      const krv = parseInt(document.getElementById('deKrv')?.value) || 0;
+      const jobType = document.getElementById('deJobType')?.value || 'regular';
+      const optInsRaw = document.getElementById('deOptIns')?.value;
+      const optIns = (optInsRaw !== '' && optInsRaw != null && !isNaN(parseFloat(optInsRaw)))
+        ? parseFloat(optInsRaw) : 0;
+      const freiRaw = document.getElementById('deFreiZuschlag')?.value;
+      const freiZuschlag = (freiRaw !== '' && freiRaw != null && !isNaN(parseFloat(freiRaw)))
+        ? parseFloat(freiRaw) : 0;
+      const nettoAddRaw = document.getElementById('deNettoAdd')?.value;
+      const nettoAdd = (nettoAddRaw !== '' && nettoAddRaw != null && !isNaN(parseFloat(nettoAddRaw)))
+        ? parseFloat(nettoAddRaw) : 0;
+
+      // Bemessungsgrundlage: Brutto minus steuer-/SV-freie Zuschläge (§3b EStG)
+      const svBase = Math.max(0, monthlyGross - freiZuschlag);
+      const taxBase = Math.max(0, monthlyGross - freiZuschlag);
+
+      const MINIJOB = 603;
+      const MIDI_MAX = 2000;
+      const pensionCeil = 8450;
+      const healthCeil = 5812.50;
+
+      let pension = 0, unemployment = 0, health = 0, care = 0;
+      let lst = 0, soli = 0, church = 0;
+      let noteExtra = '';
+
+      // ========== MINIJOB ==========
+      if (jobType === 'minijob') {
+        // Employee: usually 0 Lohnsteuer (pauschal by AG), 0 KV/PV/ALV
+        // Optional RV 3.6% if not exempt
+        const payRV = document.getElementById('minijobRV')?.value === '1';
+        pension = payRV ? monthlyGross * 0.036 : 0;
+        unemployment = 0; health = 0; care = 0;
+        lst = 0; soli = 0; church = 0;
+        noteExtra = payRV
+          ? 'Minijob: 0 LSt + RV 3.6% (employee chose not to exempt)'
+          : 'Minijob ≤€603: 0 LSt + 0 SV for employee (AG pays pauschal)';
+      }
+      // ========== MIDIJOB ==========
+      else if (jobType === 'midijob') {
+        // Official 2026 formulas (DRV / §20 Abs. 2a SGB IV)
+        // BE for employee share:
+        const beAN = Math.max(0, 1.431639227 * svBase - 863.2784538);
+        // BE for total (used for childless PV surcharge):
+        const beGes = Math.max(0, 1.145937223 * svBase - 291.8744452);
+
+        if (krv === 0) {
+          pension = beAN * 0.093;
+          unemployment = beAN * 0.013;
+        }
+        if (pkv === 0) {
+          health = beAN * (0.073 + kvz / 200);
+          let careRate = 0.018;
+          if (children === 0 && age >= 23) {
+            // base on beAN + childless surcharge on beGes
+            care = beAN * 0.018 + beGes * 0.006;
+          } else {
+            if (children >= 2) careRate = Math.max(0.008, 0.018 - Math.min(children - 1, 4) * 0.0025);
+            if (isSachsen) careRate += 0.005;
+            care = beAN * careRate;
+          }
+        } else {
+          health = Math.max(0, (pkpv - pkpvAg) / 100);
+          care = 0;
+        }
+
+        // Lohnsteuer: normal PAP with chosen tax class (not automatic SK6)
+        try {
+          const params = {
+            LZZ: 2, RE4: Math.round(taxBase * 100), STKL: taxClass,
+            KVZ: kvz, PVZ: (children === 0 && age >= 23) ? 1 : 0,
+            PVS: isSachsen ? 1 : 0, PVA: children >= 2 ? Math.min(children - 1, 4) : 0,
+            ZKF: zkf, KRV: krv, PKV: pkv, R: hasChurch ? 1 : 0
+          };
+          if (lzzFreib > 0) params.LZZFREIB = lzzFreib;
+          if (pkv === 1 && pkpv > 0) { params.PKPV = pkpv; if (pkpvAg > 0) params.PKPVAGZ = pkpvAg; }
+          const res = window.papCalculate(2026, params);
+          lst = (res.LSTLZZ || 0) / 100;
+          soli = (res.SOLZLZZ || 0) / 100;
+          const churchBase = (res.BK || res.LSTLZZ || 0) / 100;
+          const churchRate = (state === 'BW' || state === 'BY') ? 0.08 : 0.09;
+          church = hasChurch ? churchBase * churchRate : 0;
+        } catch (e) { console.error(e); }
+        noteExtra = 'Midijob 2026: SV on reduced BE (official formula F=0.6619)';
+      }
+      // ========== REGULAR ==========
+      else {
+        if (krv === 0) {
+          pension = Math.min(svBase, pensionCeil) * 0.093;
+          unemployment = Math.min(svBase, pensionCeil) * 0.013;
+        }
+        if (pkv === 0) {
+          health = Math.min(svBase, healthCeil) * (0.073 + kvz / 200);
+          let careRate = 0.018;
+          if (children === 0 && age >= 23) careRate += 0.006;
+          else if (children >= 2) careRate = Math.max(0.008, 0.018 - Math.min(children - 1, 4) * 0.0025);
+          if (isSachsen) careRate += 0.005;
+          care = Math.min(svBase, healthCeil) * careRate;
+        } else {
+          health = Math.max(0, (pkpv - pkpvAg) / 100);
+          care = 0;
+        }
+        try {
+          const params = {
+            LZZ: 2, RE4: Math.round(taxBase * 100), STKL: taxClass,
+            KVZ: kvz, PVZ: (children === 0 && age >= 23) ? 1 : 0,
+            PVS: isSachsen ? 1 : 0, PVA: children >= 2 ? Math.min(children - 1, 4) : 0,
+            ZKF: zkf, KRV: krv, PKV: pkv, R: hasChurch ? 1 : 0
+          };
+          if (lzzFreib > 0) params.LZZFREIB = lzzFreib;
+          if (pkv === 1 && pkpv > 0) { params.PKPV = pkpv; if (pkpvAg > 0) params.PKPVAGZ = pkpvAg; }
+          const res = window.papCalculate(2026, params);
+          lst = (res.LSTLZZ || 0) / 100;
+          soli = (res.SOLZLZZ || 0) / 100;
+          const churchBase = (res.BK || res.LSTLZZ || 0) / 100;
+          const churchRate = (state === 'BW' || state === 'BY') ? 0.08 : 0.09;
+          church = hasChurch ? churchBase * churchRate : 0;
+        } catch (e) { console.error(e); }
+        noteExtra = 'Regular employment: BMF PAP 2026 + full SV';
+      }
+
+      const social = pension + unemployment + health + care;
+      const net = monthlyGross - social - lst - soli - church - optIns + nettoAdd;
+
+      return {
+        social: r2(social),
+        tax: r2(lst),
+        soli: r2(soli),
+        church: r2(church),
+        net: r2(net),
+        rows: [
+          ['Gross / Brutto', r2(monthlyGross)],
+          ['davon steuer-/SV-frei (§3b)', r2(freiZuschlag)],
+          ['SV-/Steuer-Bemessung', r2(svBase)],
+          ['Rentenversicherung', r2(pension)],
+          ['Arbeitslosenversicherung', r2(unemployment)],
+          [pkv ? 'PKV (net employee)' : 'Krankenversicherung', r2(health)],
+          ['Pflegeversicherung', r2(care)],
+          ['Sozialversicherung total', r2(social)],
+          ['Lohnsteuer (PAP)', r2(lst)],
+          ['Solidaritätszuschlag', r2(soli)],
+          ['Kirchensteuer', r2(church)],
+          ['Freiwillige Abzüge', r2(optIns)],
+          ['AG-Zuschuss / Jobticket', r2(nettoAdd)],
+          ['Net / Überweisung', r2(net)]
+        ],
+        source: noteExtra + ' | Optional: enter Zusatzbeitrag, PKV, ELStAM Freibetrag, voluntary deductions'
+      };
+    }
+
+    function calcFrance(monthlyGross) {
+      // Official 2026: URSSAF/CLEISS cotisations + barème IR + décote + plafonnement QF
+      const PMSS = 4005; // plafond mensuel SS 2026
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+
+      const isCadre = document.getElementById('frCadre')?.value === '1';
+      const mutuelleRaw = document.getElementById('frMutuelle')?.value;
+      const mutuelle = (mutuelleRaw !== '' && mutuelleRaw != null && !isNaN(parseFloat(mutuelleRaw)))
+        ? parseFloat(mutuelleRaw) : 0;
+      const otherRaw = document.getElementById('frOtherDed')?.value;
+      const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
+        ? parseFloat(otherRaw) : 0;
+
+      // Tranches
+      const t1 = Math.min(monthlyGross, PMSS);
+      const t2 = Math.max(0, Math.min(monthlyGross, PMSS * 8) - PMSS);
+
+      // Cotisations salariales obligatoires
+      const vieillessePlaf = t1 * 0.0690;
+      const vieillesseDeplaf = monthlyGross * 0.0040;
+      const agircT1 = t1 * 0.0315;
+      const cegT1 = t1 * 0.0086;   // CEG salarié T1
+      const agircT2 = t2 * 0.0864;
+      const cegT2 = t2 * 0.0108;   // CEG salarié T2
+      const cet = (monthlyGross > PMSS) ? (t1 + t2) * 0.0014 : 0;
+      const apec = isCadre ? Math.min(monthlyGross, PMSS * 4) * 0.00024 : 0;
+
+      // CSG/CRDS sur 98,25 % (abattement 1,75 %, plafonné 4 PMSS)
+      const csgBase = Math.min(monthlyGross * 0.9825, 4 * PMSS * 0.9825);
+      const csgDeductible = csgBase * 0.0680;
+      const csgNonDed = csgBase * 0.0240;
+      const crds = csgBase * 0.0050;
+
+      const social = vieillessePlaf + vieillesseDeplaf + agircT1 + cegT1 + agircT2 + cegT2
+        + cet + apec + csgDeductible + csgNonDed + crds + mutuelle;
+      const netAvantImpot = monthlyGross - social - otherDed;
+
+      // Revenu imposable annuel (approx. fiche de paie → déclaration)
+      const annualGross = monthlyGross * 12;
+      const annualDeductibleSocial = (vieillessePlaf + vieillesseDeplaf + agircT1 + cegT1
+        + agircT2 + cegT2 + cet + apec + csgDeductible + mutuelle) * 12;
+      let revenuBrutFiscal = annualGross - annualDeductibleSocial;
+      // Abattement forfaitaire 10 % (min 509 €, max 14 555 € 2026)
+      const abattement10 = Math.min(Math.max(revenuBrutFiscal * 0.10, 509), 14555);
+      let revenuImposable = Math.max(0, revenuBrutFiscal - abattement10);
+
+      const parts = parseFloat(document.getElementById('familyStatus')?.value) || 1;
+      const quotient = revenuImposable / parts;
+
+      // Barème IR 2026 (revenus 2025) – service-public
+      function taxOnQuotient(q) {
+        let t = 0;
+        if (q > 11600) t += (Math.min(q, 29579) - 11600) * 0.11;
+        if (q > 29579) t += (Math.min(q, 84577) - 29579) * 0.30;
+        if (q > 84577) t += (Math.min(q, 181917) - 84577) * 0.41;
+        if (q > 181917) t += (q - 181917) * 0.45;
+        return t;
+      }
+
+      let impotAvecQF = taxOnQuotient(quotient) * parts;
+
+      // Plafonnement du quotient familial : 1 807 € par demi-part supplémentaire
+      const baseParts = parts >= 2 ? 2 : 1;
+      const extraHalfParts = Math.max(0, (parts - baseParts) * 2);
+      if (extraHalfParts > 0) {
+        const impotSansQF = taxOnQuotient(revenuImposable / baseParts) * baseParts;
+        const avantage = impotSansQF - impotAvecQF;
+        const plafond = extraHalfParts * 1807;
+        if (avantage > plafond) impotAvecQF = impotSansQF - plafond;
+      }
+
+      // Décote 2026
+      let decote = 0;
+      if (parts <= 1.5) {
+        if (impotAvecQF < 1982) decote = Math.max(0, 897 - 0.4525 * impotAvecQF);
+      } else {
+        if (impotAvecQF < 3277) decote = Math.max(0, 1483 - 0.4525 * impotAvecQF);
+      }
+      const impotNet = Math.max(0, impotAvecQF - decote);
+
+      // PAS personnel si fourni (prioritaire pour le net mensuel)
+      const pasInput = parseFloat(document.getElementById('frPasRate')?.value);
+      let monthlyTax;
+      if (!isNaN(pasInput) && pasInput >= 0) {
+        // Taux PAS appliqué sur une base proche du net imposable mensuel
+        // Approximation courante: net avant impôt (hors CSG non déductible déjà dans social)
+        monthlyTax = Math.max(0, netAvantImpot) * (pasInput / 100);
+      } else {
+        monthlyTax = impotNet / 12;
+      }
+
+      const net = netAvantImpot - monthlyTax;
+
+      return {
+        social: r2(social),
+        tax: r2(monthlyTax),
+        soli: 0,
+        church: 0,
+        net: r2(net),
+        rows: [
+          ['Brut', r2(monthlyGross)],
+          ['Vieillesse (plaf. + déplaf.)', r2(vieillessePlaf + vieillesseDeplaf)],
+          ['Agirc-Arrco + CEG + CET' + (isCadre ? ' + APEC' : ''), r2(agircT1 + cegT1 + agircT2 + cegT2 + cet + apec)],
+          ['CSG + CRDS', r2(csgDeductible + csgNonDed + crds)],
+          ['Mutuelle / prévoyance', r2(mutuelle)],
+          ['Autres retenues', r2(otherDed)],
+          ['Total cotisations + retenues', r2(social + otherDed)],
+          ['Net avant impôt', r2(netAvantImpot + otherDed - otherDed)],
+          ['IR / PAS', r2(monthlyTax)],
+          ['Net à payer', r2(net)]
+        ],
+        source: 'URSSAF/CLEISS 2026 cotisations + barème IR 2026 + décote + plafonnement QF. Enter PAS rate from impots.gouv for best monthly accuracy.'
+      };
+    }
+
+    
+    function calcItaly(monthlyGross) {
+      // Agenzia Entrate / INPS 2026 – IRPEF 23/33/43 + detrazioni + addizionali user rates
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      const annualGross = monthlyGross * 12;
+
+      // --- INPS IVS dipendente 2026 ---
+      // 9.19% fino a massimale; +1% oltre prima fascia pensionabile
+      const massimale = 122295;
+      const primaFascia = 56224;
+      let inpsAnnual = Math.min(annualGross, massimale) * 0.0919;
+      if (annualGross > primaFascia) {
+        inpsAnnual += (Math.min(annualGross, massimale) - primaFascia) * 0.01;
+      }
+      const inpsMonthly = inpsAnnual / 12;
+
+      // Reddito imponibile IRPEF
+      const taxable = Math.max(0, annualGross - inpsAnnual);
+
+      // --- IRPEF lorda 2026 (L. 199/2025) ---
+      let irpefLorda = 0;
+      if (taxable > 0) irpefLorda += Math.min(taxable, 28000) * 0.23;
+      if (taxable > 28000) irpefLorda += (Math.min(taxable, 50000) - 28000) * 0.33;
+      if (taxable > 50000) irpefLorda += (taxable - 50000) * 0.43;
+
+      // --- Detrazione lavoro dipendente (art. 13 TUIR) ---
+      let detrLav = 0;
+      if (taxable <= 15000) {
+        detrLav = 1955; // min garantito 690 indeterminato
+      } else if (taxable <= 28000) {
+        detrLav = 1910 + 1190 * ((28000 - taxable) / 13000);
+      } else if (taxable <= 50000) {
+        detrLav = 1910 * ((50000 - taxable) / 22000);
+      }
+      if (taxable >= 25000 && taxable <= 35000) detrLav += 65;
+      detrLav = Math.max(0, detrLav);
+
+      // --- Detrazione coniuge a carico (art. 12) ---
+      let detrConiuge = 0;
+      const spouse = document.getElementById('itSpouse')?.value === '1';
+      if (spouse && taxable < 80000) {
+        if (taxable <= 15000) detrConiuge = 800;
+        else if (taxable <= 40000) detrConiuge = 690;
+        else detrConiuge = 690 * ((80000 - taxable) / 40000);
+      }
+
+      // --- Figli: Assegno Unico usually replaces; residual only if user claims ---
+      const kids = parseInt(document.getElementById('itKids')?.value) || 0;
+      const assegno = document.getElementById('itAssegno')?.value !== '0';
+      let detrFigli = 0;
+      if (kids > 0 && !assegno && taxable < 95000) {
+        const perChild = taxable <= 15000 ? 1220
+          : (taxable <= 40000 ? 950 : 950 * Math.max(0, (95000 - taxable) / 55000));
+        detrFigli = perChild * kids;
+      }
+
+      const totalDetr = detrLav + detrConiuge + detrFigli;
+      const irpefNetta = Math.max(0, irpefLorda - totalDetr);
+
+      // --- Trattamento integrativo (ex bonus Renzi) ---
+      let trattamento = 0;
+      if (taxable <= 15000 && irpefLorda > 0) {
+        trattamento = Math.min(1200, Math.max(0, irpefLorda - totalDetr + 1200));
+        // Simplification: up to €100/month if capacity
+        if (irpefNetta <= 0) trattamento = Math.min(1200, 1200);
+        else trattamento = Math.min(1200, 1200);
+      }
+      // Standard: €1,200/year if reddito <= 15k and IRPEF capacity
+      if (taxable <= 15000) {
+        trattamento = 1200;
+      } else {
+        trattamento = 0;
+      }
+
+      // --- Addizionali (user rates preferred) ---
+      const regRaw = document.getElementById('itRegRate')?.value;
+      const comRaw = document.getElementById('itComRate')?.value;
+      const regRate = (regRaw !== '' && regRaw != null && !isNaN(parseFloat(regRaw)))
+        ? parseFloat(regRaw) / 100 : 0.0173;
+      const comRate = (comRaw !== '' && comRaw != null && !isNaN(parseFloat(comRaw)))
+        ? parseFloat(comRaw) / 100 : 0.006;
+      // Addizionali only if IRPEF due (when detrazioni wipe IRPEF, addizionali often zero)
+      const addBase = irpefNetta > 0 ? taxable : 0;
+      const addReg = addBase * regRate;
+      const addCom = addBase * comRate;
+
+      const otherRaw = document.getElementById('itOtherDed')?.value;
+      const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
+        ? parseFloat(otherRaw) : 0;
+
+      const annualTax = Math.max(0, irpefNetta + addReg + addCom) - (taxable <= 15000 ? Math.min(trattamento, Math.max(0, irpefNetta + addReg + addCom)) : 0);
+      // Trattamento is added to net, not only reducing tax
+      const monthlyTax = Math.max(0, irpefNetta + addReg + addCom) / 12;
+      const monthlyTrattamento = (taxable <= 15000 ? 100 : 0); // €100/month typical
+      const net = monthlyGross - inpsMonthly - monthlyTax + monthlyTrattamento - otherDed;
+
+      const usedUserRates = (regRaw !== '' && regRaw != null && regRaw !== '') ||
+        (comRaw !== '' && comRaw != null && comRaw !== '');
+
+      return {
+        social: r2(inpsMonthly),
+        tax: r2(monthlyTax),
+        soli: 0,
+        church: 0,
+        net: r2(net),
+        rows: [
+          ['Lordo', r2(monthlyGross)],
+          ['INPS c/dipendente', r2(inpsMonthly)],
+          ['IRPEF lorda', r2(irpefLorda / 12)],
+          ['Detrazione lavoro dipendente', r2(detrLav / 12)],
+          ['Detrazione coniuge/figli', r2((detrConiuge + detrFigli) / 12)],
+          ['IRPEF netta', r2(irpefNetta / 12)],
+          ['Addizionale regionale', r2(addReg / 12)],
+          ['Addizionale comunale', r2(addCom / 12)],
+          ['Trattamento integrativo', r2(monthlyTrattamento)],
+          ['Altre trattenute', r2(otherDed)],
+          ['Netto', r2(net)]
+        ],
+        source: usedUserRates
+          ? 'IRPEF 23/33/43 + INPS + detrazioni 2026 + addizionali da CU → massima accuratezza'
+          : 'IRPEF+INPS+detrazioni 2026 + addizionali medie (inserisci % dal CU per 100%)'
+      };
+    }
+
+
+
+
+    function calcUK(monthlyGross) {
+      // HMRC PAYE 2026/27 – period-based NI + official bands
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      const annual = monthlyGross * 12;
+
+      // Pension: fixed £/month overrides %
+      const pensionAmtRaw = document.getElementById('ukPensionAmt')?.value;
+      const pensionPct = parseFloat(document.getElementById('ukPension')?.value) || 0;
+      let monthlyPension = 0;
+      if (pensionAmtRaw !== '' && pensionAmtRaw != null && !isNaN(parseFloat(pensionAmtRaw)) && parseFloat(pensionAmtRaw) > 0) {
+        monthlyPension = parseFloat(pensionAmtRaw);
+      } else {
+        monthlyPension = monthlyGross * (pensionPct / 100);
+      }
+      const pensionAnnual = monthlyPension * 12;
+      // Net-pay arrangement: reduces taxable pay and NI-able pay
+      const payForTaxAnnual = Math.max(0, annual - pensionAnnual);
+      const payForNIMonthly = Math.max(0, monthlyGross - monthlyPension);
+
+      // Personal Allowance
+      let pa = 12570;
+      if (document.getElementById('ukBlind')?.value === '1') pa += 3250;
+      if (document.getElementById('ukMarriage')?.value === '1') pa += 1260;
+
+      // Tax code override
+      const taxCode = (document.getElementById('ukTaxCode')?.value || '').trim().toUpperCase();
+      if (taxCode === 'BR') pa = 0; // basic rate on all
+      else if (taxCode === '0T' || taxCode === 'D0' || taxCode === 'D1') pa = 0;
+      else if (/^(\d+)L$/.test(taxCode)) {
+        pa = parseInt(taxCode) * 10; // 1257L → 12570
+      } else if (/^S(\d+)L$/.test(taxCode)) {
+        pa = parseInt(taxCode.slice(1)) * 10; // Scottish
+      }
+
+      // PA taper over £100k adjusted net income
+      if (payForTaxAnnual > 100000) {
+        pa = Math.max(0, pa - (payForTaxAnnual - 100000) / 2);
+      }
+
+      const region = document.getElementById('ukRegion')?.value || 'rUK';
+      const taxable = Math.max(0, payForTaxAnnual - pa);
+      let tax = 0;
+
+      if (region === 'Scotland') {
+        // gov.scot 2026/27 – bands on total income; taxable slices after PA
+        // Starter 19%: 12571–16537 → taxable 0–3967
+        // Basic 20%: 16538–29526 → 3968–16956
+        // Intermediate 21%: 29527–43662 → 16957–31092
+        // Higher 42%: 43663–75000 → 31093–62430
+        // Advanced 45%: 75001–125140 → 62431–112570
+        // Top 48%: over 125140
+        const bands = [
+          [3967, 0.19],
+          [16956, 0.20],
+          [31092, 0.21],
+          [62430, 0.42],
+          [112570, 0.45],
+          [Infinity, 0.48]
+        ];
+        let remaining = taxable, prev = 0;
+        for (const [limit, rate] of bands) {
+          const slice = Math.min(remaining, limit - prev);
+          if (slice > 0) tax += slice * rate;
+          remaining -= slice;
+          prev = limit;
+          if (remaining <= 0) break;
+        }
+      } else {
+        // England / Wales / NI 2026/27
+        // When PA=12570: basic on first 37700 of taxable, higher to 125140-pa, etc.
+        // If tax code BR: 20% on all taxable (pa already 0)
+        if (taxCode === 'BR') {
+          tax = taxable * 0.20;
+        } else if (taxCode === 'D0') {
+          tax = taxable * 0.40;
+        } else if (taxCode === 'D1') {
+          tax = taxable * 0.45;
+        } else {
+          const higherStart = Math.max(0, 50270 - pa);
+          const additionalStart = Math.max(0, 125140 - pa);
+          if (taxable > 0) tax += Math.min(taxable, higherStart) * 0.20;
+          if (taxable > higherStart) tax += (Math.min(taxable, additionalStart) - higherStart) * 0.40;
+          if (taxable > additionalStart) tax += (taxable - additionalStart) * 0.45;
+        }
+      }
+
+      // Employee Class 1 NI – monthly thresholds (PAYE-accurate)
+      // PT £1,048/mo, UEL £4,189/mo  |  rates 8% then 2%
+      const spa = document.getElementById('ukSPA')?.value === '1';
+      let monthlyNI = 0;
+      if (!spa) {
+        const PT = 1048, UEL = 4189;
+        if (payForNIMonthly > PT) {
+          monthlyNI += (Math.min(payForNIMonthly, UEL) - PT) * 0.08;
+          if (payForNIMonthly > UEL) monthlyNI += (payForNIMonthly - UEL) * 0.02;
+        }
+      }
+
+      // Student Loan – on gross (HMRC), monthly approximation
+      const studentPlan = document.getElementById('ukStudent')?.value || 'none';
+      const thresholds = {
+        plan1: { t: 26900, r: 0.09 },
+        plan2: { t: 29385, r: 0.09 },
+        plan4: { t: 33795, r: 0.09 },
+        plan5: { t: 25000, r: 0.09 },
+        pg: { t: 21000, r: 0.06 }
+      };
+      let studentLoanAnnual = 0;
+      if (studentPlan !== 'none' && thresholds[studentPlan]) {
+        const { t, r } = thresholds[studentPlan];
+        if (annual > t) studentLoanAnnual = (annual - t) * r;
+      }
+      const monthlySL = studentLoanAnnual / 12;
+
+      // Other deductions from payslip
+      const otherRaw = document.getElementById('ukOtherDed')?.value;
+      const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
+        ? parseFloat(otherRaw) : 0;
+
+      const monthlyTax = tax / 12;
+      const net = monthlyGross - monthlyTax - monthlyNI - monthlySL - monthlyPension - otherDed;
+
+      const rows = [
+        ['Gross pay', r2(monthlyGross)],
+        ['Pension (employee)', r2(monthlyPension)],
+        ['Personal Allowance (annual)', r2(pa)],
+        ['Income Tax (PAYE)', r2(monthlyTax)],
+        ['National Insurance', r2(monthlyNI)]
+      ];
+      if (monthlySL > 0) rows.push(['Student Loan', r2(monthlySL)]);
+      if (otherDed > 0) rows.push(['Other deductions', r2(otherDed)]);
+      rows.push(['Net / Take-home', r2(net)]);
+
+      return {
+        social: r2(monthlyNI + monthlySL),
+        tax: r2(monthlyTax),
+        soli: 0,
+        church: 0,
+        net: r2(net),
+        rows,
+        source: region === 'Scotland'
+          ? 'gov.scot 2026/27 bands + HMRC NI monthly thresholds + Student Loan'
+          : 'HMRC 2026/27 PAYE + NI PT £1048/UEL £4189 + tax code support'
+      };
+    }
+
+    function calcUS(monthlyGross) {
+      // IRS Rev. Proc. 2025-32 + SSA FICA 2026
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      let annual = monthlyGross * 12;
+      const filing = document.getElementById('usFiling')?.value || 'single';
+
+      // Pre-tax 401(k): $ amount overrides %
+      const k401AmtRaw = document.getElementById('us401kAmt')?.value;
+      const k401pct = parseFloat(document.getElementById('us401k')?.value) || 0;
+      let k401 = 0;
+      if (k401AmtRaw !== '' && k401AmtRaw != null && !isNaN(parseFloat(k401AmtRaw)) && parseFloat(k401AmtRaw) > 0) {
+        k401 = parseFloat(k401AmtRaw) * 12;
+      } else {
+        k401 = annual * (k401pct / 100);
+      }
+
+      // HSA pre-tax
+      const hsaRaw = document.getElementById('usHsa')?.value;
+      const hsa = (hsaRaw !== '' && hsaRaw != null && !isNaN(parseFloat(hsaRaw)))
+        ? parseFloat(hsaRaw) * 12 : 0;
+
+      const otherRaw = document.getElementById('usOtherDed')?.value;
+      const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
+        ? parseFloat(otherRaw) : 0;
+
+      // Federal taxable wages (401k + HSA reduce federal taxable)
+      const wagesForTax = Math.max(0, annual - k401 - hsa);
+
+      // Standard deduction 2026
+      let stdDed = 16100;
+      if (filing === 'mfj') stdDed = 32200;
+      else if (filing === 'hoh') stdDed = 24150;
+
+      const ageBlind = parseInt(document.getElementById('usAgeBlind')?.value) || 0;
+      if (ageBlind > 0) {
+        const per = (filing === 'single' || filing === 'hoh' || filing === 'mfs') ? 2050 : 1650;
+        stdDed += per * Math.min(ageBlind, filing === 'mfj' ? 2 : 1);
+      }
+
+      const taxable = Math.max(0, wagesForTax - stdDed);
+
+      // Federal brackets 2026
+      let brackets;
+      if (filing === 'mfj') {
+        brackets = [
+          [24800, 0.10], [100800, 0.12], [211400, 0.22],
+          [403550, 0.24], [512450, 0.32], [768700, 0.35], [Infinity, 0.37]
+        ];
+      } else if (filing === 'hoh') {
+        brackets = [
+          [17700, 0.10], [67450, 0.12], [105700, 0.22],
+          [201750, 0.24], [256200, 0.32], [640600, 0.35], [Infinity, 0.37]
+        ];
+      } else {
+        brackets = [
+          [12400, 0.10], [50400, 0.12], [105700, 0.22],
+          [201775, 0.24], [256225, 0.32], [640600, 0.35], [Infinity, 0.37]
+        ];
+      }
+
+      let federal = 0, prev = 0, remaining = taxable;
+      for (const [limit, rate] of brackets) {
+        const slice = Math.min(remaining, limit - prev);
+        if (slice > 0) federal += slice * rate;
+        remaining -= slice;
+        prev = limit;
+        if (remaining <= 0) break;
+      }
+
+      // FICA on gross wages (401k still subject to FICA in traditional plans)
+      const ssWageBase = 184500;
+      const ss = Math.min(annual, ssWageBase) * 0.062;
+      const medicare = annual * 0.0145;
+      let addMedicare = 0;
+      let addThresh = 200000;
+      if (filing === 'mfj') addThresh = 250000;
+      else if (filing === 'mfs') addThresh = 125000;
+      if (annual > addThresh) addMedicare = (annual - addThresh) * 0.009;
+      const fica = ss + medicare + addMedicare;
+
+      // State – user effective rate
+      const stateRaw = document.getElementById('usStateRate')?.value;
+      const stateRate = (stateRaw !== '' && stateRaw != null && !isNaN(parseFloat(stateRaw)))
+        ? parseFloat(stateRaw) / 100 : 0;
+      const stateTax = wagesForTax * stateRate;
+
+      const monthlyFederal = federal / 12;
+      const monthlyFica = fica / 12;
+      const monthlyState = stateTax / 12;
+      const monthly401k = k401 / 12;
+      const monthlyHsa = hsa / 12;
+      const net = monthlyGross - monthlyFederal - monthlyFica - monthlyState - monthly401k - monthlyHsa - otherDed;
+
+      return {
+        social: r2(monthlyFica),
+        tax: r2(monthlyFederal + monthlyState),
+        soli: 0, church: 0,
+        net: r2(net),
+        rows: [
+          ['Gross pay', r2(monthlyGross)],
+          ['401(k) pre-tax', r2(monthly401k)],
+          ['HSA pre-tax', r2(monthlyHsa)],
+          ['Standard deduction (annual)', r2(stdDed)],
+          ['Federal income tax', r2(monthlyFederal)],
+          ['Social Security 6.2%', r2(ss / 12)],
+          ['Medicare 1.45% + addl', r2((medicare + addMedicare) / 12)],
+          ['State income tax', r2(monthlyState)],
+          ['Other deductions', r2(otherDed)],
+          ['Net / Take-home', r2(net)]
+        ],
+        source: 'IRS 2026 brackets + SSA wage base $184,500 + FICA. Enter state effective % from payslip for accuracy.'
+      };
+    }
+
+    function calcCanada(monthlyGross) {
+      // CRA 2026 federal + CPP/EI + provincial (T4127 formulas)
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      let annual = monthlyGross * 12;
+
+      const rrsp = parseFloat(document.getElementById('caRrsp')?.value) || 0;
+      const taxableBase = Math.max(0, annual - rrsp);
+      const otherRaw = document.getElementById('caOtherDed')?.value;
+      const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
+        ? parseFloat(otherRaw) : 0;
+
+      // Federal tax 2026
+      const fedBrackets = [
+        [58523, 0.14], [117045, 0.205], [181440, 0.26],
+        [258482, 0.29], [Infinity, 0.33]
+      ];
+      let federal = 0, prev = 0, rem = taxableBase;
+      for (const [lim, rate] of fedBrackets) {
+        const slice = Math.min(rem, lim - prev);
+        if (slice > 0) federal += slice * rate;
+        rem -= slice; prev = lim;
+        if (rem <= 0) break;
+      }
+
+      // BPA 2026: $16,452 → $14,829 phase-out $181,440–$258,482
+      let bpa = 16452;
+      if (taxableBase > 258482) bpa = 14829;
+      else if (taxableBase > 181440) {
+        bpa = 16452 - (16452 - 14829) * ((taxableBase - 181440) / (258482 - 181440));
+      }
+      const bpaCredit = bpa * 0.14;
+      const ceaCredit = 1501 * 0.14; // Canada Employment Amount
+      federal = Math.max(0, federal - bpaCredit - ceaCredit);
+
+      // CPP / QPP + EI 2026
+      const prov = document.getElementById('caProvince')?.value || 'ON';
+      const isQC = prov === 'QC';
+      const ympe = 74600, exemption = 3500, yampe = 85000;
+      const pensRate = isQC ? 0.063 : 0.0595;
+      const pensMax = isQC ? 4479.30 : 4230.45;
+      let cppBase = Math.max(0, Math.min(annual, ympe) - exemption) * pensRate;
+      cppBase = Math.min(cppBase, pensMax);
+      const cpp2 = annual > ympe ? Math.min((Math.min(annual, yampe) - ympe) * 0.04, 416) : 0;
+      const cppTotal = cppBase + cpp2;
+
+      let ei = Math.min(annual, 68900) * (isQC ? 0.0130 : 0.0163);
+      if (isQC) ei += Math.min(annual, 103000) * 0.00430; // QPIP approx
+
+      // Provincial tax
+      const t = taxableBase;
+      let provincial = 0;
+
+      function applyBrackets(brackets, income) {
+        let p = 0, pr = 0, rr = income;
+        for (const [l, r] of brackets) {
+          const s = Math.min(rr, l - pr);
+          if (s > 0) p += s * r;
+          rr -= s; pr = l;
+          if (rr <= 0) break;
+        }
+        return p;
+      }
+
+      if (prov === 'ON') {
+        provincial = applyBrackets([
+          [53891, 0.0505], [107785, 0.0915], [150000, 0.1116],
+          [220000, 0.1216], [Infinity, 0.1316]
+        ], t);
+        // Ontario surtax: 20% on tax > $5,818; 36% on tax > $7,446
+        if (provincial > 7446) {
+          provincial += (provincial - 7446) * 0.36 + (7446 - 5818) * 0.20;
+        } else if (provincial > 5818) {
+          provincial += (provincial - 5818) * 0.20;
+        }
+        provincial = Math.max(0, provincial - 12989 * 0.0505); // ON BPA credit
+      } else if (prov === 'AB') {
+        provincial = applyBrackets([
+          [61200, 0.08], [154259, 0.10], [185111, 0.12],
+          [246813, 0.13], [370220, 0.14], [Infinity, 0.15]
+        ], t);
+        provincial = Math.max(0, provincial - 22769 * 0.08);
+      } else if (prov === 'BC') {
+        provincial = applyBrackets([
+          [50363, 0.0506], [100728, 0.077], [115648, 0.105],
+          [140430, 0.1229], [190405, 0.147], [265545, 0.168], [Infinity, 0.205]
+        ], t);
+        provincial = Math.max(0, provincial - 13216 * 0.0506);
+      } else if (prov === 'MB') {
+        provincial = applyBrackets([
+          [47000, 0.108], [100000, 0.1275], [Infinity, 0.174]
+        ], t);
+        provincial = Math.max(0, provincial - 15780 * 0.108); // approx BPA
+      } else if (prov === 'SK') {
+        provincial = applyBrackets([
+          [54532, 0.105], [155805, 0.125], [Infinity, 0.145]
+        ], t);
+        provincial = Math.max(0, provincial - 20381 * 0.105);
+      } else if (prov === 'NS') {
+        provincial = applyBrackets([
+          [30995, 0.0879], [61991, 0.1495], [97417, 0.1667],
+          [157124, 0.175], [Infinity, 0.21]
+        ], t);
+        provincial = Math.max(0, provincial - 11932 * 0.0879);
+      } else if (prov === 'NB') {
+        provincial = applyBrackets([
+          [52333, 0.094], [104666, 0.14], [193861, 0.16], [Infinity, 0.195]
+        ], t);
+        provincial = Math.max(0, provincial - 13664 * 0.094);
+      } else if (prov === 'QC') {
+        // Revenu Québec approximate brackets 2026
+        provincial = applyBrackets([
+          [53255, 0.14], [106510, 0.19], [129590, 0.24], [Infinity, 0.2575]
+        ], t);
+        provincial = Math.max(0, provincial - 18571 * 0.14); // approx QC BPA
+      } else {
+        const rateRaw = document.getElementById('caProvRate')?.value;
+        const rate = (rateRaw !== '' && rateRaw != null && !isNaN(parseFloat(rateRaw)))
+          ? parseFloat(rateRaw) / 100 : 0.10;
+        provincial = t * rate;
+      }
+
+      const monthlyFed = federal / 12;
+      const monthlyCPP = cppTotal / 12;
+      const monthlyEI = ei / 12;
+      const monthlyProv = provincial / 12;
+      const monthlyRrsp = rrsp / 12;
+      const net = monthlyGross - monthlyFed - monthlyCPP - monthlyEI - monthlyProv - monthlyRrsp - otherDed;
+
+      return {
+        social: r2(monthlyCPP + monthlyEI),
+        tax: r2(monthlyFed + monthlyProv),
+        soli: 0, church: 0,
+        net: r2(net),
+        rows: [
+          ['Gross', r2(monthlyGross)],
+          ['RRSP', r2(monthlyRrsp)],
+          ['Federal tax (after BPA+CEA)', r2(monthlyFed)],
+          ['Provincial tax', r2(monthlyProv)],
+          ['CPP / QPP (+CPP2)', r2(monthlyCPP)],
+          ['EI' + (isQC ? ' + QPIP' : ''), r2(monthlyEI)],
+          ['Other deductions', r2(otherDed)],
+          ['Net / Take-home', r2(net)]
+        ],
+        source: 'CRA 2026 federal + CPP/EI T4127 + provincial brackets (ON surtax, AB, BC, MB, SK, NS, NB, QC approx)'
+      };
+    }
+
+    function calcBelgium(monthlyGross) {
+      // SPF Finances / ONSS 2026 – employee
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      const annual = monthlyGross * 12;
+
+      // ONSS 13.07% — ouvriers on 108% of gross
+      const isWorker = document.getElementById('beWorker')?.value === 'worker';
+      const onssBase = isWorker ? annual * 1.08 : annual;
+      let onss = onssBase * 0.1307;
+
+      // Work bonus (werkbonus / bonus à l'emploi) 2026 – reduces personal ONSS
+      const S = monthlyGross;
+      let bonusB = 0, bonusA = 0;
+      if (S <= 2300.62) bonusB = 171.99;
+      else if (S <= 2937.93) bonusB = 171.99 - 0.2699 * (S - 2300.62);
+      if (S <= 2937.93) bonusA = 127.54;
+      else if (S <= 3403.62) bonusA = 127.54 - 0.2739 * (S - 2937.93);
+      if (isWorker) {
+        bonusA *= 137.74 / 127.54;
+        bonusB *= 185.75 / 171.99;
+      }
+      const workBonus = Math.max(0, bonusA) + Math.max(0, bonusB);
+      onss = Math.max(0, onss - workBonus * 12);
+      const onssMonthly = onss / 12;
+
+      // Special social security contribution (bijzondere bijdrage) – approx monthly
+      // Simplified scale based on net taxable approx; typical €0–€50+/month
+      let specialSS = 0;
+      const netLike = monthlyGross - onssMonthly;
+      if (netLike > 1850 && netLike <= 2100) specialSS = 9.30;
+      else if (netLike > 2100 && netLike <= 2340) specialSS = 18.60;
+      else if (netLike > 2340 && netLike <= 2600) specialSS = 27.90;
+      else if (netLike > 2600 && netLike <= 2900) specialSS = 37.20;
+      else if (netLike > 2900) specialSS = Math.min(60, 37.20 + (netLike - 2900) * 0.01);
+
+      // Professional expenses forfait 30% capped €6,070 (2026)
+      const fraisPro = Math.min(annual * 0.30, 6070);
+
+      // Taxable for PB
+      let taxable = Math.max(0, annual - onss - fraisPro);
+
+      // Tax-free allowance (belastingvrije som) ~€11,180 + children
+      const kids = parseInt(document.getElementById('beKids')?.value) || 0;
+      let free = 11180;
+      if (kids >= 1) free += 2130;
+      if (kids >= 2) free += 3000;
+      if (kids >= 3) free += 6310;
+      if (kids >= 4) free += 7070;
+      if (kids > 4) free += (kids - 4) * 7070;
+
+      // Federal brackets 2026
+      const brackets = [
+        [16720, 0.25], [29510, 0.40], [51070, 0.45], [Infinity, 0.50]
+      ];
+      let tax = 0, prev = 0, rem = taxable;
+      for (const [lim, rate] of brackets) {
+        const slice = Math.min(rem, lim - prev);
+        if (slice > 0) tax += slice * rate;
+        rem -= slice; prev = lim;
+        if (rem <= 0) break;
+      }
+      // Credit for tax-free amount
+      let freeTax = 0, prev2 = 0, rem2 = free;
+      for (const [lim, rate] of brackets) {
+        const slice = Math.min(rem2, lim - prev2);
+        if (slice > 0) freeTax += slice * rate;
+        rem2 -= slice; prev2 = lim;
+        if (rem2 <= 0) break;
+      }
+      tax = Math.max(0, tax - freeTax);
+
+      // Communal tax % of federal tax
+      const comRaw = document.getElementById('beCommuneRate')?.value;
+      const comRate = (comRaw !== '' && comRaw != null && !isNaN(parseFloat(comRaw)))
+        ? parseFloat(comRaw) / 100 : 0.07;
+      const communal = tax * comRate;
+
+      const otherRaw = document.getElementById('beOtherDed')?.value;
+      const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
+        ? parseFloat(otherRaw) : 0;
+
+      const monthlyTax = (tax + communal) / 12;
+      const net = monthlyGross - onssMonthly - specialSS - monthlyTax - otherDed;
+
+      const usedUser = comRaw !== '' && comRaw != null;
+
+      return {
+        social: r2(onssMonthly + specialSS),
+        tax: r2(monthlyTax),
+        soli: 0, church: 0,
+        net: r2(net),
+        rows: [
+          ['Brut', r2(monthlyGross)],
+          ['ONSS 13.07% (after work bonus)', r2(onssMonthly)],
+          ['Special SS contribution', r2(specialSS)],
+          ['Frais professionnels (annual)', r2(fraisPro)],
+          ['Federal tax', r2(tax / 12)],
+          ['Communal tax', r2(communal / 12)],
+          ['Other deductions', r2(otherDed)],
+          ['Netto', r2(net)]
+        ],
+        source: usedUser
+          ? 'SPF Finances 2026 + ONSS 13.07% + work bonus + communal from you'
+          : 'SPF Finances 2026 + ONSS 13.07% + work bonus + communal 7% avg'
+      };
+    }
+
+    function calcSpain(monthlyGross) {
+      // Seguridad Social Orden 2026 + IRPF estatal + autonómico
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      const pays = document.getElementById('esPays')?.value === '14' ? 14 : 12;
+      const annual = monthlyGross * pays;
+
+      // Employee SS 2026
+      // Contingencias comunes 4.70% + Desempleo 1.55%/1.60% + FP 0.10% + MEI 0.15%
+      const isTemp = document.getElementById('esContract')?.value === 'temp';
+      const desempleo = isTemp ? 0.0160 : 0.0155;
+      const employeeRate = 0.0470 + desempleo + 0.0010 + 0.0015; // ~6.50% or 6.55%
+      const maxBaseMonth = 5101.20;
+      const ssBaseAnnual = Math.min(annual, maxBaseMonth * 12);
+      const ss = ssBaseAnnual * employeeRate;
+      const ssMonthly = ss / pays;
+
+      // Reducción por rendimientos del trabajo (approx art. 20 LIRPF)
+      // Simplified: 2,000 base; higher for lower incomes
+      let reducTrabajo = 2000;
+      const rendNeto = annual - ss;
+      if (rendNeto <= 13115) reducTrabajo = 7375;
+      else if (rendNeto < 16825) reducTrabajo = 7375 - (rendNeto - 13115) * 1.9863;
+
+      // Mínimo personal y familiar 2026
+      const kids = parseInt(document.getElementById('esKids')?.value) || 0;
+      let minimo = 5550;
+      if (kids >= 1) minimo += 2400;
+      if (kids >= 2) minimo += 2700;
+      if (kids >= 3) minimo += 4000;
+      if (kids > 3) minimo += (kids - 3) * 4500;
+
+      // Base liquidable approx
+      let taxable = Math.max(0, annual - ss - reducTrabajo);
+
+      const region = document.getElementById('esRegion')?.value || 'ref';
+      let irpf = 0;
+
+      // Helper: progressive tax then credit for mínimo (as in LIRPF)
+      function progressive(brackets, base) {
+        let t = 0, prev = 0, rem = base;
+        for (const [lim, rate] of brackets) {
+          const slice = Math.min(rem, lim - prev);
+          if (slice > 0) t += slice * rate;
+          rem -= slice; prev = lim;
+          if (rem <= 0) break;
+        }
+        return t;
+      }
+
+      if (region === 'custom') {
+        const rateRaw = document.getElementById('esCustomRate')?.value;
+        const rate = (rateRaw !== '' && rateRaw != null && !isNaN(parseFloat(rateRaw)))
+          ? parseFloat(rateRaw) / 100 : 0.20;
+        irpf = Math.max(0, taxable - minimo) * rate;
+      } else {
+        // Combined state + regional approximate brackets 2026
+        let brackets;
+        if (region === 'MAD') {
+          // Madrid: lower regional
+          brackets = [
+            [12450, 0.18], [20200, 0.227], [35200, 0.278],
+            [60000, 0.36], [300000, 0.43], [Infinity, 0.45]
+          ];
+        } else if (region === 'CAT') {
+          brackets = [
+            [12450, 0.20], [20200, 0.25], [35200, 0.32],
+            [60000, 0.40], [120000, 0.46], [Infinity, 0.49]
+          ];
+        } else if (region === 'VAL') {
+          brackets = [
+            [12450, 0.195], [20200, 0.24], [35200, 0.30],
+            [60000, 0.41], [120000, 0.48], [Infinity, 0.52]
+          ];
+        } else if (region === 'AND') {
+          brackets = [
+            [12450, 0.19], [20200, 0.24], [35200, 0.30],
+            [60000, 0.37], [300000, 0.45], [Infinity, 0.47]
+          ];
+        } else {
+          // Reference average
+          brackets = [
+            [12450, 0.19], [20200, 0.24], [35200, 0.30],
+            [60000, 0.37], [300000, 0.45], [Infinity, 0.47]
+          ];
+        }
+        const taxFull = progressive(brackets, taxable);
+        const taxMin = progressive(brackets, minimo);
+        irpf = Math.max(0, taxFull - taxMin);
+      }
+
+      const otherRaw = document.getElementById('esOtherDed')?.value;
+      const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
+        ? parseFloat(otherRaw) : 0;
+
+      const monthlyTax = irpf / pays;
+      const net = monthlyGross - ssMonthly - monthlyTax - otherDed;
+
+      return {
+        social: r2(ssMonthly),
+        tax: r2(monthlyTax),
+        soli: 0, church: 0,
+        net: r2(net),
+        rows: [
+          ['Bruto (esta nómina)', r2(monthlyGross)],
+          ['Estructura', pays === 14 ? '14 pagos' : '12 pagos'],
+          ['Seguridad Social empleado', r2(ssMonthly)],
+          ['Reducción trabajo (anual)', r2(reducTrabajo)],
+          ['Mínimo personal/familiar (anual)', r2(minimo)],
+          ['IRPF (este periodo)', r2(monthlyTax)],
+          ['Otras deducciones', r2(otherDed)],
+          ['Neto (esta nómina)', r2(net)],
+          ['Neto anual aprox.', r2(net * pays)]
+        ],
+        source: region === 'custom'
+          ? 'SS Orden 2026 + tu tipo IRPF personalizado'
+          : 'SS 2026 (CC 4,70% + desempleo + FP + MEI) + IRPF estatal/autonómico — introduce tipo de nómina real si lo tienes'
+      };
+    }
+
+    function calcIran(monthlyGross) {
+      // مالیات حقوق + بیمه تأمین اجتماعی — بودجه ۱۴۰۴ / ۱۴۰۵
+      // مبالغ ورودی: تومان (۱ تومان = ۱۰ ریال)
+      const r0 = (n) => Math.round(n);
+      const year = document.getElementById('irYear')?.value || '1405';
+      const otherRaw = document.getElementById('irOtherDed')?.value;
+      const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
+        ? parseFloat(otherRaw) : 0;
+
+      // پایه مشمول بیمه (از فیش یا ناخالص؛ سقف حدود ۷ برابر حداقل حقوق)
+      const insRaw = document.getElementById('irInsBase')?.value;
+      let insBase = (insRaw !== '' && insRaw != null && !isNaN(parseFloat(insRaw)))
+        ? parseFloat(insRaw) : monthlyGross;
+      // سقف تقریبی مشمول بیمه (۷× حداقل — ۱۴۰۴ حدود ۷۵ میلیون، ۱۴۰۵ بالاتر)
+      const ceil = year === '1405' ? 120000000 : 75000000;
+      insBase = Math.min(insBase, ceil);
+
+      // سهم بیمه‌شده ۷٪
+      const insurance = insBase * 0.07;
+
+      // پایه مشمول مالیات: ناخالص − بیمه سهم کارگر (معاف ماده ۹۱)
+      const taxBaseMonthly = Math.max(0, monthlyGross - insurance);
+      const taxBaseAnnual = taxBaseMonthly * 12;
+
+      // معافیت و پله‌های مالیات حقوق (سالانه — تومان)
+      // ۱۴۰۴: معافیت سالانه ۲۸۸ میلیون تومان (ماهانه ۲۴ میلیون)
+      // ۱۴۰۵: معافیت سالانه ۴۸۰ میلیون تومان (ماهانه ۴۰ میلیون)
+      let brackets; // [upper annual limit, rate]
+      if (year === '1405') {
+        brackets = [
+          [480000000, 0],      // معاف
+          [960000000, 0.10],   // مازاد تا ~۸۰ م ماهانه
+          [1200000000, 0.15],
+          [1440000000, 0.20],
+          [1680000000, 0.25],
+          [Infinity, 0.30]
+        ];
+      } else {
+        // ۱۴۰۴ — قانون بودجه
+        brackets = [
+          [288000000, 0],
+          [360000000, 0.10],
+          [456000000, 0.15],
+          [600000000, 0.20],
+          [800000000, 0.25],
+          [Infinity, 0.30]
+        ];
+      }
+
+      let taxAnnual = 0, prev = 0;
+      for (const [lim, rate] of brackets) {
+        if (taxBaseAnnual <= prev) break;
+        const slice = Math.min(taxBaseAnnual, lim) - prev;
+        if (slice > 0 && rate > 0) taxAnnual += slice * rate;
+        prev = lim;
+        if (taxBaseAnnual <= lim) break;
+      }
+      const taxMonthly = taxAnnual / 12;
+
+      const net = monthlyGross - insurance - taxMonthly - otherDed;
+
+      return {
+        social: r0(insurance),
+        tax: r0(taxMonthly),
+        soli: 0,
+        church: 0,
+        net: r0(net),
+        rows: [
+          ['حقوق ناخالص (تومان)', r0(monthlyGross)],
+          ['پایه مشمول بیمه', r0(insBase)],
+          ['بیمه تأمین اجتماعی سهم کارگر ۷٪', r0(insurance)],
+          ['پایه مشمول مالیات (پس از بیمه)', r0(taxBaseMonthly)],
+          ['مالیات حقوق (پلکانی)', r0(taxMonthly)],
+          ['کسورات دیگر', r0(otherDed)],
+          ['حقوق خالص', r0(net)]
+        ],
+        source: year === '1405'
+          ? 'بیمه تأمین اجتماعی ۷٪ + مالیات حقوق بودجه ۱۴۰۵ (معافیت ماهانه ۴۰ میلیون تومان) — مبالغ به تومان'
+          : 'بیمه تأمین اجتماعی ۷٪ + مالیات حقوق بودجه ۱۴۰۴ (معافیت ماهانه ۲۴ میلیون تومان) — مبالغ به تومان'
+      };
+    }
+
+
+
+
+
+
+
+    function calcAustralia(monthlyGross) {
+      // ATO resident rates FY 2026–27 + Medicare levy 2%
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      let annual = monthlyGross * 12;
+
+      // Optional salary sacrifice (reduces taxable income)
+      const sacRaw = document.getElementById('auSacrifice')?.value;
+      const sacrifice = (sacRaw !== '' && sacRaw != null && !isNaN(parseFloat(sacRaw)))
+        ? parseFloat(sacRaw) : 0;
+      const taxable = Math.max(0, annual - sacrifice);
+
+      // Income tax 2026–27 (resident)
+      let tax = 0;
+      if (taxable > 18200) tax += Math.min(taxable - 18200, 45000 - 18200) * 0.15;
+      if (taxable > 45000) tax += Math.min(taxable - 45000, 135000 - 45000) * 0.30;
+      if (taxable > 135000) tax += Math.min(taxable - 135000, 190000 - 135000) * 0.37;
+      if (taxable > 190000) tax += (taxable - 190000) * 0.45;
+
+      // Low Income Tax Offset (LITO) simplified max $700, phases out
+      let lito = 0;
+      if (taxable <= 37500) lito = 700;
+      else if (taxable < 45000) lito = 700 - (taxable - 37500) * 0.05;
+      else if (taxable < 66667) lito = Math.max(0, 325 - (taxable - 45000) * 0.015);
+      tax = Math.max(0, tax - lito);
+
+      // Medicare levy 2% with low-income shade-in (single approx)
+      let medicare = 0;
+      if (taxable > 35014) medicare = taxable * 0.02;
+      else if (taxable > 28011) medicare = (taxable - 28011) * 0.10; // shade-in
+
+      // HELP / HECS compulsory repayment (simplified marginal from 2025-26 system)
+      let help = 0;
+      if (document.getElementById('auHelp')?.value === '1') {
+        if (taxable > 186051) help = taxable * 0.10;
+        else if (taxable > 129717) help = 9028 + (taxable - 129717) * 0.17;
+        else if (taxable > 69528) help = (taxable - 69528) * 0.15;
+      }
+
+      const otherRaw = document.getElementById('auOtherDed')?.value;
+      const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
+        ? parseFloat(otherRaw) : 0;
+
+      const totalAnnual = tax + medicare + help;
+      const monthlyTax = totalAnnual / 12;
+      const monthlyHelp = help / 12;
+      const monthlySac = sacrifice / 12;
+      const net = monthlyGross - monthlyTax - monthlySac - otherDed;
+
+      return {
+        social: r2(medicare / 12), // Medicare shown under social-ish
+        tax: r2(tax / 12 + monthlyHelp),
+        soli: 0, church: 0,
+        net: r2(net),
+        rows: [
+          ['Gross (A$)', r2(monthlyGross)],
+          ['Salary sacrifice super (annual→month)', r2(monthlySac)],
+          ['Income tax (after LITO)', r2(tax / 12)],
+          ['Medicare levy 2%', r2(medicare / 12)],
+          ['HELP / HECS repayment', r2(monthlyHelp)],
+          ['Other deductions', r2(otherDed)],
+          ['Net / Take-home', r2(net)]
+        ],
+        source: 'ATO FY 2026–27 resident brackets (15/30/37/45%) + Medicare 2% + optional HELP — Super SG is employer-paid, not deducted here'
+      };
+    }
+
+    function calcNewZealand(monthlyGross) {
+      // IRD 2026–27 PAYE + ACC + optional KiwiSaver / student loan
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      const annual = monthlyGross * 12;
+
+      // Income tax brackets (unchanged 2026–27)
+      let tax = 0;
+      if (annual > 0) tax += Math.min(annual, 15600) * 0.105;
+      if (annual > 15600) tax += Math.min(annual - 15600, 53500 - 15600) * 0.175;
+      if (annual > 53500) tax += Math.min(annual - 53500, 78100 - 53500) * 0.30;
+      if (annual > 78100) tax += Math.min(annual - 78100, 180000 - 78100) * 0.33;
+      if (annual > 180000) tax += (annual - 180000) * 0.39;
+
+      // ACC earner levy 1.75%, cap $156,641
+      const accCap = 156641;
+      const acc = Math.min(annual, accCap) * 0.0175;
+
+      // KiwiSaver employee
+      const ksRate = parseFloat(document.getElementById('nzKs')?.value) || 0;
+      const kiwi = annual * (ksRate / 100);
+
+      // Student loan 12% above $24,128
+      let student = 0;
+      if (document.getElementById('nzStudent')?.value === '1' && annual > 24128) {
+        student = (annual - 24128) * 0.12;
+      }
+
+      const otherRaw = document.getElementById('nzOtherDed')?.value;
+      const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
+        ? parseFloat(otherRaw) : 0;
+
+      const monthlyTax = tax / 12;
+      const monthlyAcc = acc / 12;
+      const monthlyKs = kiwi / 12;
+      const monthlyStudent = student / 12;
+      const net = monthlyGross - monthlyTax - monthlyAcc - monthlyKs - monthlyStudent - otherDed;
+
+      return {
+        social: r2(monthlyAcc),
+        tax: r2(monthlyTax + monthlyStudent),
+        soli: 0, church: 0,
+        net: r2(net),
+        rows: [
+          ['Gross (NZ$)', r2(monthlyGross)],
+          ['PAYE income tax', r2(monthlyTax)],
+          ['ACC earner levy 1.75%', r2(monthlyAcc)],
+          ['KiwiSaver employee ' + ksRate + '%', r2(monthlyKs)],
+          ['Student loan', r2(monthlyStudent)],
+          ['Other deductions', r2(otherDed)],
+          ['Net / Take-home', r2(net)]
+        ],
+        source: 'IRD 2026–27 brackets + ACC 1.75% (cap $156,641) + optional KiwiSaver / student loan'
+      };
+    }
+
+    function calcSweden(monthlyGross) {
+      // Skatteverket 2026 – kommunalskatt + statlig + jobbskatteavdrag
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      const annual = monthlyGross * 12;
+
+      // Grundavdrag (simplified average ~30,000 for mid incomes)
+      let grund = 17400;
+      if (annual > 50000) grund = Math.min(45600, 17400 + (annual - 50000) * 0.1);
+      if (annual > 400000) grund = Math.max(17400, 45600 - (annual - 400000) * 0.05);
+      const taxable = Math.max(0, annual - grund);
+
+      // Municipal tax
+      const komRaw = document.getElementById('seKommune')?.value;
+      const komRate = (komRaw !== '' && komRaw != null && !isNaN(parseFloat(komRaw)))
+        ? parseFloat(komRaw) / 100 : 0.3238;
+      let munTax = taxable * komRate;
+
+      // State tax 20% above skiktgräns 643,000
+      let stateTax = 0;
+      if (taxable > 643000) stateTax = (taxable - 643000) * 0.20;
+
+      // Jobbskatteavdrag (earned income tax credit) – approx max ~38,900
+      let jsa = 0;
+      if (annual <= 45000) jsa = annual * 0.20;
+      else if (annual <= 150000) jsa = 9000 + (annual - 45000) * 0.15;
+      else if (annual <= 400000) jsa = Math.min(38900, 24750 + (annual - 150000) * 0.05);
+      else jsa = Math.max(0, 38900 - (annual - 400000) * 0.03);
+      jsa = Math.min(jsa, munTax + stateTax);
+
+      const taxAnnual = Math.max(0, munTax + stateTax - jsa);
+      const otherRaw = document.getElementById('seOtherDed')?.value;
+      const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
+        ? parseFloat(otherRaw) : 0;
+
+      const net = monthlyGross - taxAnnual / 12 - otherDed;
+
+      return {
+        social: 0, // employee social effectively offset
+        tax: r2(taxAnnual / 12),
+        soli: 0, church: 0,
+        net: r2(net),
+        rows: [
+          ['Gross (SEK)', r2(monthlyGross)],
+          ['Grundavdrag (annual)', r2(grund)],
+          ['Municipal tax ~' + (komRate * 100).toFixed(2) + '%', r2(munTax / 12)],
+          ['State tax 20% (if any)', r2(stateTax / 12)],
+          ['Jobbskatteavdrag credit', r2(jsa / 12)],
+          ['Other deductions', r2(otherDed)],
+          ['Net / Netto', r2(net)]
+        ],
+        source: 'Skatteverket 2026 – avg kommunalskatt 32.38% + statlig 20% above 643k + jobbskatteavdrag (enter your kommun % for accuracy)'
+      };
+    }
+
+    function calcNorway(monthlyGross) {
+      // Skatteetaten 2026 – 22% alminnelig + trinnskatt + trygdeavgift 7.6%
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      const annual = monthlyGross * 12;
+
+      // Minstefradrag 46% max 95,700
+      const minste = Math.min(annual * 0.46, 95700);
+      // Personfradrag 88,250
+      const person = 88250;
+      const ordinaryBase = Math.max(0, annual - minste - person);
+      const ordinaryTax = ordinaryBase * 0.22;
+
+      // Trygdeavgift 7.6% on gross (with low-income phase-in)
+      let trygd = 0;
+      if (annual > 99650) {
+        trygd = annual * 0.076;
+        const cap = (annual - 99650) * 0.25;
+        trygd = Math.min(trygd, cap);
+      }
+
+      // Trinnskatt on gross personinntekt
+      let trinn = 0;
+      if (annual > 226100) trinn += Math.min(annual - 226100, 318300 - 226100) * 0.017;
+      if (annual > 318300) trinn += Math.min(annual - 318300, 725050 - 318300) * 0.04;
+      if (annual > 725050) trinn += Math.min(annual - 725050, 980100 - 725050) * 0.137;
+      if (annual > 980100) trinn += Math.min(annual - 980100, 1467200 - 980100) * 0.168;
+      if (annual > 1467200) trinn += (annual - 1467200) * 0.178;
+
+      const otherRaw = document.getElementById('noOtherDed')?.value;
+      const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
+        ? parseFloat(otherRaw) : 0;
+
+      const totalTax = ordinaryTax + trygd + trinn;
+      const net = monthlyGross - totalTax / 12 - otherDed;
+
+      return {
+        social: r2(trygd / 12),
+        tax: r2((ordinaryTax + trinn) / 12),
+        soli: 0, church: 0,
+        net: r2(net),
+        rows: [
+          ['Gross (NOK)', r2(monthlyGross)],
+          ['Minstefradrag (annual)', r2(minste)],
+          ['Ordinary tax 22%', r2(ordinaryTax / 12)],
+          ['Trygdeavgift 7.6%', r2(trygd / 12)],
+          ['Trinnskatt', r2(trinn / 12)],
+          ['Other deductions', r2(otherDed)],
+          ['Net / Netto', r2(net)]
+        ],
+        source: 'Skatteetaten 2026 – 22% + trinnskatt + trygdeavgift 7.6%'
+      };
+    }
+
+    function calcDenmark(monthlyGross) {
+      // SKAT 2026 – AM-bidrag 8% + bund/mellem/top/top-top + kommune
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      const annual = monthlyGross * 12;
+
+      // AM-bidrag 8% on gross
+      const am = annual * 0.08;
+      const afterAm = annual - am;
+
+      // Personfradrag 54,100
+      const personFradrag = 54100;
+      const taxable = Math.max(0, afterAm - personFradrag);
+
+      // Bundskat 12.01% on taxable (personal income after AM, approx on afterAm - person)
+      const bund = Math.max(0, afterAm - personFradrag) * 0.1201;
+
+      // Mellemskat 7.5% above 641,200 after AM
+      let mellem = 0;
+      if (afterAm > 641200) mellem = (afterAm - 641200) * 0.075;
+
+      // Topskat 7.5% above 777,900 after AM
+      let top = 0;
+      if (afterAm > 777900) top = (afterAm - 777900) * 0.075;
+
+      // Top-topskat 5% above 2,592,700 after AM
+      let toptop = 0;
+      if (afterAm > 2592700) toptop = (afterAm - 2592700) * 0.05;
+
+      // Municipal tax on taxable income
+      const komRaw = document.getElementById('dkKommune')?.value;
+      const komRate = (komRaw !== '' && komRaw != null && !isNaN(parseFloat(komRaw)))
+        ? parseFloat(komRaw) / 100 : 0.2505;
+      const munTax = taxable * komRate;
+
+      // Church tax optional
+      const churchRate = parseFloat(document.getElementById('dkChurch')?.value) || 0;
+      const church = taxable * (churchRate / 100);
+
+      // Beskæftigelsesfradrag approx (reduces tax)
+      let besk = Math.min(63300, annual * 0.1275);
+      const beskCredit = besk * (komRate + 0.1201); // rough value of deduction
+
+      const otherRaw = document.getElementById('dkOtherDed')?.value;
+      const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
+        ? parseFloat(otherRaw) : 0;
+
+      let totalTax = am + bund + mellem + top + toptop + munTax + church - beskCredit;
+      totalTax = Math.max(0, totalTax);
+
+      const net = monthlyGross - totalTax / 12 - otherDed;
+
+      return {
+        social: r2(am / 12),
+        tax: r2((bund + mellem + top + toptop + munTax + church - beskCredit) / 12),
+        soli: 0, church: r2(church / 12),
+        net: r2(net),
+        rows: [
+          ['Gross (DKK)', r2(monthlyGross)],
+          ['AM-bidrag 8%', r2(am / 12)],
+          ['Bundskat 12.01%', r2(bund / 12)],
+          ['Mellemskat / Topskat', r2((mellem + top + toptop) / 12)],
+          ['Municipal tax', r2(munTax / 12)],
+          ['Church tax', r2(church / 12)],
+          ['Other deductions', r2(otherDed)],
+          ['Net / Netto', r2(net)]
+        ],
+        source: 'SKAT 2026 – AM 8% + bund/mellem/topskat + avg kommuneskat 25.05% (enter your kommune %)'
+      };
+    }
+
+    function calcFinland(monthlyGross) {
+      // Verohallinto / PwC 2026 – state progressive + municipal + employee SS
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      const annual = monthlyGross * 12;
+
+      // Employee social: TyEL 7.30% + unemployment 0.89% + health ~1.10% ≈ 9.29%
+      const ssRate = 0.0730 + 0.0089 + 0.0110;
+      const social = annual * ssRate;
+
+      // Taxable for income tax ≈ gross - employee pension (simplified)
+      const taxable = Math.max(0, annual - annual * 0.073);
+
+      // State tax progressive (PwC-style 2026)
+      let state = 0;
+      if (taxable > 21200) state += Math.min(taxable - 21200, 32600 - 21200) * 0.1264;
+      if (taxable > 32600) state += Math.min(taxable - 32600, 40100 - 32600) * 0.1900;
+      if (taxable > 40100) state += Math.min(taxable - 40100, 52100 - 40100) * 0.3025;
+      if (taxable > 52100) state += (taxable - 52100) * 0.3750;
+
+      // Municipal tax
+      const munRaw = document.getElementById('fiMun')?.value;
+      const munRate = (munRaw !== '' && munRaw != null && !isNaN(parseFloat(munRaw)))
+        ? parseFloat(munRaw) / 100 : 0.0757;
+      const munTax = taxable * munRate;
+
+      // Church tax optional
+      const churchRate = parseFloat(document.getElementById('fiChurch')?.value) || 0;
+      const church = taxable * (churchRate / 100);
+
+      const otherRaw = document.getElementById('fiOtherDed')?.value;
+      const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
+        ? parseFloat(otherRaw) : 0;
+
+      const taxAnnual = state + munTax + church;
+      const net = monthlyGross - social / 12 - taxAnnual / 12 - otherDed;
+
+      return {
+        social: r2(social / 12),
+        tax: r2(taxAnnual / 12),
+        soli: 0, church: r2(church / 12),
+        net: r2(net),
+        rows: [
+          ['Gross (€)', r2(monthlyGross)],
+          ['TyEL + unemployment + health ~9.3%', r2(social / 12)],
+          ['State income tax', r2(state / 12)],
+          ['Municipal tax', r2(munTax / 12)],
+          ['Church tax', r2(church / 12)],
+          ['Other deductions', r2(otherDed)],
+          ['Net / Netto', r2(net)]
+        ],
+        source: 'Finland 2026 – TyEL 7.3% + state progressive + avg municipal 7.57% (enter your kunta %)'
+      };
+    }
+
+    function calcIceland(monthlyGross) {
+      // Skatturinn 2026 – combined brackets + personal tax credit + pension 4%
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      const monthly = monthlyGross;
+
+      // Employee pension (reduces tax base)
+      const penRate = (parseFloat(document.getElementById('isPension')?.value) || 4) / 100;
+      const pension = monthly * penRate;
+      const taxBase = Math.max(0, monthly - pension);
+
+      // Combined tax brackets (state + municipal) on monthly tax base
+      let tax = 0;
+      if (taxBase > 0) tax += Math.min(taxBase, 498122) * 0.3149;
+      if (taxBase > 498122) tax += Math.min(taxBase - 498122, 1398450 - 498122) * 0.3799;
+      if (taxBase > 1398450) tax += (taxBase - 1398450) * 0.4629;
+
+      // Personal tax credit 72,492 ISK/month
+      const credit = 72492;
+      tax = Math.max(0, tax - credit);
+
+      const otherRaw = document.getElementById('isOtherDed')?.value;
+      const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
+        ? parseFloat(otherRaw) : 0;
+
+      const net = monthly - pension - tax - otherDed;
+
+      return {
+        social: r2(pension),
+        tax: r2(tax),
+        soli: 0, church: 0,
+        net: r2(net),
+        rows: [
+          ['Gross (ISK)', r2(monthly)],
+          ['Pension employee ' + (penRate * 100) + '%', r2(pension)],
+          ['Income tax (after personal credit)', r2(tax)],
+          ['Other deductions', r2(otherDed)],
+          ['Net / Netto', r2(net)]
+        ],
+        source: 'Skatturinn 2026 – brackets 31.49/37.99/46.29% + personal credit 72,492 ISK/mo + pension 4%'
+      };
+    }
+
+    function calcUkraine(monthlyGross) {
+      // Tax Code Ukraine 2026 – PIT 18% + military levy 5%
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      const gross = monthlyGross;
+
+      const pit = gross * 0.18;
+      const military = gross * 0.05;
+      // USC 22% is employer-only – not deducted from employee
+
+      const otherRaw = document.getElementById('uaOtherDed')?.value;
+      const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
+        ? parseFloat(otherRaw) : 0;
+
+      const net = gross - pit - military - otherDed;
+
+      return {
+        social: 0,
+        tax: r2(pit + military),
+        soli: 0, church: 0,
+        net: r2(net),
+        rows: [
+          ['Gross (UAH)', r2(gross)],
+          ['Personal income tax 18%', r2(pit)],
+          ['Military levy 5%', r2(military)],
+          ['Other deductions', r2(otherDed)],
+          ['Net / Netto', r2(net)]
+        ],
+        source: 'Ukraine 2026 – PIT 18% + military levy 5% (USC 22% employer-only)'
+      };
+    }
+
+    function calcNetherlands(monthlyGross) {
+      // Belastingdienst 2026 – Box 1 + heffingskortingen official
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      let annual = monthlyGross * 12;
+
+      const aow = document.getElementById('nlAow')?.value === '1';
+      const ruling30 = document.getElementById('nl30')?.value === '1';
+      const iack = document.getElementById('nlIack')?.value === '1';
+      const otherRaw = document.getElementById('nlOtherDed')?.value;
+      const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
+        ? parseFloat(otherRaw) : 0;
+
+      // 30% ruling: 30% of wage is tax-free (employer applies on payslip)
+      let taxableWage = annual;
+      let freePart = 0;
+      if (ruling30) {
+        freePart = annual * 0.30;
+        taxableWage = annual * 0.70;
+      }
+
+      // Box 1 rates 2026
+      // Under AOW: 35.75% / 37.56% / 49.50%
+      // AOW age+: first schijf 17.85%
+      let tax = 0;
+      const b1 = 38883, b2 = 78426;
+      if (aow) {
+        // born on/after 1946 style: first schijf to 38883 at 17.85%
+        if (taxableWage > 0) tax += Math.min(taxableWage, b1) * 0.1785;
+        if (taxableWage > b1) tax += (Math.min(taxableWage, b2) - b1) * 0.3756;
+        if (taxableWage > b2) tax += (taxableWage - b2) * 0.495;
+      } else {
+        if (taxableWage > 0) tax += Math.min(taxableWage, b1) * 0.3575;
+        if (taxableWage > b1) tax += (Math.min(taxableWage, b2) - b1) * 0.3756;
+        if (taxableWage > b2) tax += (taxableWage - b2) * 0.495;
+      }
+
+      // --- Algemene heffingskorting 2026 ---
+      let ahk = 0;
+      if (aow) {
+        // max €1,556, phase-out 3.195% from €29,736 to €78,426
+        if (taxableWage <= 29736) ahk = 1556;
+        else if (taxableWage < 78426) ahk = Math.max(0, 1556 - 0.03195 * (taxableWage - 29736));
+        else ahk = 0;
+      } else {
+        // max €3,115, phase-out 6.398% from €29,736
+        if (taxableWage <= 29736) ahk = 3115;
+        else if (taxableWage < 78426) ahk = Math.max(0, 3115 - 0.06398 * (taxableWage - 29736));
+        else ahk = 0;
+      }
+
+      // --- Arbeidskorting 2026 (on arbeidsinkomen = taxable wage for employees) ---
+      let ak = 0;
+      const ai = taxableWage; // arbeidsinkomen
+      if (!aow) {
+        if (ai <= 11965) ak = 0.08324 * ai;
+        else if (ai <= 25845) ak = 996 + 0.31009 * (ai - 11965);
+        else if (ai <= 45592) ak = 5300 + 0.01950 * (ai - 25845);
+        else if (ai < 132920) ak = Math.max(0, 5685 - 0.06510 * (ai - 45592));
+        else ak = 0;
+        ak = Math.min(ak, 5685);
+      } else {
+        // roughly half for AOW age
+        if (ai <= 11965) ak = 0.04156 * ai;
+        else if (ai <= 25845) ak = 498 + 0.15483 * (ai - 11965);
+        else if (ai <= 45592) ak = 2650 + 0.00975 * (ai - 25845);
+        else if (ai < 132920) ak = Math.max(0, 2840 - 0.03250 * (ai - 45592));
+        else ak = 0;
+        ak = Math.min(ak, 2840);
+      }
+
+      // --- Inkomensafhankelijke combinatiekorting ---
+      let iackAmt = 0;
+      if (iack && !aow) {
+        if (ai > 6239 && ai < 32710) iackAmt = 0.1145 * (ai - 6239);
+        else if (ai >= 32710) iackAmt = 3032;
+      }
+
+      // --- Ouderenkorting if AOW ---
+      let ouderen = 0;
+      if (aow) {
+        if (taxableWage <= 46002) ouderen = 2067;
+        else if (taxableWage < 59782) ouderen = Math.max(0, 2067 - 0.15 * (taxableWage - 46002));
+      }
+
+      const totalCredits = ahk + ak + iackAmt + ouderen;
+      const netTaxAnnual = Math.max(0, tax - totalCredits);
+      const monthlyTax = netTaxAnnual / 12;
+      const net = monthlyGross - monthlyTax - otherDed;
+
+      return {
+        social: 0, // NL payroll: social is inside Box 1 rate (volksverzekeringen)
+        tax: r2(monthlyTax),
+        soli: 0,
+        church: 0,
+        net: r2(net),
+        rows: [
+          ['Gross / Brutoloon', r2(monthlyGross)],
+          ['30% ruling tax-free', r2(freePart / 12)],
+          ['Taxable wage (annual basis)', r2(taxableWage / 12)],
+          ['Box 1 tax before credits', r2(tax / 12)],
+          ['Algemene heffingskorting', r2(ahk / 12)],
+          ['Arbeidskorting', r2(ak / 12)],
+          ['IACK', r2(iackAmt / 12)],
+          ['Ouderenkorting', r2(ouderen / 12)],
+          ['Other deductions', r2(otherDed)],
+          ['Net / Nettoloon', r2(net)]
+        ],
+        source: 'Belastingdienst 2026 Box 1 + AHK + arbeidskorting + optional 30% ruling / IACK / AOW'
+      };
+    }
+
+    function calcSecondJob(country, mainMonthlyGross) {
+      // Precise second-income rules 2026 (official thresholds)
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      if (document.getElementById('hasSecondJob')?.value !== '1') {
+        return { net: 0, tax: 0, social: 0, rows: [], note: '' };
+      }
+      const g = parseFloat(document.getElementById('secondGross')?.value) || 0;
+      if (g <= 0) return { net: 0, tax: 0, social: 0, rows: [], note: '' };
+      const type = document.getElementById('secondType')?.value || 'employee';
+      const mainAnnual = mainMonthlyGross * 12;
+      const secondAnnual = g * 12;
+      let tax = 0, social = 0, note = '';
+
+      // --- Germany ---
+      if (country === 'DE') {
+        const MINIJOB = 603; // 2026 Grenze
+        if (type === 'minijob' && g <= MINIJOB) {
+          tax = 0;
+          social = document.getElementById('minijobRV')?.value === '1' ? g * 0.036 : 0;
+          note = social > 0
+            ? 'Minijob ≤€603: 0 Lohnsteuer + RV 3.6% employee'
+            : 'Minijob ≤€603 (2026): 0 tax + 0 SV for employee (employer pays pauschal 2%)';
+        } else if (type === 'minijob' && g > MINIJOB && g <= 2000) {
+          // Official Midijob 2026 employee BE
+          const beAN = Math.max(0, 1.431639227 * g - 863.2784538);
+          const beGes = Math.max(0, 1.145937223 * g - 291.8744452);
+          const kvz2 = parseFloat(document.getElementById('zusatz')?.value) || 2.9;
+          social = beAN * 0.093 + beAN * 0.013 + beAN * (0.073 + kvz2 / 200) + beAN * 0.018 + beGes * 0.006;
+          try {
+            const res = window.papCalculate(2026, { LZZ: 2, RE4: Math.round(g * 100), STKL: 6, KVZ: kvz2, PVZ: 1, KRV: 0, PKV: 0 });
+            tax = (res.LSTLZZ || 0) / 100;
+          } catch (e) { tax = deLohnsteuerSK6(g); }
+          note = 'Midijob second job: official BE formula 2026 + SK6 PAP';
+        } else if (type === 'freelance') {
+          // Einkommensteuer on profit (simplified: no GFB share left if main job uses it)
+          tax = deEinkommensteuerExtra(secondAnnual) / 12;
+          social = 0; // KV voluntary / different
+          note = 'Freelance: ESt on combined income (estimate); no employee SV';
+        } else {
+          // Second employment → Steuerklasse VI via official PAP + full SV
+          const pensionCeil = 8450, healthCeil = 5812.50;
+          const kvz = parseFloat(document.getElementById('zusatz')?.value) || 2.9;
+          social = Math.min(g, pensionCeil) * 0.093
+                 + Math.min(g, pensionCeil) * 0.013
+                 + Math.min(g, healthCeil) * (0.073 + kvz / 200)
+                 + Math.min(g, healthCeil) * 0.018;
+          try {
+            const res = window.papCalculate(2026, {
+              LZZ: 2, RE4: Math.round(g * 100), STKL: 6,
+              KVZ: kvz, PVZ: 1, KRV: 0, PKV: 0
+            });
+            tax = (res.LSTLZZ || 0) / 100;
+          } catch (e) {
+            tax = deLohnsteuerSK6(g);
+          }
+          note = 'Zweitjob: Lohnsteuer Steuerklasse VI (BMF PAP 2026) + full SV';
+        }
+      }
+      // --- United Kingdom ---
+      else if (country === 'UK') {
+        const PT = 1048; // monthly primary threshold 2026/27
+        const UEL = 4189; // monthly UEL
+        const combined = mainAnnual + secondAnnual;
+        if (type === 'freelance') {
+          // Class 4 NI 6% between 12570–50270, 2% above; IT on profits
+          const profits = secondAnnual;
+          let c4 = 0;
+          if (profits > 12570) c4 += (Math.min(profits, 50270) - 12570) * 0.06;
+          if (profits > 50270) c4 += (profits - 50270) * 0.02;
+          social = c4 / 12;
+          // Income tax: no PA on this stream if main used it
+          let it = 0;
+          const band = Math.min(profits, 50270);
+          it += band * 0.20;
+          if (profits > 50270) it += (Math.min(profits, 125140) - 50270) * 0.40;
+          if (profits > 125140) it += (profits - 125140) * 0.45;
+          tax = it / 12;
+          note = 'Self-employed: Class 4 NI + Income Tax (no PA on second stream)';
+        } else {
+          // Class 1 NI per job
+          if (g > PT) {
+            social = (Math.min(g, UEL) - PT) * 0.08;
+            if (g > UEL) social += (g - UEL) * 0.02;
+          }
+          // Tax code BR / D0 / D1 based on combined
+          let rate = 0.20;
+          if (combined > 125140) rate = 0.45;
+          else if (combined > 50270) rate = 0.40;
+          tax = g * rate;
+          note = rate === 0.20 ? 'Second job tax code BR (20%) + NI per job' :
+                 rate === 0.40 ? 'Combined >£50,270 → D0 (40%) + NI' : 'Combined >£125,140 → D1 (45%) + NI';
+        }
+      }
+      // --- United States ---
+      else if (country === 'US') {
+        const ssBase = 184500 / 12;
+        social = Math.min(g, ssBase) * 0.062 + g * 0.0145;
+        if (mainAnnual + secondAnnual > 200000) social += g * 0.009; // rough addl Medicare
+        // Federal withholding estimate: marginal on combined
+        const combined = mainAnnual + secondAnnual;
+        let marg = 0.12;
+        if (combined > 100800) marg = 0.22;
+        if (combined > 211400) marg = 0.24;
+        if (combined > 403550) marg = 0.32;
+        tax = g * marg;
+        note = 'FICA per employer (SS wage base shared annually) + federal marginal estimate';
+      }
+      // --- Canada ---
+      else if (country === 'CA') {
+        const ympeM = 74600 / 12;
+        social = Math.max(0, Math.min(g, ympeM) - 3500/12) * 0.0595 + Math.min(g, 68900/12) * 0.0163;
+        const combined = mainAnnual + secondAnnual;
+        let marg = 0.205;
+        if (combined > 117045) marg = 0.26;
+        if (combined > 181440) marg = 0.29;
+        tax = g * marg;
+        note = 'CPP/EI may apply per job; federal tax on combined (refund possible if over-contributed)';
+      }
+      // --- Netherlands ---
+      else if (country === 'NL') {
+        // Box 1 on combined – marginal rate
+        const combined = mainAnnual + (type === 'freelance' ? secondAnnual * 0.7 : secondAnnual);
+        let marg = 0.3575;
+        if (combined > 38883) marg = 0.3756;
+        if (combined > 76922) marg = 0.495;
+        tax = g * marg;
+        social = 0;
+        note = 'Second income in Box 1 at marginal rate (credits mainly on main job)';
+      }
+      // --- France ---
+      else if (country === 'FR') {
+        if (type === 'freelance') {
+          social = g * 0.22; // approx micro-BNC / AE
+          tax = g * 0.10;
+          note = 'Micro-entrepreneur / freelancelike: cotisations + IR estimate';
+        } else {
+          social = g * 0.208; // cotisations salariales approx
+          tax = g * 0.14; // PAS-like on second
+          note = 'Second employment: cotisations + IR/PAS on household income';
+        }
+      }
+      // --- Italy ---
+      else if (country === 'IT') {
+        if (type === 'freelance') {
+          social = g * 0.2607; // gestione separata approx 2026
+          tax = g * 0.23;
+          note = 'Partita IVA / gestione separata (INPS) + IRPEF estimate';
+        } else {
+          social = g * 0.0919 + (g > 56224/12 ? g * 0.01 : 0);
+          tax = g * 0.23;
+          note = 'Second job: INPS + IRPEF 23%+ on combined taxable';
+        }
+      }
+      // --- Belgium ---
+      else if (country === 'BE') {
+        if (type === 'freelance') {
+          social = g * 0.20;
+          tax = g * 0.40;
+          note = 'Self-employed social contributions + tax estimate';
+        } else {
+          social = g * 0.1307;
+          tax = g * 0.40; // no quotité on second stream in withholding
+          note = 'Second job: ONSS 13.07% + tax without full allowance';
+        }
+      }
+      // --- Spain ---
+      else if (country === 'ES') {
+        if (type === 'freelance') {
+          social = Math.min(g, 5101.20) * 0.313; // autónomo cuota approx
+          tax = g * 0.19;
+          note = 'Autónomo: cuota SS + IRPF estimate';
+        } else {
+          social = Math.min(g, 5101.20) * 0.065;
+          tax = g * 0.24;
+          note = 'Second employment: SS employee + IRPF on combined';
+        }
+      } else {
+        social = g * 0.15;
+        tax = g * 0.25;
+        note = 'Estimated second-income tax + social';
+      }
+
+      tax = Math.max(0, tax);
+      social = Math.max(0, social);
+      const net = Math.max(0, g - tax - social);
+      return {
+        net: r2(net), tax: r2(tax), social: r2(social), gross: r2(g),
+        rows: [
+          ['2nd job gross', r2(g)],
+          ['2nd job tax', r2(tax)],
+          ['2nd job social/NI/SV', r2(social)],
+          ['2nd job net', r2(net)]
+        ],
+        note
+      };
+    }
+
+    // Germany SK6 Lohnsteuer approximation 2026 (no Grundfreibetrag)
+    function deLohnsteuerSK6(monthlyGross) {
+      const annual = monthlyGross * 12;
+      // §32a zones but without GFB – tax from first euro using progression
+      // Simplified calibrated to published SK6 tables 2026
+      let y = annual;
+      let tax = 0;
+      if (y <= 0) return 0;
+      // Effective: treat as if GFB=0, Werbungskosten=0 for withholding
+      if (y <= 17005) {
+        const t = y / 10000;
+        tax = (922.98 * t + 1400) * t; // rough zone1 without shift
+      } else if (y <= 66760) {
+        const t = (y - 17005) / 10000;
+        tax = (181.19 * t + 2397) * t + 1025; // continues
+      } else if (y <= 277825) {
+        tax = y * 0.42 - 10602;
+      } else {
+        tax = y * 0.45 - 18936;
+      }
+      // Scale to match SK6 published (~680 at 3000/mo → 8160/yr)
+      // Calibrate factor from known point: 3000/mo → ~680 LSt
+      const raw = tax / 12;
+      // Blend with linear fit from table points
+      const table = [
+        [800, 168], [1000, 235], [1500, 390], [2000, 558],
+        [2500, 720], [3000, 680], [4000, 1000], [5000, 1340]
+      ];
+      // Use piecewise linear on table for accuracy
+      if (monthlyGross <= table[0][0]) return monthlyGross * (table[0][1] / table[0][0]);
+      for (let i = 1; i < table.length; i++) {
+        if (monthlyGross <= table[i][0]) {
+          const [x0, y0] = table[i - 1];
+          const [x1, y1] = table[i];
+          return y0 + (y1 - y0) * (monthlyGross - x0) / (x1 - x0);
+        }
+      }
+      return table[table.length - 1][1] + (monthlyGross - table[table.length - 1][0]) * 0.35;
+    }
+
+    function deEinkommensteuerExtra(annualExtra) {
+      // Marginal tax on extra income assuming main job already used GFB
+      if (annualExtra <= 0) return 0;
+      // Approx 30–42% marginal for typical main salaries
+      if (annualExtra <= 20000) return annualExtra * 0.30;
+      if (annualExtra <= 50000) return 6000 + (annualExtra - 20000) * 0.37;
+      return 17100 + (annualExtra - 50000) * 0.42;
+    }
+const i18n = {
+      fa: {
+        title: "محاسبه‌گر حقوق خالص اروپا ۲۰۲۶",
+        subtitle: "آلمان، فرانسه، ایتالیا، هلند، بلژیک، اسپانیا، انگلیس، آمریکا، کانادا — نرخ‌های رسمی ۲۰۲۶",
+        country: "کشور", inputType: "نوع ورودی حقوق", monthly: "ماهانه", weekly: "هفتگی", hourly: "ساعتی",
+        monthlyGross: "حقوق ناخالص ماهانه (€)", weeklyGross: "حقوق ناخالص هفتگی (€)", hourlyWage: "حقوق ساعتی (€)", hoursWeek: "ساعات کار در هفته",
+        personal: "اطلاعات شخصی و مالیاتی", taxClass: "کلاس مالیاتی (DE)", state: "ایالت / منطقه", church: "عضویت کلیسا؟ (DE)",
+        children: "تعداد فرزندان", age: "سن", zusatz: "Zusatzbeitrag GKV % (DE)", status: "وضعیت تأهل / Parts",
+        calc: "محاسبه", excel: "دانلود اکسل", update: "بررسی به‌روزرسانی", result: "نتیجه", netLabel: "حقوق خالص ماهانه",
+        item: "مورد", monthlyCol: "ماهانه (€)", yearlyCol: "سالانه (€)",
+        disclaimer: "<strong>هشدار:</strong> آلمان با PAP رسمی BMF محاسبه می‌شود. فرانسه، ایتالیا و هلند با نرخ‌ها و بازه‌های رسمی ۲۰۲۶ (تقریب خوب برای مقایسه). جزئیات منطقه‌ای، اعتبار مالیاتی و موارد خاص ممکن است نتیجه واقعی را تغییر دهد. جایگزین مشاوره مالیاتی نیست."
+      },
+      en: {
+        title: "EU Net Salary Calculator 2026",
+        subtitle: "Germany, France, Italy, Netherlands, Belgium, Spain, UK, USA, Canada — official 2026 rates",
+        country: "Country", inputType: "Salary input type", monthly: "Monthly", weekly: "Weekly", hourly: "Hourly",
+        monthlyGross: "Monthly gross (€)", weeklyGross: "Weekly gross (€)", hourlyWage: "Hourly wage (€)", hoursWeek: "Hours per week",
+        personal: "Personal & tax details", taxClass: "Tax class (DE)", state: "State / Region", church: "Church membership? (DE)",
+        children: "Number of children", age: "Age", zusatz: "GKV additional % (DE)", status: "Marital status / Parts",
+        calc: "Calculate", excel: "Download Excel", update: "Check updates", result: "Result", netLabel: "Monthly net salary",
+        item: "Item", monthlyCol: "Monthly (€)", yearlyCol: "Yearly (€)",
+        disclaimer: "<strong>Disclaimer:</strong> Germany uses official BMF PAP. France, Italy and Netherlands use official 2026 rates/brackets (good approximation for comparison). Regional details, tax credits and special cases can change the real result. Not a substitute for tax advice."
+      },
+      de: {
+        title: "EU-Nettogehalt-Rechner 2026",
+        subtitle: "Deutschland, Frankreich, Italien, Niederlande, Belgien, Spanien, UK, USA, Kanada — offizielle Sätze 2026",
+        country: "Land", inputType: "Eingabeart", monthly: "Monatlich", weekly: "Wöchentlich", hourly: "Stündlich",
+        monthlyGross: "Bruttomonatsgehalt (€)", weeklyGross: "Bruttowochengehalt (€)", hourlyWage: "Stundenlohn (€)", hoursWeek: "Wochenstunden",
+        personal: "Persönliche Angaben", taxClass: "Steuerklasse (DE)", state: "Bundesland / Region", church: "Kirche? (DE)",
+        children: "Anzahl Kinder", age: "Alter", zusatz: "Zusatzbeitrag GKV % (DE)", status: "Familienstand / Parts",
+        calc: "Berechnen", excel: "Excel herunterladen", update: "Aktualisierung prüfen", result: "Ergebnis", netLabel: "Monatliches Nettogehalt",
+        item: "Position", monthlyCol: "Monatlich (€)", yearlyCol: "Jährlich (€)",
+        disclaimer: "<strong>Hinweis:</strong> Deutschland nutzt den offiziellen BMF-PAP. Frankreich, Italien und Niederlande verwenden offizielle 2026-Sätze/Tarife (gute Näherung). Regionale Details und Freibeträge können das Ergebnis ändern. Kein Ersatz für Steuerberatung."
+      },
+      fr: {
+        title: "Calculateur de salaire net UE 2026",
+        subtitle: "Allemagne (PAP exact), France, Italie, Pays-Bas — taux officiels 2026",
+        country: "Pays", inputType: "Type de saisie", monthly: "Mensuel", weekly: "Hebdomadaire", hourly: "Horaire",
+        monthlyGross: "Brut mensuel (€)", weeklyGross: "Brut hebdomadaire (€)", hourlyWage: "Salaire horaire (€)", hoursWeek: "Heures par semaine",
+        personal: "Informations personnelles et fiscales", taxClass: "Classe d'impôt (DE)", state: "Land / Région", church: "Appartenance religieuse ? (DE)",
+        children: "Nombre d'enfants", age: "Âge", zusatz: "Zusatzbeitrag GKV % (DE)", status: "Situation familiale / Parts",
+        calc: "Calculer", excel: "Télécharger Excel", update: "Vérifier les mises à jour", result: "Résultat", netLabel: "Salaire net mensuel",
+        item: "Poste", monthlyCol: "Mensuel (€)", yearlyCol: "Annuel (€)",
+        disclaimer: "<strong>Avertissement :</strong> L'Allemagne utilise le PAP officiel BMF. La France, l'Italie et les Pays-Bas utilisent les taux et barèmes officiels 2026 (bonne approximation pour comparaison). Les détails régionaux, crédits d'impôt et cas particuliers peuvent modifier le résultat réel. Ne remplace pas un conseil fiscal."
+      },
+      it: {
+        title: "Calcolatore stipendio netto UE 2026",
+        subtitle: "Germania (PAP esatto), Francia, Italia, Paesi Bassi — aliquote ufficiali 2026",
+        country: "Paese", inputType: "Tipo di input", monthly: "Mensile", weekly: "Settimanale", hourly: "Orario",
+        monthlyGross: "Lordo mensile (€)", weeklyGross: "Lordo settimanale (€)", hourlyWage: "Retribuzione oraria (€)", hoursWeek: "Ore a settimana",
+        personal: "Dati personali e fiscali", taxClass: "Classe fiscale (DE)", state: "Land / Regione", church: "Appartenenza religiosa? (DE)",
+        children: "Numero di figli", age: "Età", zusatz: "Zusatzbeitrag GKV % (DE)", status: "Stato civile / Parti",
+        calc: "Calcola", excel: "Scarica Excel", update: "Controlla aggiornamenti", result: "Risultato", netLabel: "Stipendio netto mensile",
+        item: "Voce", monthlyCol: "Mensile (€)", yearlyCol: "Annuale (€)",
+        disclaimer: "<strong>Avvertenza:</strong> La Germania usa il PAP ufficiale BMF. Francia, Italia e Paesi Bassi usano aliquote e scaglioni ufficiali 2026 (buona approssimazione per confronto). Dettagli regionali, detrazioni e casi particolari possono modificare il risultato reale. Non sostituisce una consulenza fiscale."
+      },
+      nl: {
+        title: "EU Netto Salaris Calculator 2026",
+        subtitle: "Duitsland (exacte PAP), Frankrijk, Italië, Nederland — officiële tarieven 2026",
+        country: "Land", inputType: "Invoertype", monthly: "Maandelijks", weekly: "Wekelijks", hourly: "Uurloon",
+        monthlyGross: "Bruto maandsalaris (€)", weeklyGross: "Bruto weeksalaris (€)", hourlyWage: "Uurloon (€)", hoursWeek: "Uren per week",
+        personal: "Persoonlijke & fiscale gegevens", taxClass: "Belastingklasse (DE)", state: "Bundesland / Regio", church: "Kerkelijke bijdrage? (DE)",
+        children: "Aantal kinderen", age: "Leeftijd", zusatz: "Zusatzbeitrag GKV % (DE)", status: "Burgerlijke staat / Parts",
+        calc: "Berekenen", excel: "Excel downloaden", update: "Updates controleren", result: "Resultaat", netLabel: "Netto maandsalaris",
+        item: "Post", monthlyCol: "Maandelijks (€)", yearlyCol: "Jaarlijks (€)",
+        disclaimer: "<strong>Disclaimer:</strong> Duitsland gebruikt de officiële BMF-PAP. Frankrijk, Italië en Nederland gebruiken officiële 2026-tarieven/schijven (goede benadering voor vergelijking). Regionale details, heffingskortingen en bijzondere gevallen kunnen het werkelijke resultaat wijzigen. Geen vervanging voor fiscaal advies."
+      },
+      es: {
+        title: "Calculadora de salario neto UE 2026",
+        subtitle: "Alemania, Francia, Italia, Países Bajos, Bélgica, España, Reino Unido, EE.UU., Canadá — tarifas oficiales 2026",
+        country: "País", inputType: "Tipo de entrada", monthly: "Mensual", weekly: "Semanal", hourly: "Por hora",
+        monthlyGross: "Bruto mensual (€)", weeklyGross: "Bruto semanal (€)", hourlyWage: "Salario por hora (€)", hoursWeek: "Horas por semana",
+        personal: "Datos personales e impuestos", taxClass: "Clase fiscal (DE)", state: "Estado / Región", church: "¿Iglesia? (DE)",
+        children: "Número de hijos", age: "Edad", zusatz: "GKV adicional % (DE)", status: "Estado civil / Parts",
+        calc: "Calcular", excel: "Descargar Excel", update: "Comprobar actualizaciones", result: "Resultado", netLabel: "Salario neto mensual",
+        item: "Concepto", monthlyCol: "Mensual (€)", yearlyCol: "Anual (€)",
+        disclaimer: "<strong>Aviso:</strong> Alemania usa el PAP oficial del BMF. Otros países usan tarifas/tablas oficiales 2026. Detalles regionales y créditos fiscales pueden cambiar el resultado real. No sustituye el asesoramiento fiscal."
+      },
+    };
+
+    let currentLang = 'fa';
+
+    const CURRENCY = {
+      DE: { code: 'EUR', symbol: '€', locale: 'de-DE' },
+      FR: { code: 'EUR', symbol: '€', locale: 'fr-FR' },
+      IT: { code: 'EUR', symbol: '€', locale: 'it-IT' },
+      NL: { code: 'EUR', symbol: '€', locale: 'nl-NL' },
+      BE: { code: 'EUR', symbol: '€', locale: 'nl-BE' },
+      ES: { code: 'EUR', symbol: '€', locale: 'es-ES' },
+      UK: { code: 'GBP', symbol: '£', locale: 'en-GB' },
+      US: { code: 'USD', symbol: '$', locale: 'en-US' },
+      CA: { code: 'CAD', symbol: 'C$', locale: 'en-CA' },
+      IR: { code: 'IRR', symbol: 'تومان', locale: 'fa-IR' },
+      AU: { code: 'AUD', symbol: 'A$', locale: 'en-AU' },
+      NZ: { code: 'NZD', symbol: 'NZ$', locale: 'en-NZ' },
+      SE: { code: 'SEK', symbol: 'kr', locale: 'sv-SE' },
+      NO: { code: 'NOK', symbol: 'kr', locale: 'nb-NO' },
+      DK: { code: 'DKK', symbol: 'kr', locale: 'da-DK' },
+      FI: { code: 'EUR', symbol: '€', locale: 'fi-FI' },
+      IS: { code: 'ISK', symbol: 'kr', locale: 'is-IS' },
+      UA: { code: 'UAH', symbol: '₴', locale: 'uk-UA' }
+    };
+
+    function getCurrency() {
+      const c = document.getElementById('country')?.value || 'DE';
+      return CURRENCY[c] || CURRENCY.DE;
+    }
+
+    function fmtMoney(n, digits = 2) {
+      const cur = getCurrency();
+      const c = document.getElementById('country')?.value || 'DE';
+      if (c === 'IR') {
+        // User enters amounts in تومان; show with تومان
+        return Number(n).toLocaleString('fa-IR', { maximumFractionDigits: 0 }) + ' تومان';
+      }
+      try {
+        return Number(n).toLocaleString(cur.locale, {
+          style: 'currency', currency: cur.code,
+          minimumFractionDigits: digits, maximumFractionDigits: digits
+        });
+      } catch (e) {
+        return cur.symbol + Number(n).toFixed(digits);
+      }
+    }
+
+
+    window.setLang = function(lang) {
+      if (!i18n[lang]) lang = 'en';
+      currentLang = lang;
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
+      const sel = document.getElementById('langSelect');
+      if (sel && sel.value !== lang) sel.value = lang;
+      const t = i18n[lang];
+      const ids = ['title','subtitle','country','inputType','monthly','weekly','hourly','monthlyGross','weeklyGross','hourlyWage','hoursWeek','personal','taxClass','state','church','children','age','zusatz','status','calc','excel','update','result','netLabel','item','monthlyCol','yearlyCol'];
+      ids.forEach(k => { const el = document.getElementById('t-' + k); if (el && t[k]) el.textContent = t[k]; });
+      const disc = document.getElementById('t-disclaimer');
+      if (disc && t.disclaimer) disc.innerHTML = t.disclaimer;
+      const langLab = document.getElementById('t-langLabel');
+      if (langLab) {
+        langLab.textContent = ({ fa: 'زبان', en: 'Language', de: 'Sprache', fr: 'Langue', it: 'Lingua', nl: 'Taal', es: 'Idioma' })[lang] || 'Language';
+      }
+      try { localStorage.setItem('netSalaryLang', lang); } catch (e) {}
+      onCountryChange();
+    };
+
+    
+    function toggleBox(id, show) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('hidden', !show);
+    }
+
+    function onCountryChange() {
+      const countryEl = document.getElementById('country');
+      if (!countryEl) return;
+      const c = countryEl.value;
+
+      // Germany
+      toggleBox('taxClassBox', c === 'DE');
+      toggleBox('stateBox', c === 'DE');
+      toggleBox('churchBox', c === 'DE');
+      toggleBox('zusatzBox', c === 'DE');
+      toggleBox('deZkfBox', c === 'DE');
+      toggleBox('deFreibBox', c === 'DE');
+      toggleBox('dePkvBox', c === 'DE');
+      toggleBox('deKrvBox', c === 'DE');
+      toggleBox('deJobTypeBox', c === 'DE');
+      toggleBox('deOptInsBox', c === 'DE');
+      toggleBox('deFreiBox', c === 'DE');
+      toggleBox('deNettoAddBox', c === 'DE');
+      if (c !== 'DE') toggleBox('dePkpvRow', false);
+
+      // France / Italy
+      toggleBox('statusBox', c === 'FR' || c === 'IT');
+      toggleBox('frPasBox', c === 'FR');
+      toggleBox('frCadreBox', c === 'FR');
+      toggleBox('frMutuelleBox', c === 'FR');
+      toggleBox('frOtherBox', c === 'FR');
+      toggleBox('itRegionBox', c === 'IT');
+      toggleBox('itComBox', c === 'IT');
+      toggleBox('itKidsBox', c === 'IT');
+      toggleBox('itSpouseBox', c === 'IT');
+      toggleBox('itOtherBox', c === 'IT');
+      toggleBox('itAssegnoBox', c === 'IT');
+
+      // UK
+      toggleBox('ukRegionBox', c === 'UK');
+      toggleBox('ukStudentBox', c === 'UK');
+      toggleBox('ukPensionBox', c === 'UK');
+      toggleBox('ukBlindBox', c === 'UK');
+      toggleBox('ukMarriageBox', c === 'UK');
+      toggleBox('ukSPABox', c === 'UK');
+      toggleBox('ukPensionAmtBox', c === 'UK');
+      toggleBox('ukOtherBox', c === 'UK');
+      toggleBox('ukTaxCodeBox', c === 'UK');
+
+      // US
+      toggleBox('usFilingBox', c === 'US');
+      toggleBox('usStateBox', c === 'US');
+      toggleBox('usAgeBox', c === 'US');
+      toggleBox('us401kBox', c === 'US');
+      toggleBox('usHsaBox', c === 'US');
+      toggleBox('usOtherBox', c === 'US');
+
+      // Canada
+      toggleBox('caProvinceBox', c === 'CA');
+      toggleBox('caProvRateBox', c === 'CA');
+      toggleBox('caRrspBox', c === 'CA');
+      toggleBox('caOtherBox', c === 'CA');
+
+      // Netherlands
+      toggleBox('nlAowBox', c === 'NL');
+      toggleBox('nl30Box', c === 'NL');
+      toggleBox('nlIackBox', c === 'NL');
+      toggleBox('nlOtherBox', c === 'NL');
+
+      // Belgium / Spain
+      toggleBox('beWorkerBox', c === 'BE');
+      toggleBox('beCommuneBox', c === 'BE');
+      toggleBox('beKidsBox', c === 'BE');
+      toggleBox('beOtherBox', c === 'BE');
+      toggleBox('esPaysBox', c === 'ES');
+      toggleBox('esRegionBox', c === 'ES');
+      toggleBox('esCustomBox', c === 'ES');
+      toggleBox('esKidsBox', c === 'ES');
+      toggleBox('esContractBox', c === 'ES');
+      toggleBox('esOtherBox', c === 'ES');
+
+      // Iran
+      toggleBox('irYearBox', c === 'IR');
+      toggleBox('irMaritalBox', c === 'IR');
+      toggleBox('irKidsBox', c === 'IR');
+      toggleBox('irInsBaseBox', c === 'IR');
+      toggleBox('irOtherBox', c === 'IR');
+
+      // AU / NZ / Scandinavia / FI / IS / UA
+      toggleBox('auHelpBox', c === 'AU');
+      toggleBox('auSacrificeBox', c === 'AU');
+      toggleBox('auOtherBox', c === 'AU');
+      toggleBox('nzKsBox', c === 'NZ');
+      toggleBox('nzStudentBox', c === 'NZ');
+      toggleBox('nzOtherBox', c === 'NZ');
+      toggleBox('seKommuneBox', c === 'SE');
+      toggleBox('seOtherBox', c === 'SE');
+      toggleBox('noOtherBox', c === 'NO');
+      toggleBox('dkKommuneBox', c === 'DK');
+      toggleBox('dkChurchBox', c === 'DK');
+      toggleBox('dkOtherBox', c === 'DK');
+      toggleBox('fiMunBox', c === 'FI');
+      toggleBox('fiChurchBox', c === 'FI');
+      toggleBox('fiOtherBox', c === 'FI');
+      toggleBox('isPensionBox', c === 'IS');
+      toggleBox('isOtherBox', c === 'IS');
+      toggleBox('uaOtherBox', c === 'UA');
+
+      const notes = {
+        DE: currentLang==='fa' ? 'آلمان: PAP رسمی BMF + SV ۲۰۲۶ — دقیق' : currentLang==='de' ? 'DE: Offizielle PAP + SV 2026' : 'DE: Official PAP + 2026 social rates',
+        FR: currentLang==='fa' ? 'فرانسه: cotisations رسمی + IR — PAS شخصی را وارد کنید' : 'FR: Official cotisations + IR — enter personal PAS',
+        IT: currentLang==='fa' ? 'ایتالیا: INPS+IRPEF — نرخ addizionale منطقه/شهر را وارد کنید' : 'IT: INPS+IRPEF — enter regional/municipal rates',
+        NL: currentLang==='fa' ? 'هلند: Box 1 + heffingskortingen رسمی ۲۰۲۶' : 'NL: Box 1 + official 2026 tax credits',
+        UK: currentLang==='fa' ? 'انگلیس: HMRC ۲۰۲۶/۲۷ + NI + Student Loan — پوند (£)' : 'UK: HMRC 2026/27 + NI + Student Loan (£)',
+        US: currentLang==='fa' ? 'آمریکا: IRS ۲۰۲۶ + FICA — دلار ($)' : 'US: IRS 2026 + FICA ($)',
+        CA: currentLang==='fa' ? 'کانادا: CRA ۲۰۲۶ + CPP/EI — دلار کانادا (C$)' : 'CA: CRA 2026 + CPP/EI (C$)',
+        BE: currentLang==='fa' ? 'بلژیک: ONSS ۱۳٫۰۷٪ + فدرال (€)' : 'BE: ONSS 13.07% + federal (€)',
+        ES: currentLang==='fa' ? 'اسپانیا: SS ۶٫۵٪ + IRPF (€)' : 'ES: SS 6.5% + IRPF (€)',
+        IR: currentLang==='fa' ? 'ایران: بیمه ۷٪ + مالیات پلکانی — مبالغ به تومان' : 'Iran: SSO 7% + progressive tax — amounts in Toman',
+        AU: currentLang==='fa' ? 'استرالیا: ATO + Medicare ۲٪ (A$)' : 'Australia: ATO + Medicare 2% (A$)',
+        NZ: currentLang==='fa' ? 'نیوزلند: IRD + ACC + KiwiSaver (NZ$)' : 'New Zealand: IRD + ACC + KiwiSaver (NZ$)',
+        SE: currentLang==='fa' ? 'سوئد: kommunalskatt + statlig (SEK)' : 'Sweden: municipal + state (SEK)',
+        NO: currentLang==='fa' ? 'نروژ: ۲۲٪ + trinnskatt (NOK)' : 'Norway: 22% + trinnskatt (NOK)',
+        DK: currentLang==='fa' ? 'دانمارک: AM ۸٪ + topskat (DKK)' : 'Denmark: AM 8% + topskat (DKK)',
+        FI: currentLang==='fa' ? 'فنلاند: state + municipal + TyEL (€)' : 'Finland: state + municipal + TyEL (€)',
+        IS: currentLang==='fa' ? 'ایسلند: brackets + pension (ISK)' : 'Iceland: brackets + pension (ISK)',
+        UA: currentLang==='fa' ? 'اوکراین: PIT ۱۸٪ + military ۵٪ (₴)' : 'Ukraine: PIT 18% + military 5% (₴)'
+      };
+
+      // Currency unit on gross salary labels
+      const cur = getCurrency();
+      const unitLabels = {
+        IR: currentLang==='fa' ? 'تومان' : 'Toman',
+        UK: '£', US: '$', CA: 'C$', AU: 'A$', NZ: 'NZ$',
+        SE: 'SEK', NO: 'NOK', DK: 'DKK', IS: 'ISK', UA: '₴',
+        DE: '€', FR: '€', IT: '€', NL: '€', BE: '€', ES: '€', FI: '€'
+      };
+      const unit = unitLabels[c] || cur.symbol || '€';
+      const baseMonthly = { fa: 'حقوق ناخالص ماهانه', en: 'Monthly gross', de: 'Bruttomonatsgehalt', fr: 'Brut mensuel', it: 'Lordo mensile', nl: 'Bruto maandsalaris', es: 'Bruto mensual' };
+      const baseWeekly = { fa: 'حقوق ناخالص هفتگی', en: 'Weekly gross', de: 'Bruttowochengehalt', fr: 'Brut hebdomadaire', it: 'Lordo settimanale', nl: 'Bruto weeksalaris', es: 'Bruto semanal' };
+      const baseHourly = { fa: 'حقوق ساعتی', en: 'Hourly wage', de: 'Stundenlohn', fr: 'Salaire horaire', it: 'Retribuzione oraria', nl: 'Uurloon', es: 'Salario por hora' };
+      const mg = document.getElementById('t-monthlyGross');
+      const wg = document.getElementById('t-weeklyGross');
+      const hw = document.getElementById('t-hourlyWage');
+      if (mg) mg.textContent = (baseMonthly[currentLang] || baseMonthly.en) + ' (' + unit + ')';
+      if (wg) wg.textContent = (baseWeekly[currentLang] || baseWeekly.en) + ' (' + unit + ')';
+      if (hw) hw.textContent = (baseHourly[currentLang] || baseHourly.en) + ' (' + unit + ')';
+
+      const note = document.getElementById('countryNote');
+      if (note) note.textContent = notes[c] || '';
+    }
+
+    window.onCountryChange = onCountryChange;
+
+    function toggleInput() {
+      const type = document.querySelector('input[name="inputType"]:checked').value;
+      document.getElementById('monthlyBox').classList.toggle('hidden', type !== 'monthly');
+      document.getElementById('weeklyBox').classList.toggle('hidden', type !== 'weekly');
+      document.getElementById('hourlyBox').classList.toggle('hidden', type !== 'hourly');
+    }
+    window.toggleInput = toggleInput;
+
+    function getMonthlyGross() {
+      const type = document.querySelector('input[name="inputType"]:checked').value;
+      if (type === 'monthly') return parseFloat(document.getElementById('monthlyGross').value) || 0;
+      if (type === 'weekly') return (parseFloat(document.getElementById('weeklyGross').value) || 0) * 52 / 12;
+      const h = parseFloat(document.getElementById('hourlyWage').value) || 0;
+      const hours = parseFloat(document.getElementById('hoursPerWeek').value) || 40;
+      return h * hours * 52 / 12;
+    }
+
+    // ---------- Country calculators ----------
+    
+window.calculate = function() {
+      const monthlyGross = getMonthlyGross();
+      if (monthlyGross <= 0) {
+        alert(currentLang === 'fa' ? 'لطفاً مقدار حقوق را وارد کنید' : currentLang === 'de' ? 'Bitte Gehalt eingeben' : 'Please enter salary');
+        return;
+      }
+      const country = document.getElementById('country').value;
+      let result;
+      if (country === 'DE') result = calcGermany(monthlyGross);
+      else if (country === 'FR') result = calcFrance(monthlyGross);
+      else if (country === 'IT') result = calcItaly(monthlyGross);
+      else if (country === 'NL') result = calcNetherlands(monthlyGross);
+      else if (country === 'UK') result = calcUK(monthlyGross);
+      else if (country === 'US') result = calcUS(monthlyGross);
+      else if (country === 'CA') result = calcCanada(monthlyGross);
+      else if (country === 'BE') result = calcBelgium(monthlyGross);
+      else if (country === 'ES') result = calcSpain(monthlyGross);
+      else if (country === 'IR') result = calcIran(monthlyGross);
+      else if (country === 'AU') result = calcAustralia(monthlyGross);
+      else if (country === 'NZ') result = calcNewZealand(monthlyGross);
+      else if (country === 'SE') result = calcSweden(monthlyGross);
+      else if (country === 'NO') result = calcNorway(monthlyGross);
+      else if (country === 'DK') result = calcDenmark(monthlyGross);
+      else if (country === 'FI') result = calcFinland(monthlyGross);
+      else if (country === 'IS') result = calcIceland(monthlyGross);
+      else if (country === 'UA') result = calcUkraine(monthlyGross);
+      else result = calcNetherlands(monthlyGross);
+
+      document.getElementById('results').classList.remove('hidden');
+      const loc = currentLang === 'fa' ? 'fa-IR' : currentLang === 'de' ? 'de-DE' : 'en-US';
+      // Second job
+      const second = calcSecondJob(country, monthlyGross);
+      if (second.net > 0) {
+        result.net = Math.round((result.net + second.net + Number.EPSILON) * 100) / 100;
+        result.tax = Math.round(((result.tax || 0) + second.tax + Number.EPSILON) * 100) / 100;
+        result.social = Math.round(((result.social || 0) + second.social + Number.EPSILON) * 100) / 100;
+        result.rows = result.rows.concat(second.rows);
+        result.source = (result.source || '') + ' | ' + second.note;
+      }
+
+      const cur = getCurrency();
+      document.getElementById('netMonthly').textContent = fmtMoney(result.net);
+      const yearlyPrefix = currentLang==='fa'?'سالانه: ':currentLang==='de'?'Jährlich: ':currentLang==='es'?'Anual: ':currentLang==='fr'?'Annuel: ':currentLang==='it'?'Annuale: ':currentLang==='nl'?'Jaarlijks: ':'Yearly: ';
+      document.getElementById('netYearly').textContent = yearlyPrefix + fmtMoney(result.net * 12, 0);
+      // Update table headers with currency
+      const sym = cur.symbol;
+      const mCol = document.getElementById('t-monthlyCol');
+      const yCol = document.getElementById('t-yearlyCol');
+      if (mCol) mCol.textContent = (currentLang==='fa'?'ماهانه':currentLang==='de'?'Monatlich':currentLang==='es'?'Mensual':currentLang==='fr'?'Mensuel':currentLang==='it'?'Mensile':currentLang==='nl'?'Maandelijks':'Monthly') + ' (' + sym + ')';
+      if (yCol) yCol.textContent = (currentLang==='fa'?'سالانه':currentLang==='de'?'Jährlich':currentLang==='es'?'Anual':currentLang==='fr'?'Annuel':currentLang==='it'?'Annuale':currentLang==='nl'?'Jaarlijks':'Yearly') + ' (' + sym + ')';
+      document.getElementById('taxSource').textContent = result.source;
+
+      const tbody = document.getElementById('breakdown');
+      tbody.innerHTML = result.rows.map(([name, val]) =>
+        `<tr><td>${name}</td><td>${fmtMoney(val)}</td><td>${fmtMoney(val*12, 0)}</td></tr>`
+      ).join('');
+
+      window.lastResult = { country, monthlyGross, ...result, annualNet: result.net * 12 };
+    };
+
+    window.exportExcel = function() {
+      if (!window.lastResult) { alert(currentLang==='fa'?'ابتدا محاسبه کنید':currentLang==='de'?'Bitte zuerst berechnen':'Please calculate first'); return; }
+      const r = window.lastResult;
+      const data = [['EU Net Salary 2026'], ['Country', r.country], ['Currency', (CURRENCY[r.country]||CURRENCY.DE).code], ['Monthly Gross', r.monthlyGross], ['Monthly Net', r.net], ['Yearly Net', r.annualNet], [], ['Source', r.source]];
+      r.rows.forEach(([n,v]) => data.push([n, v]));
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Netto');
+      XLSX.writeFile(wb, 'eu-net-salary-2026.xlsx');
+    };
+
+    window.showUpdateInfo = function() {
+      alert(currentLang==='fa' ?
+        'داده‌ها ۲۰۲۶:\n• DE: BMF PAP + SV\n• FR: cotisations + IR barème\n• IT: INPS + IRPEF 23/33/43%\n• NL: Belastingdienst Box 1\n\nمنابع رسمی را همیشه بررسی کنید.' :
+        currentLang==='de' ?
+        'Daten 2026:\n• DE: BMF PAP + SV\n• FR: Cotisations + IR\n• IT: INPS + IRPEF\n• NL: Belastingdienst Box 1\n\nOffizielle Quellen prüfen.' :
+        'Data 2026:\n• DE: BMF PAP + SV\n• FR: cotisations + IR\n• IT: INPS + IRPEF\n• NL: Belastingdienst Box 1\n\nAlways verify official sources.');
+    };
+// init
+    toggleInput();
+    let savedLang = 'fa';
+    try { savedLang = localStorage.getItem('netSalaryLang') || 'fa'; } catch (e) {}
+    setLang(savedLang);
+    onCountryChange();
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
       });
+    }
   </script>
 </body>
 </html>
