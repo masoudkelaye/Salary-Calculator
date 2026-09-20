@@ -393,11 +393,12 @@ window.calculate = function() {
     };
 
     window.showUpdateInfo = function() {
-      alert(currentLang==='fa' ?
-        'داده‌ها ۲۰۲۶:\n• DE: BMF PAP + SV\n• FR: cotisations + IR barème\n• IT: INPS + IRPEF 23/33/43%\n• NL: Belastingdienst Box 1\n\nمنابع رسمی را همیشه بررسی کنید.' :
-        currentLang==='de' ?
-        'Daten 2026:\n• DE: BMF PAP + SV\n• FR: Cotisations + IR\n• IT: INPS + IRPEF\n• NL: Belastingdienst Box 1\n\nOffizielle Quellen prüfen.' :
-        'Data 2026:\n• DE: BMF PAP + SV\n• FR: cotisations + IR\n• IT: INPS + IRPEF\n• NL: Belastingdienst Box 1\n\nAlways verify official sources.');
+      const msg = {
+        fa: 'وضعیت داده‌های مالیاتی این برنامه\n\nسال مرجع: ۲۰۲۶\n• آلمان: BMF PAP + بیمه اجتماعی\n• فرانسه / ایتالیا / هلند و سایر کشورها: نرخ‌های رسمی ۲۰۲۶\n\n⚠️ این دکمه کد برنامه را خودکار عوض نمی‌کند.\nاگر قوانین مالیاتی تغییر کند، نرخ‌ها و فرمول‌ها باید دستی در کد به‌روز شوند.\n\nمنابع رسمی (نمونه):\nDE: bmf-steuerrechner.de / BMF PAP\nUK: GOV.UK / HMRC\nUS: IRS\nو سایت‌های مالیاتی هر کشور',
+        de: 'Steuerdaten-Status\n\nReferenzjahr: 2026\n\n⚠️ Diese Schaltfläche ändert den Code nicht automatisch.\nBei Gesetzesänderungen müssen Sätze und Formeln manuell aktualisiert werden.',
+        en: 'Tax data status\n\nReference year: 2026\n\n⚠️ This button does NOT auto-update the app code.\nIf tax laws change, rates and formulas must be updated manually in the code.\n\nAlways verify official sources (BMF, HMRC, IRS, etc.).'
+      };
+      alert(msg[currentLang] || msg.en);
     };
 
     toggleInput();

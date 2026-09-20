@@ -117,39 +117,79 @@
       white-space: nowrap;
     }
 
-    .lang-switch select#langSelect {
-      width: auto;
-      min-width: 8.5rem;
-      max-width: 11rem;
-      margin: 0;
-      padding: 0.45rem 2rem 0.45rem 0.75rem;
+    .lang-dd {
+      position: relative;
+      min-width: 9rem;
+    }
+    .lang-dd-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.45rem 0.85rem;
       border: none;
       border-radius: 999px;
-      background: rgba(0, 0, 0, 0.35);
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2338bdf8' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.7rem center;
-      color: var(--text);
+      background: rgba(0, 0, 0, 0.4);
+      color: #f1f5f9 !important;
       font-size: 0.85rem;
       font-weight: 600;
+      font-family: inherit;
       cursor: pointer;
       box-shadow: none;
     }
-
-    .lang-switch select#langSelect:hover,
-    .lang-switch select#langSelect:focus {
-      background-color: rgba(56, 189, 248, 0.12);
-      border: none;
+    .lang-dd-btn:hover, .lang-dd-btn:focus {
+      background: rgba(56, 189, 248, 0.15);
       box-shadow: 0 0 0 2px var(--accent-glow);
+      outline: none;
     }
-
-    [dir=rtl] .lang-switch {
-      padding: 0.25rem 0.85rem 0.25rem 0.25rem;
+    .lang-dd-btn .chev {
+      width: 0; height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid #38bdf8;
+      flex-shrink: 0;
     }
-
-    [dir=rtl] .lang-switch select#langSelect {
-      background-position: left 0.7rem center;
-      padding: 0.45rem 0.75rem 0.45rem 2rem;
+    .lang-dd.open .lang-dd-btn .chev {
+      border-top: none;
+      border-bottom: 6px solid #38bdf8;
+    }
+    .lang-dd-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      inset-inline-start: 0;
+      min-width: 100%;
+      z-index: 1000;
+      padding: 0.35rem;
+      border-radius: 14px;
+      background: #0c1222;
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+      backdrop-filter: blur(20px);
+    }
+    .lang-dd.open .lang-dd-menu { display: block; }
+    .lang-dd-item {
+      display: block;
+      width: 100%;
+      text-align: start;
+      padding: 0.55rem 0.75rem;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: #f1f5f9 !important;
+      font-size: 0.88rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .lang-dd-item:hover {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8 !important;
+    }
+    .lang-dd-item.active {
+      background: rgba(56, 189, 248, 0.22);
+      color: #7dd3fc !important;
     }
 
     /* Hero */
@@ -253,6 +293,23 @@
       border-color: var(--accent);
       box-shadow: 0 0 0 3px var(--accent-glow);
       background: rgba(0, 0, 0, 0.4);
+    }
+
+    
+    /* Native dropdown options (must be light-on-dark) */
+    select, .lang-switch select#langSelect {
+      color-scheme: dark;
+    }
+    select option,
+    .lang-switch select#langSelect option {
+      background-color: #0c1222;
+      color: #f1f5f9;
+    }
+    select option:checked,
+    select option:hover,
+    .lang-switch select#langSelect option:checked {
+      background-color: #1e293b;
+      color: #38bdf8;
     }
 
     input[type=number]::-webkit-inner-spin-button { opacity: 0.4; }
@@ -511,7 +568,7 @@
       .app { padding: 1rem 0.9rem 2.5rem; }
       .card { padding: 1.1rem 1rem; border-radius: 16px; }
       .lang-switch { width: 100%; justify-content: space-between; }
-      .lang-switch select#langSelect { flex: 1; max-width: none; }
+      .lang-dd { flex: 1; max-width: none; }
       .actions, .flex { width: 100%; }
       .actions button, .flex button { flex: 1; min-width: 0; }
     }
@@ -522,9 +579,33 @@
 
   <div class="app">
   <div class="topbar">
-    <div class="lang-switch">
+        <div class="lang-switch">
       <span class="lang-label" id="t-langLabel">Language</span>
-      <select id="langSelect" onchange="setLang(this.value)" aria-label="Language">
+      <div class="lang-dd" id="langDd" style="position:relative;min-width:9rem;">
+        <button type="button" class="lang-dd-btn" id="langDdBtn" aria-haspopup="listbox" aria-expanded="false"
+          style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;width:100%;padding:0.5rem 0.9rem;border:1px solid rgba(255,255,255,0.2);border-radius:999px;background:#0c1222;color:#f8fafc;font-size:0.9rem;font-weight:600;font-family:inherit;cursor:pointer;">
+          <span id="langDdLabel">فارسی</span>
+          <span class="chev" aria-hidden="true" style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid #38bdf8;"></span>
+        </button>
+        <div class="lang-dd-menu" role="listbox" id="langDdMenu"
+          style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:9999;padding:0.4rem;border-radius:14px;background:#0c1222;border:1px solid rgba(255,255,255,0.25);box-shadow:0 12px 40px rgba(0,0,0,0.7);">
+          <button type="button" class="lang-dd-item active" data-lang="fa" role="option"
+            style="display:block;width:100%;text-align:start;padding:0.6rem 0.8rem;margin:0.15rem 0;border:none;border-radius:10px;background:#1e293b;color:#f8fafc;font-size:0.9rem;font-weight:500;font-family:inherit;cursor:pointer;">فارسی</button>
+          <button type="button" class="lang-dd-item" data-lang="en" role="option"
+            style="display:block;width:100%;text-align:start;padding:0.6rem 0.8rem;margin:0.15rem 0;border:none;border-radius:10px;background:#1e293b;color:#f8fafc;font-size:0.9rem;font-weight:500;font-family:inherit;cursor:pointer;">English</button>
+          <button type="button" class="lang-dd-item" data-lang="de" role="option"
+            style="display:block;width:100%;text-align:start;padding:0.6rem 0.8rem;margin:0.15rem 0;border:none;border-radius:10px;background:#1e293b;color:#f8fafc;font-size:0.9rem;font-weight:500;font-family:inherit;cursor:pointer;">Deutsch</button>
+          <button type="button" class="lang-dd-item" data-lang="fr" role="option"
+            style="display:block;width:100%;text-align:start;padding:0.6rem 0.8rem;margin:0.15rem 0;border:none;border-radius:10px;background:#1e293b;color:#f8fafc;font-size:0.9rem;font-weight:500;font-family:inherit;cursor:pointer;">Français</button>
+          <button type="button" class="lang-dd-item" data-lang="it" role="option"
+            style="display:block;width:100%;text-align:start;padding:0.6rem 0.8rem;margin:0.15rem 0;border:none;border-radius:10px;background:#1e293b;color:#f8fafc;font-size:0.9rem;font-weight:500;font-family:inherit;cursor:pointer;">Italiano</button>
+          <button type="button" class="lang-dd-item" data-lang="nl" role="option"
+            style="display:block;width:100%;text-align:start;padding:0.6rem 0.8rem;margin:0.15rem 0;border:none;border-radius:10px;background:#1e293b;color:#f8fafc;font-size:0.9rem;font-weight:500;font-family:inherit;cursor:pointer;">Nederlands</button>
+          <button type="button" class="lang-dd-item" data-lang="es" role="option"
+            style="display:block;width:100%;text-align:start;padding:0.6rem 0.8rem;margin:0.15rem 0;border:none;border-radius:10px;background:#1e293b;color:#f8fafc;font-size:0.9rem;font-weight:500;font-family:inherit;cursor:pointer;">Español</button>
+        </div>
+      </div>
+      <select id="langSelect" class="hidden" aria-hidden="true" tabindex="-1">
         <option value="fa">فارسی</option>
         <option value="en">English</option>
         <option value="de">Deutsch</option>
@@ -3187,6 +3268,19 @@ const i18n = {
       document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
       const sel = document.getElementById('langSelect');
       if (sel && sel.value !== lang) sel.value = lang;
+      // Custom language dropdown UI
+      const names = { fa: 'فارسی', en: 'English', de: 'Deutsch', fr: 'Français', it: 'Italiano', nl: 'Nederlands', es: 'Español' };
+      const lab = document.getElementById('langDdLabel');
+      if (lab) lab.textContent = names[lang] || lang;
+      document.querySelectorAll('.lang-dd-item').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+      const dd = document.getElementById('langDd');
+      if (dd) dd.classList.remove('open');
+      const menu = document.getElementById('langDdMenu');
+      if (menu) menu.style.display = 'none';
+      const ddb = document.getElementById('langDdBtn');
+      if (ddb) ddb.setAttribute('aria-expanded', 'false');
       const t = i18n[lang];
       const ids = ['title','subtitle','country','inputType','monthly','weekly','hourly','monthlyGross','weeklyGross','hourlyWage','hoursWeek','personal','taxClass','state','church','children','age','zusatz','status','calc','excel','update','result','netLabel','item','monthlyCol','yearlyCol'];
       ids.forEach(k => { const el = document.getElementById('t-' + k); if (el && t[k]) el.textContent = t[k]; });
@@ -3445,13 +3539,129 @@ window.calculate = function() {
       XLSX.writeFile(wb, 'eu-net-salary-2026.xlsx');
     };
 
-    window.showUpdateInfo = function() {
-      alert(currentLang==='fa' ?
-        'داده‌ها ۲۰۲۶:\n• DE: BMF PAP + SV\n• FR: cotisations + IR barème\n• IT: INPS + IRPEF 23/33/43%\n• NL: Belastingdienst Box 1\n\nمنابع رسمی را همیشه بررسی کنید.' :
-        currentLang==='de' ?
-        'Daten 2026:\n• DE: BMF PAP + SV\n• FR: Cotisations + IR\n• IT: INPS + IRPEF\n• NL: Belastingdienst Box 1\n\nOffizielle Quellen prüfen.' :
-        'Data 2026:\n• DE: BMF PAP + SV\n• FR: cotisations + IR\n• IT: INPS + IRPEF\n• NL: Belastingdienst Box 1\n\nAlways verify official sources.');
+    window.showUpdateInfo = async function() {
+      const ratesUrl = (function() {
+        try {
+          const u = localStorage.getItem('ratesUrl');
+          if (u) return u;
+        } catch (e) {}
+        return (typeof window.RATES_URL === 'string' && window.RATES_URL) ? window.RATES_URL : './rates.json';
+      })();
+
+      const t = (fa, en) => (currentLang === 'fa' ? fa : en);
+      const btn = document.getElementById('t-update');
+      const prev = btn ? btn.textContent : '';
+      if (btn) btn.textContent = t('در حال بررسی…', 'Checking…');
+
+      try {
+        const res = await fetch(ratesUrl + (ratesUrl.includes('?') ? '&' : '?') + 't=' + Date.now(), {
+          cache: 'no-store',
+          credentials: 'omit'
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const remote = await res.json();
+        if (!remote || !remote.version) throw new Error('Invalid rates file');
+
+        const localVer = (window.TAX_RATES && window.TAX_RATES.version) || 'embedded';
+        let storedVer = null;
+        try { storedVer = localStorage.getItem('taxRatesVersion'); } catch (e) {}
+
+        window.TAX_RATES = remote;
+        try {
+          localStorage.setItem('taxRatesCache', JSON.stringify(remote));
+          localStorage.setItem('taxRatesVersion', remote.version);
+          localStorage.setItem('taxRatesCheckedAt', new Date().toISOString());
+        } catch (e) {}
+
+        const changed = storedVer && storedVer !== remote.version;
+        const msg = t(
+          'بررسی به‌روزرسانی انجام شد.\\n\\n' +
+          'آدرس نرخ‌ها: ' + ratesUrl + '\\n' +
+          'نسخه روی سرور: ' + remote.version + '\\n' +
+          'تاریخ: ' + (remote.updated || '—') + '\\n' +
+          'نسخه قبلی ذخیره‌شده: ' + (storedVer || 'نداشتید') + '\\n\\n' +
+          (changed
+            ? '✓ نسخه جدید اعمال شد. نرخ‌های به‌روز برای محاسبه استفاده می‌شوند.\\n(برای اعمال کامل بعضی کشورها ممکن است رفرش لازم باشد.)'
+            : 'نسخه با آخرین بسته هم‌خوان است یا برای اولین بار ذخیره شد.\\n\\nبرای میزبانی روی سرور خودتان:\\n1) فایل rates.json را کنار index.html بگذارید\\n2) یا در کنسول: localStorage.setItem(\"ratesUrl\", \"https://YOUR-SERVER/rates.json\")') ,
+          'Update check done.\\n\\nRates URL: ' + ratesUrl + '\\nServer version: ' + remote.version + '\\nUpdated: ' + (remote.updated || '—') + '\\nPreviously stored: ' + (storedVer || 'none') + '\\n\\n' +
+          (changed
+            ? '✓ New rates applied for this session.'
+            : 'Up to date (or first save).\\n\\nHost rates.json on your server next to index.html,\\nor: localStorage.setItem(\"ratesUrl\", \"https://YOUR-SERVER/rates.json\")')
+        );
+        alert(msg);
+      } catch (err) {
+        alert(t(
+          'خطا در بررسی به‌روزرسانی:\\n' + err.message + '\\n\\nآدرس فعلی: ' + ratesUrl + '\\n\\nمطمئن شوید rates.json روی سرور در دسترس است و CORS اجازه می‌دهد.',
+          'Update check failed:\\n' + err.message + '\\n\\nURL: ' + ratesUrl + '\\n\\nEnsure rates.json is reachable (and CORS allows it).'
+        ));
+      } finally {
+        if (btn) btn.textContent = prev;
+      }
     };
+
+    // Load cached rates on startup
+    (function loadCachedRates() {
+      try {
+        const raw = localStorage.getItem('taxRatesCache');
+        if (raw) {
+          const o = JSON.parse(raw);
+          if (o && o.version) window.TAX_RATES = o;
+        }
+      } catch (e) {}
+      // Also try local rates.json quietly
+      fetch('./rates.json?t=' + Date.now(), { cache: 'no-store' })
+        .then(r => r.ok ? r.json() : null)
+        .then(o => {
+          if (o && o.version) {
+            window.TAX_RATES = o;
+            try {
+              localStorage.setItem('taxRatesCache', JSON.stringify(o));
+              localStorage.setItem('taxRatesVersion', o.version);
+            } catch (e) {}
+          }
+        })
+        .catch(() => {});
+    })();
+
+    // Language dropdown interactions
+    (function initLangDd() {
+      const dd = document.getElementById('langDd');
+      const btn = document.getElementById('langDdBtn');
+      const menu = document.getElementById('langDdMenu');
+      if (!dd || !btn || !menu) return;
+      function closeMenu() {
+        dd.classList.remove('open');
+        menu.style.display = 'none';
+        btn.setAttribute('aria-expanded', 'false');
+      }
+      function openMenu() {
+        dd.classList.add('open');
+        menu.style.display = 'block';
+        btn.setAttribute('aria-expanded', 'true');
+      }
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (dd.classList.contains('open')) closeMenu();
+        else openMenu();
+      });
+      menu.querySelectorAll('.lang-dd-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const lang = item.dataset.lang;
+          if (lang) setLang(lang);
+          closeMenu();
+        });
+        item.addEventListener('mouseenter', () => {
+          item.style.background = '#334155';
+          item.style.color = '#38bdf8';
+        });
+        item.addEventListener('mouseleave', () => {
+          item.style.background = '#1e293b';
+          item.style.color = '#f8fafc';
+        });
+      });
+      document.addEventListener('click', closeMenu);
+    })();
 // init
     toggleInput();
     let savedLang = 'fa';
