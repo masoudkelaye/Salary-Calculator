@@ -1,65 +1,110 @@
 {
-  "version": "2026.09.20",
-  "updated": "2026-09-20T19:35:10.932Z",
-  "notes": "Auto-updated by update-rates.mjs on the server. Browser loads this file.",
-  "ratesUrlHint": "Put rates.json next to index.html or set localStorage key ratesUrl",
+  "version": "2026.09.21",
+  "updated": "2026-09-21T09:55:00Z",
+  "notes": "Verified against official public sources on 2026-09-21. Host next to index.html.",
+  "sourcesChecked": [
+    "GKV-Spitzenverband / BMAS (DE Sozialversicherung 2026)",
+    "GOV.UK income tax rates & employer thresholds 2026/27",
+    "Belastingdienst.nl box 1 & heffingskortingen 2026",
+    "IRS tax inflation adjustments TY 2026",
+    "Canada.ca T4127 payroll formulas 2026 (CPP/EI)",
+    "FPS Finance Belgium tax rates income year 2026",
+    "Spain SS employee ~6.50% + IRPF reference 2026",
+    "CLEISS / URSSAF France cotisations 2026"
+  ],
   "countries": {
     "DE": {
       "year": 2026,
+      "source": "GKV-Spitzenverband / BMAS 2026",
       "kv_allgemein": 0.146,
-      "zusatz_default": 0.025,
+      "zusatz_avg": 0.029,
+      "zusatz_default": 0.029,
       "rv": 0.186,
       "av": 0.026,
-      "pv": 0.034,
+      "pv": 0.036,
+      "pv_childless_surcharge": 0.006,
+      "bbg_kv_pv_month": 5812.5,
+      "bbg_rv_av_month": 8450,
       "minijob_limit": 603,
       "midijob_upper": 2000,
-      "source": "embedded-2026-defaults + check timestamp",
-      "fetchedAt": "2026-09-20T19:35:10.931Z",
-      "note": "BMF PAP is applied in the app via lohnsteuerrechner; SV rates are defaults for 2026"
+      "gesamt_sv_satz": 0.423,
+      "faktor_f": 0.6619
     },
     "UK": {
-      "year": "from GOV.UK",
+      "year": "2026/27",
+      "source": "GOV.UK 2026/27",
       "personalAllowance": 12570,
       "basicRate": 0.2,
       "higherRate": 0.4,
       "additionalRate": 0.45,
       "basicThreshold": 37700,
-      "higherThreshold": 125140,
+      "additionalRateThreshold": 125140,
       "niPrimary": 0.08,
       "niUpper": 0.02,
       "niPT_weekly": 242,
-      "niUEL_weekly": 967,
-      "source": "https://www.gov.uk/income-tax-rates",
-      "fetchedAt": "2026-09-20T19:35:10.929Z"
-    },
-    "US": {
-      "year": 2026,
-      "ssRate": 0.062,
-      "medicare": 0.0145,
-      "ssWageBase": 176100
-    },
-    "CA": {
-      "year": 2026,
-      "cppRate": 0.0595,
-      "eiRate": 0.0164
-    },
-    "FR": {
-      "year": 2026,
-      "csg_crds_approx": 0.097,
-      "note": "PAS personal rate recommended"
-    },
-    "IT": {
-      "year": 2026,
-      "irpef": [
-        0.23,
-        0.35,
-        0.43
-      ],
-      "inps_employee_approx": 0.0919
+      "niUEL_weekly": 967
     },
     "NL": {
       "year": 2026,
-      "box1_note": "progressive Box 1 + credits"
+      "source": "Belastingdienst 2026",
+      "box1_schijf1_to": 38883,
+      "box1_schijf1_rate": 0.3575,
+      "box1_schijf2_to": 78426,
+      "box1_schijf2_rate": 0.3756,
+      "box1_schijf3_rate": 0.495,
+      "algemene_heffingskorting_max": 3115
+    },
+    "US": {
+      "year": 2026,
+      "source": "IRS TY 2026",
+      "ssRate": 0.062,
+      "medicare": 0.0145,
+      "ssWageBase": 184500,
+      "standardDeduction_single": 16100,
+      "standardDeduction_mfj": 32200
+    },
+    "CA": {
+      "year": 2026,
+      "source": "CRA T4127 2026",
+      "cppRate": 0.0595,
+      "cppYMPE": 74600,
+      "cppBasicExemption": 3500,
+      "cppMaxEmployee": 4230.45,
+      "eiRate": 0.0163,
+      "eiMaxInsurable": 68900,
+      "eiMaxEmployee": 1123.07
+    },
+    "FR": {
+      "year": 2026,
+      "source": "URSSAF / CLEISS 2026",
+      "pass_monthly": 4005,
+      "csg": 0.092,
+      "crds": 0.005,
+      "csg_crds_assiette": 0.9825,
+      "vieillesse_plafonnee_employee": 0.069,
+      "vieillesse_deplafonnee_employee": 0.004
+    },
+    "IT": {
+      "year": 2026,
+      "irpef": [0.23, 0.35, 0.43],
+      "inps_employee_approx": 0.0919
+    },
+    "BE": {
+      "year": 2026,
+      "source": "FPS Finance 2026",
+      "onssEmployee": 0.1307,
+      "brackets": [
+        {"upTo": 16720, "rate": 0.25},
+        {"upTo": 29510, "rate": 0.4},
+        {"upTo": 51070, "rate": 0.45},
+        {"upTo": null, "rate": 0.5}
+      ],
+      "personalAllowance": 11180
+    },
+    "ES": {
+      "year": 2026,
+      "ssEmployeeApprox": 0.065,
+      "source": "Seguridad Social / IRPF 2026"
     },
     "IR": {
       "year": 1405,
@@ -69,38 +114,17 @@
     "UA": {
       "year": 2026,
       "pit": 0.18,
-      "military": 0.05,
-      "source": "statutory flat rates",
-      "fetchedAt": "2026-09-20T19:35:10.932Z"
+      "military": 0.05
     },
-    "AU": {
-      "year": "2026-27",
-      "medicare": 0.02
-    },
-    "NZ": {
-      "year": "2026-27",
-      "acc": 0.0175
-    },
-    "BE": {
-      "onssEmployee": 0.1307
-    },
-    "ES": {
-      "ssEmployeeApprox": 0.065
-    },
-    "SE": {},
-    "NO": {},
-    "DK": {
-      "amBidrag": 0.08
-    },
-    "FI": {
-      "tyelEmployee": 0.073
-    },
-    "IS": {
-      "pensionEmployeeMin": 0.04
-    }
+    "AU": {"year": "2026-27", "medicare": 0.02},
+    "NZ": {"year": "2026-27", "acc": 0.0175},
+    "DK": {"year": 2026, "amBidrag": 0.08},
+    "FI": {"year": 2026, "tyelEmployee": 0.073},
+    "IS": {"year": 2026, "pensionEmployeeMin": 0.04},
+    "SE": {"year": 2026},
+    "NO": {"year": 2026}
   },
   "changelog": [
-    "2026.09.20 – auto update: UK: OK (https://www.gov.uk/income-tax-rates); DE: OK (embedded-2026-defaults + check timestamp); UA: OK (statutory flat rates)",
-    "2026.09.20 – Initial external rates package for live update checks"
+    "2026.09.21 – Refresh from official public sources (DE, UK, NL, US, CA, BE, ES, FR)"
   ]
 }
