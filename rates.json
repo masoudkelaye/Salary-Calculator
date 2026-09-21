@@ -1,7 +1,7 @@
 {
   "version": "2026.09.21",
-  "updated": "2026-09-21T09:55:00Z",
-  "notes": "Verified against official public sources on 2026-09-21. Host next to index.html.",
+  "updated": "2026-09-21T19:56:39.363Z",
+  "notes": "Auto-updated by update-rates.mjs on the server. Browser loads this file.",
   "sourcesChecked": [
     "GKV-Spitzenverband / BMAS (DE Sozialversicherung 2026)",
     "GOV.UK income tax rates & employer thresholds 2026/27",
@@ -15,24 +15,26 @@
   "countries": {
     "DE": {
       "year": 2026,
-      "source": "GKV-Spitzenverband / BMAS 2026",
+      "source": "embedded-2026-defaults + check timestamp",
       "kv_allgemein": 0.146,
       "zusatz_avg": 0.029,
-      "zusatz_default": 0.029,
+      "zusatz_default": 0.025,
       "rv": 0.186,
       "av": 0.026,
-      "pv": 0.036,
+      "pv": 0.034,
       "pv_childless_surcharge": 0.006,
       "bbg_kv_pv_month": 5812.5,
       "bbg_rv_av_month": 8450,
       "minijob_limit": 603,
       "midijob_upper": 2000,
       "gesamt_sv_satz": 0.423,
-      "faktor_f": 0.6619
+      "faktor_f": 0.6619,
+      "fetchedAt": "2026-09-21T19:56:39.362Z",
+      "note": "BMF PAP is applied in the app via lohnsteuerrechner; SV rates are defaults for 2026"
     },
     "UK": {
-      "year": "2026/27",
-      "source": "GOV.UK 2026/27",
+      "year": "from GOV.UK",
+      "source": "https://www.gov.uk/income-tax-rates",
       "personalAllowance": 12570,
       "basicRate": 0.2,
       "higherRate": 0.4,
@@ -42,7 +44,8 @@
       "niPrimary": 0.08,
       "niUpper": 0.02,
       "niPT_weekly": 242,
-      "niUEL_weekly": 967
+      "niUEL_weekly": 967,
+      "fetchedAt": "2026-09-21T19:56:39.356Z"
     },
     "NL": {
       "year": 2026,
@@ -86,7 +89,11 @@
     },
     "IT": {
       "year": 2026,
-      "irpef": [0.23, 0.35, 0.43],
+      "irpef": [
+        0.23,
+        0.35,
+        0.43
+      ],
       "inps_employee_approx": 0.0919
     },
     "BE": {
@@ -94,10 +101,22 @@
       "source": "FPS Finance 2026",
       "onssEmployee": 0.1307,
       "brackets": [
-        {"upTo": 16720, "rate": 0.25},
-        {"upTo": 29510, "rate": 0.4},
-        {"upTo": 51070, "rate": 0.45},
-        {"upTo": null, "rate": 0.5}
+        {
+          "upTo": 16720,
+          "rate": 0.25
+        },
+        {
+          "upTo": 29510,
+          "rate": 0.4
+        },
+        {
+          "upTo": 51070,
+          "rate": 0.45
+        },
+        {
+          "upTo": null,
+          "rate": 0.5
+        }
       ],
       "personalAllowance": 11180
     },
@@ -114,17 +133,39 @@
     "UA": {
       "year": 2026,
       "pit": 0.18,
-      "military": 0.05
+      "military": 0.05,
+      "source": "statutory flat rates",
+      "fetchedAt": "2026-09-21T19:56:39.363Z"
     },
-    "AU": {"year": "2026-27", "medicare": 0.02},
-    "NZ": {"year": "2026-27", "acc": 0.0175},
-    "DK": {"year": 2026, "amBidrag": 0.08},
-    "FI": {"year": 2026, "tyelEmployee": 0.073},
-    "IS": {"year": 2026, "pensionEmployeeMin": 0.04},
-    "SE": {"year": 2026},
-    "NO": {"year": 2026}
+    "AU": {
+      "year": "2026-27",
+      "medicare": 0.02
+    },
+    "NZ": {
+      "year": "2026-27",
+      "acc": 0.0175
+    },
+    "DK": {
+      "year": 2026,
+      "amBidrag": 0.08
+    },
+    "FI": {
+      "year": 2026,
+      "tyelEmployee": 0.073
+    },
+    "IS": {
+      "year": 2026,
+      "pensionEmployeeMin": 0.04
+    },
+    "SE": {
+      "year": 2026
+    },
+    "NO": {
+      "year": 2026
+    }
   },
   "changelog": [
+    "2026.09.21 – auto update: UK: OK (https://www.gov.uk/income-tax-rates); DE: OK (embedded-2026-defaults + check timestamp); UA: OK (statutory flat rates)",
     "2026.09.21 – Refresh from official public sources (DE, UK, NL, US, CA, BE, ES, FR)"
   ]
 }
