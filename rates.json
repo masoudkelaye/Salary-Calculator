@@ -1,6 +1,6 @@
 {
   "version": "2026.09.21",
-  "updated": "2026-09-21T19:56:39.363Z",
+  "updated": "2026-09-21T20:11:33.254Z",
   "notes": "Auto-updated by update-rates.mjs on the server. Browser loads this file.",
   "sourcesChecked": [
     "GKV-Spitzenverband / BMAS (DE Sozialversicherung 2026)",
@@ -29,7 +29,7 @@
       "midijob_upper": 2000,
       "gesamt_sv_satz": 0.423,
       "faktor_f": 0.6619,
-      "fetchedAt": "2026-09-21T19:56:39.362Z",
+      "fetchedAt": "2026-09-21T20:11:33.253Z",
       "note": "BMF PAP is applied in the app via lohnsteuerrechner; SV rates are defaults for 2026"
     },
     "UK": {
@@ -45,7 +45,7 @@
       "niUpper": 0.02,
       "niPT_weekly": 242,
       "niUEL_weekly": 967,
-      "fetchedAt": "2026-09-21T19:56:39.356Z"
+      "fetchedAt": "2026-09-21T20:11:33.247Z"
     },
     "NL": {
       "year": 2026,
@@ -135,7 +135,7 @@
       "pit": 0.18,
       "military": 0.05,
       "source": "statutory flat rates",
-      "fetchedAt": "2026-09-21T19:56:39.363Z"
+      "fetchedAt": "2026-09-21T20:11:33.254Z"
     },
     "AU": {
       "year": "2026-27",
@@ -165,6 +165,7 @@
     }
   },
   "changelog": [
+    "2026.09.21 – auto update: UK: OK (https://www.gov.uk/income-tax-rates); DE: OK (embedded-2026-defaults + check timestamp); UA: OK (statutory flat rates)",
     "2026.09.21 – auto update: UK: OK (https://www.gov.uk/income-tax-rates); DE: OK (embedded-2026-defaults + check timestamp); UA: OK (statutory flat rates)",
     "2026.09.21 – Refresh from official public sources (DE, UK, NL, US, CA, BE, ES, FR)"
   ]
