@@ -1,6 +1,6 @@
 {
   "version": "2026.09.23",
-  "updated": "2026-09-23T12:24:21.115Z",
+  "updated": "2026-09-23T12:26:35.831Z",
   "notes": "Auto-updated by update-rates.mjs. Calculators use these via R(country, key, fallback). Live scrape for UK/NL/US when available; DE from GKV 2026 statutory tables.",
   "sourcesChecked": [
     "GOV.UK income tax + NI 2026/27",
@@ -26,7 +26,7 @@
       "midijob_upper": 2000,
       "gesamt_sv_satz": 0.423,
       "faktor_f": 0.6619,
-      "fetchedAt": "2026-09-23T12:24:20.360Z",
+      "fetchedAt": "2026-09-23T12:26:35.155Z",
       "kv_ermaessigt": 0.14,
       "pv_child_discount": 0.0025,
       "bbg_kv_pv_year": 69750,
@@ -47,7 +47,7 @@
       "niUpper": 0.02,
       "niPT_weekly": 242,
       "niUEL_weekly": 967,
-      "fetchedAt": "2026-09-23T12:24:20.340Z",
+      "fetchedAt": "2026-09-23T12:26:35.053Z",
       "niPT_monthly": 1048,
       "niUEL_monthly": 4189
     },
@@ -60,7 +60,7 @@
       "box1_schijf2_rate": 0.3756,
       "box1_schijf3_rate": 0.495,
       "algemene_heffingskorting_max": 3115,
-      "fetchedAt": "2026-09-23T12:24:20.651Z",
+      "fetchedAt": "2026-09-23T12:26:35.358Z",
       "box1_schijf1_rate_aow": 0.1785,
       "algemene_heffingskorting_phase_from": 29736,
       "algemene_heffingskorting_phase_pct": 0.06398,
@@ -74,7 +74,7 @@
       "ssWageBase": 184500,
       "standardDeduction_single": 16100,
       "standardDeduction_mfj": 32200,
-      "fetchedAt": "2026-09-23T12:24:20.769Z",
+      "fetchedAt": "2026-09-23T12:26:35.544Z",
       "additionalMedicare": 0.009,
       "standardDeduction_hoh": 24150
     },
@@ -88,7 +88,7 @@
       "eiRate": 0.0163,
       "eiMaxInsurable": 68900,
       "eiMaxEmployee": 1123.07,
-      "fetchedAt": "2026-09-23T12:24:21.111Z",
+      "fetchedAt": "2026-09-23T12:26:35.827Z",
       "qppRate": 0.063
     },
     "FR": {
@@ -100,7 +100,7 @@
       "csg_crds_assiette": 0.9825,
       "vieillesse_plafonnee_employee": 0.069,
       "vieillesse_deplafonnee_employee": 0.004,
-      "fetchedAt": "2026-09-23T12:24:21.111Z",
+      "fetchedAt": "2026-09-23T12:26:35.828Z",
       "pass_annual": 48060,
       "maladie_employee": 0,
       "note": "Net payroll uses full cotisation stack in calc; these are key parameters"
@@ -114,7 +114,7 @@
       ],
       "inps_employee_approx": 0.0919,
       "source": "Agenzia delle Entrate / INPS 2026",
-      "fetchedAt": "2026-09-23T12:24:21.113Z",
+      "fetchedAt": "2026-09-23T12:26:35.829Z",
       "irpef_brackets": [
         28000,
         50000,
@@ -144,13 +144,13 @@
         }
       ],
       "personalAllowance": 11180,
-      "fetchedAt": "2026-09-23T12:24:21.112Z"
+      "fetchedAt": "2026-09-23T12:26:35.828Z"
     },
     "ES": {
       "year": 2026,
       "ssEmployeeApprox": 0.065,
       "source": "Seguridad Social / AEAT 2026",
-      "fetchedAt": "2026-09-23T12:24:21.112Z",
+      "fetchedAt": "2026-09-23T12:26:35.829Z",
       "ssMaxBase_month": 5101.2,
       "note": "IRPF is progressive by autonomous community; user can override communal rate"
     },
@@ -159,7 +159,7 @@
       "insuranceEmployee": 0.07,
       "exemptionMonthlyToman": 40000000,
       "source": "سازمان امور مالیاتی / تامین اجتماعی 1405",
-      "fetchedAt": "2026-09-23T12:24:21.113Z",
+      "fetchedAt": "2026-09-23T12:26:35.829Z",
       "note": "Brackets change yearly; user should enter latest from official circular"
     },
     "UA": {
@@ -167,54 +167,56 @@
       "pit": 0.18,
       "military": 0.05,
       "source": "statutory flat rates UA",
-      "fetchedAt": "2026-09-23T12:24:21.113Z"
+      "fetchedAt": "2026-09-23T12:26:35.830Z"
     },
     "AU": {
       "year": "2026-27",
       "medicare": 0.02,
       "source": "ATO 2026-27",
-      "fetchedAt": "2026-09-23T12:24:21.114Z",
+      "fetchedAt": "2026-09-23T12:26:35.830Z",
       "note": "PAYG withholding tables are the payroll source of truth"
     },
     "NZ": {
       "year": "2026-27",
       "acc": 0.0175,
       "source": "IRD 2026-27",
-      "fetchedAt": "2026-09-23T12:24:21.114Z"
+      "fetchedAt": "2026-09-23T12:26:35.830Z"
     },
     "DK": {
       "year": 2026,
       "amBidrag": 0.08,
       "source": "SKAT 2026",
-      "fetchedAt": "2026-09-23T12:24:21.114Z"
+      "fetchedAt": "2026-09-23T12:26:35.830Z"
     },
     "FI": {
       "year": 2026,
       "tyelEmployee": 0.073,
       "source": "Vero / TyEL 2026",
-      "fetchedAt": "2026-09-23T12:24:21.114Z",
+      "fetchedAt": "2026-09-23T12:26:35.831Z",
       "note": "Municipal tax varies by city — user enters rate"
     },
     "IS": {
       "year": 2026,
       "pensionEmployeeMin": 0.04,
       "source": "Skatturinn 2026",
-      "fetchedAt": "2026-09-23T12:24:21.114Z"
+      "fetchedAt": "2026-09-23T12:26:35.831Z"
     },
     "SE": {
       "year": 2026,
       "source": "Skatteverket 2026",
-      "fetchedAt": "2026-09-23T12:24:21.115Z",
+      "fetchedAt": "2026-09-23T12:26:35.831Z",
       "note": "Municipal + state tax; user enters kommunalskatt %"
     },
     "NO": {
       "year": 2026,
       "source": "Skatteetaten 2026",
-      "fetchedAt": "2026-09-23T12:24:21.115Z",
+      "fetchedAt": "2026-09-23T12:26:35.831Z",
       "note": "Trygdeavgift + bracket tax; user can override"
     }
   },
   "changelog": [
+    "2026.09.23 – auto: UK: OK, DE: OK, NL: OK, US: OK, CA: OK, FR: OK, BE: OK, ES: OK, IT: OK, IR: OK, UA: OK, AU: OK, NZ: OK, DK: OK, FI: OK, IS: OK, SE: OK, NO: OK | no numeric diffs",
+    "2026.09.23 – auto: UK: OK, DE: OK, NL: OK, US: OK, CA: OK, FR: OK, BE: OK, ES: OK, IT: OK, IR: OK, UA: OK, AU: OK, NZ: OK, DK: OK, FI: OK, IS: OK, SE: OK, NO: OK | no numeric diffs",
     "2026.09.23 – auto: UK: OK, DE: OK, NL: OK, US: OK, CA: OK, FR: OK, BE: OK, ES: OK, IT: OK, IR: OK, UA: OK, AU: OK, NZ: OK, DK: OK, FI: OK, IS: OK, SE: OK, NO: OK | no numeric diffs",
     "2026.09.23 – auto: UK: OK, DE: OK, NL: OK, US: OK, CA: OK, FR: OK, BE: OK, ES: OK, IT: OK, IR: OK, UA: OK, AU: OK, NZ: OK, DK: OK, FI: OK, IS: OK, SE: OK, NO: OK | no numeric diffs",
     "2026.09.23 – Expanded updater: all countries; live UK/NL/DE/US; verified baselines FR/IT/BE/ES/CA/AU/NZ/Nordic/IR/UA",
