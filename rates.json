@@ -107,21 +107,41 @@
     },
     "IT": {
       "year": 2026,
-      "irpef": [0.23, 0.35, 0.43],
+      "irpef": [
+        0.23,
+        0.35,
+        0.43
+      ],
       "inps_employee_approx": 0.0919,
       "source": "Agenzia delle Entrate / INPS 2026",
       "fetchedAt": "2026-09-23T10:36:25.330Z",
-      "irpef_brackets": [28000, 50000, null]
+      "irpef_brackets": [
+        28000,
+        50000,
+        null
+      ]
     },
     "BE": {
       "year": 2026,
       "source": "FPS Finance / ONSS 2026",
       "onssEmployee": 0.1307,
       "brackets": [
-        {"upTo": 16720, "rate": 0.25},
-        {"upTo": 29510, "rate": 0.4},
-        {"upTo": 51070, "rate": 0.45},
-        {"upTo": null, "rate": 0.5}
+        {
+          "upTo": 16720,
+          "rate": 0.25
+        },
+        {
+          "upTo": 29510,
+          "rate": 0.4
+        },
+        {
+          "upTo": 51070,
+          "rate": 0.45
+        },
+        {
+          "upTo": null,
+          "rate": 0.5
+        }
       ],
       "personalAllowance": 11180,
       "fetchedAt": "2026-09-23T10:36:25.330Z"
