@@ -603,6 +603,8 @@
             style="display:block;width:100%;text-align:start;padding:0.6rem 0.8rem;margin:0.15rem 0;border:none;border-radius:10px;background:#1e293b;color:#f8fafc;font-size:0.9rem;font-weight:500;font-family:inherit;cursor:pointer;">Nederlands</button>
           <button type="button" class="lang-dd-item" data-lang="es" role="option"
             style="display:block;width:100%;text-align:start;padding:0.6rem 0.8rem;margin:0.15rem 0;border:none;border-radius:10px;background:#1e293b;color:#f8fafc;font-size:0.9rem;font-weight:500;font-family:inherit;cursor:pointer;">Español</button>
+          <button type="button" class="lang-opt" data-lang="he"
+            style="display:block;width:100%;text-align:start;padding:0.6rem 0.8rem;margin:0.15rem 0;border:none;border-radius:10px;background:#1e293b;color:#f8fafc;font-size:0.9rem;font-weight:500;font-family:inherit;cursor:pointer;">עברית</button>
         </div>
       </div>
       <select id="langSelect" class="hidden" aria-hidden="true" tabindex="-1">
@@ -646,6 +648,7 @@
           <option value="FI">🇫🇮 Suomi / Finland / فنلاند</option>
           <option value="IS">🇮🇸 Ísland / Iceland / ایسلند</option>
           <option value="UA">🇺🇦 Україна / Ukraine / اوکراین</option>
+          <option value="IL">🇮🇱 ישראל / Israel / اسرائیل</option>
         </select>
       </div>
     </div>
@@ -1008,6 +1011,31 @@
         <label>Other deductions UAH / month</label>
         <input type="number" id="uaOtherDed" value="" min="0" step="1" placeholder="from payslip" />
       </div>
+      
+      <div id="ilGenderBox" class="hidden">
+        <label>Gender (credit points) / מגדר</label>
+        <select id="ilGender">
+          <option value="male">Male 2.25 pts / גבר</option>
+          <option value="female">Female 2.75 pts / אישה</option>
+        </select>
+      </div>
+      <div id="ilKidsBox" class="hidden">
+        <label>Children under 18 (extra credit pts approx)</label>
+        <input type="number" id="ilKids" value="0" min="0" max="10" step="1" />
+      </div>
+      <div id="ilCreditExtraBox" class="hidden">
+        <label>Extra credit points (degree, oleh, etc.)</label>
+        <input type="number" id="ilCreditExtra" value="0" min="0" max="10" step="0.25" placeholder="0" />
+      </div>
+      <div id="ilPensionBox" class="hidden">
+        <label>Pension employee % (typical 6%)</label>
+        <input type="number" id="ilPension" value="6" min="0" max="15" step="0.5" />
+      </div>
+      <div id="ilOtherBox" class="hidden">
+        <label>Other deductions ₪ / month</label>
+        <input type="number" id="ilOtherDed" value="" min="0" step="10" placeholder="from payslip" />
+      </div>
+
       <div id="secondJobBox">
         <label>Second job / side income? (شغل دوم)</label>
         <select id="hasSecondJob" onchange="document.getElementById('secondJobDetails').classList.toggle('hidden', this.value==='0')">
@@ -2618,6 +2646,90 @@ window.papCalculate = papCalculate;
       };
     }
 
+    
+    function calcIsrael(monthlyGross) {
+      // Israel Tax Authority 2026 + Bituach Leumi + Mas Briut + credit points
+      const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      const monthly = monthlyGross;
+
+      // Pension employee (reduces taxable base for income tax)
+      const penPct = parseFloat(document.getElementById('ilPension')?.value);
+      const penRate = !isNaN(penPct) ? penPct / 100 : R('IL', 'pension_employee_default', 0.06);
+      const pension = monthly * penRate;
+      const taxBase = Math.max(0, monthly - pension);
+
+      // Income tax brackets (monthly)
+      const brackets = [
+        [R('IL', 'b1', 7010), R('IL', 'r1', 0.10)],
+        [R('IL', 'b2', 10060), R('IL', 'r2', 0.14)],
+        [R('IL', 'b3', 19000), R('IL', 'r3', 0.20)],
+        [R('IL', 'b4', 25100), R('IL', 'r4', 0.31)],
+        [R('IL', 'b5', 46690), R('IL', 'r5', 0.35)],
+        [R('IL', 'b6', 60130), R('IL', 'r6', 0.47)],
+        [Infinity, R('IL', 'r7', 0.50)]
+      ];
+      // use fixed defaults if keys missing - embed numbers
+      const br = [
+        [7010, 0.10], [10060, 0.14], [19000, 0.20], [25100, 0.31],
+        [46690, 0.35], [60130, 0.47], [Infinity, 0.50]
+      ];
+      let tax = 0, prev = 0;
+      for (const [lim, rate] of br) {
+        const slice = Math.min(taxBase, lim) - prev;
+        if (slice > 0) tax += slice * rate;
+        prev = lim;
+        if (taxBase <= lim) break;
+      }
+
+      // Credit points
+      const gender = document.getElementById('ilGender')?.value || 'male';
+      let pts = gender === 'female' ? R('IL', 'credit_points_female', 2.75) : R('IL', 'credit_points_male', 2.25);
+      const kids = parseInt(document.getElementById('ilKids')?.value) || 0;
+      // simplified: ~1.5 pts avg per child under 18
+      pts += kids * 1.5;
+      const extra = parseFloat(document.getElementById('ilCreditExtra')?.value) || 0;
+      pts += extra;
+      const credit = pts * R('IL', 'credit_point_month', 242);
+      tax = Math.max(0, tax - credit);
+
+      // Bituach Leumi + Health (Mas Briut) on gross up to cap
+      const thr = R('IL', 'bl_threshold', 7703);
+      const cap = R('IL', 'bl_cap', 51910);
+      const base = Math.min(monthly, cap);
+      let bl = 0, health = 0;
+      if (base > 0) {
+        const low = Math.min(base, thr);
+        const high = Math.max(0, base - thr);
+        bl = low * R('IL', 'bl_employee_low', 0.0104) + high * R('IL', 'bl_employee_high', 0.07);
+        health = low * R('IL', 'health_low', 0.0323) + high * R('IL', 'health_high', 0.0517);
+      }
+
+      const otherRaw = document.getElementById('ilOtherDed')?.value;
+      const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
+        ? parseFloat(otherRaw) : 0;
+
+      const net = monthly - pension - tax - bl - health - otherDed;
+
+      return {
+        social: r2(bl + health),
+        tax: r2(tax),
+        soli: 0, church: 0,
+        net: r2(net),
+        rows: [
+          ['Gross (₪)', r2(monthly)],
+          ['Pension employee ' + (penRate * 100).toFixed(1) + '%', r2(pension)],
+          ['Income tax (after credit points)', r2(tax)],
+          ['Bituach Leumi', r2(bl)],
+          ['Health tax (Mas Briut)', r2(health)],
+          ['Credit points used', r2(pts)],
+          ['Other deductions', r2(otherDed)],
+          ['Net / נטו', r2(net)]
+        ],
+        source: 'Israel 2026 – tax brackets + Bituach Leumi + Mas Briut + credit points (₪242/pt)'
+      };
+    }
+
+
     function calcUkraine(monthlyGross) {
       // Tax Code Ukraine 2026 – PIT 18% + military levy 5%
       const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
@@ -3113,7 +3225,8 @@ const i18n = {
       DK: { code: 'DKK', symbol: 'kr', locale: 'da-DK' },
       FI: { code: 'EUR', symbol: '€', locale: 'fi-FI' },
       IS: { code: 'ISK', symbol: 'kr', locale: 'is-IS' },
-      UA: { code: 'UAH', symbol: '₴', locale: 'uk-UA' }
+      UA: { code: 'UAH', symbol: '₴', locale: 'uk-UA' },
+      IL: { code: 'ILS', symbol: '₪', locale: 'he-IL' }
     };
 
     function getCurrency() {
@@ -3276,6 +3389,11 @@ const i18n = {
       toggleBox('isPensionBox', c === 'IS');
       toggleBox('isOtherBox', c === 'IS');
       toggleBox('uaOtherBox', c === 'UA');
+      toggleBox('ilGenderBox', c === 'IL');
+      toggleBox('ilKidsBox', c === 'IL');
+      toggleBox('ilCreditExtraBox', c === 'IL');
+      toggleBox('ilPensionBox', c === 'IL');
+      toggleBox('ilOtherBox', c === 'IL');
 
       const notes = {
         DE: currentLang==='fa' ? 'آلمان: PAP رسمی BMF + SV ۲۰۲۶ — دقیق' : currentLang==='de' ? 'DE: Offizielle PAP + SV 2026' : 'DE: Official PAP + 2026 social rates',
@@ -3295,7 +3413,8 @@ const i18n = {
         DK: currentLang==='fa' ? 'دانمارک: AM ۸٪ + topskat (DKK)' : 'Denmark: AM 8% + topskat (DKK)',
         FI: currentLang==='fa' ? 'فنلاند: state + municipal + TyEL (€)' : 'Finland: state + municipal + TyEL (€)',
         IS: currentLang==='fa' ? 'ایسلند: brackets + pension (ISK)' : 'Iceland: brackets + pension (ISK)',
-        UA: currentLang==='fa' ? 'اوکراین: PIT ۱۸٪ + military ۵٪ (₴)' : 'Ukraine: PIT 18% + military 5% (₴)'
+        UA: currentLang==='fa' ? 'اوکراین: PIT ۱۸٪ + military ۵٪ (₴)' : 'Ukraine: PIT 18% + military 5% (₴)',
+        IL: currentLang==='fa' ? 'اسرائیل: مالیات پلکانی + ביטוח לאומי + נקודות זיכוי (₪)' : currentLang==='he' ? 'ישראל: מס הכנסה + ביטוח לאומי + נקודות זיכוי' : 'Israel: income tax brackets + Bituach Leumi + credit points (₪)'
       };
 
       // Currency unit on gross salary labels
@@ -3303,7 +3422,7 @@ const i18n = {
       const unitLabels = {
         IR: currentLang==='fa' ? 'تومان' : 'Toman',
         UK: '£', US: '$', CA: 'C$', AU: 'A$', NZ: 'NZ$',
-        SE: 'SEK', NO: 'NOK', DK: 'DKK', IS: 'ISK', UA: '₴',
+        SE: 'SEK', NO: 'NOK', DK: 'DKK', IS: 'ISK', UA: '₴', IL: '₪',
         DE: '€', FR: '€', IT: '€', NL: '€', BE: '€', ES: '€', FI: '€'
       };
       const unit = unitLabels[c] || cur.symbol || '€';
@@ -3368,6 +3487,7 @@ window.calculate = function() {
       else if (country === 'FI') result = calcFinland(monthlyGross);
       else if (country === 'IS') result = calcIceland(monthlyGross);
       else if (country === 'UA') result = calcUkraine(monthlyGross);
+      else if (country === 'IL') result = calcIsrael(monthlyGross);
       else result = calcNetherlands(monthlyGross);
 
       document.getElementById('results').classList.remove('hidden');

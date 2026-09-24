@@ -434,9 +434,68 @@
       "trinn_r3": 0.137,
       "trinn_r4": 0.168,
       "trinn_r5": 0.178
+    },
+    "IL": {
+      "year": 2026,
+      "source": "Israel Tax Authority / Bituach Leumi 2026",
+      "currency": "ILS",
+      "tax_brackets_monthly": [
+        {
+          "upTo": 7010,
+          "rate": 0.1
+        },
+        {
+          "upTo": 10060,
+          "rate": 0.14
+        },
+        {
+          "upTo": 19000,
+          "rate": 0.2
+        },
+        {
+          "upTo": 25100,
+          "rate": 0.31
+        },
+        {
+          "upTo": 46690,
+          "rate": 0.35
+        },
+        {
+          "upTo": 60130,
+          "rate": 0.47
+        },
+        {
+          "upTo": null,
+          "rate": 0.5
+        }
+      ],
+      "credit_point_month": 242,
+      "credit_points_male": 2.25,
+      "credit_points_female": 2.75,
+      "bl_threshold": 7703,
+      "bl_cap": 51910,
+      "bl_employee_low": 0.0104,
+      "bl_employee_high": 0.07,
+      "health_low": 0.0323,
+      "health_high": 0.0517,
+      "pension_employee_default": 0.06,
+      "b1": 7010,
+      "b2": 10060,
+      "b3": 19000,
+      "b4": 25100,
+      "b5": 46690,
+      "b6": 60130,
+      "r1": 0.1,
+      "r2": 0.14,
+      "r3": 0.2,
+      "r4": 0.31,
+      "r5": 0.35,
+      "r6": 0.47,
+      "r7": 0.5
     }
   },
   "changelog": [
+    "2026.09.24 – IL: Israel tax brackets + Bituach Leumi + credit points",
     "2026.09.24 – UA: PIT 18% + military 5% from rates",
     "2026.09.24 – IR: 1405 insurance 7% + tax exemption from rates",
     "2026.09.24 – IS: brackets + personal credit from rates",
