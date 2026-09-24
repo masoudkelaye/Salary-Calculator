@@ -2232,12 +2232,16 @@ window.papCalculate = papCalculate;
         ? parseFloat(sacRaw) : 0;
       const taxable = Math.max(0, annual - sacrifice);
 
-      // Income tax 2026–27 (resident)
+      // Income tax 2026–27 (resident) from rates.json
+      const tf = R('AU', 'tax_free', 18200);
+      const b2 = R('AU', 'bracket2', 45000);
+      const b3 = R('AU', 'bracket3', 135000);
+      const b4 = R('AU', 'bracket4', 190000);
       let tax = 0;
-      if (taxable > 18200) tax += Math.min(taxable - 18200, 45000 - 18200) * 0.15;
-      if (taxable > 45000) tax += Math.min(taxable - 45000, 135000 - 45000) * 0.30;
-      if (taxable > 135000) tax += Math.min(taxable - 135000, 190000 - 135000) * 0.37;
-      if (taxable > 190000) tax += (taxable - 190000) * 0.45;
+      if (taxable > tf) tax += Math.min(taxable - tf, b2 - tf) * R('AU', 'rate2', 0.15);
+      if (taxable > b2) tax += Math.min(taxable - b2, b3 - b2) * R('AU', 'rate3', 0.30);
+      if (taxable > b3) tax += Math.min(taxable - b3, b4 - b3) * R('AU', 'rate4', 0.37);
+      if (taxable > b4) tax += (taxable - b4) * R('AU', 'rate5', 0.45);
 
       // Low Income Tax Offset (LITO) simplified max $700, phases out
       let lito = 0;
@@ -2248,8 +2252,10 @@ window.papCalculate = papCalculate;
 
       // Medicare levy 2% with low-income shade-in (single approx)
       let medicare = 0;
-      if (taxable > 35014) medicare = taxable * 0.02;
-      else if (taxable > 28011) medicare = (taxable - 28011) * 0.10; // shade-in
+      const medFull = R('AU', 'medicare_full_from', 35014);
+      const medShade = R('AU', 'medicare_shade_from', 28011);
+      if (taxable > medFull) medicare = taxable * R('AU', 'medicare', 0.02);
+      else if (taxable > medShade) medicare = (taxable - medShade) * 0.10;
 
       // HELP / HECS compulsory repayment (simplified marginal from 2025-26 system)
       let help = 0;

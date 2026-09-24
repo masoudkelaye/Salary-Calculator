@@ -313,7 +313,18 @@
       "medicare": 0.02,
       "source": "ATO 2026-27",
       "fetchedAt": "2026-09-23T10:36:25.331Z",
-      "note": "PAYG withholding tables are the payroll source of truth"
+      "note": "PAYG withholding tables are the payroll source of truth",
+      "tax_free": 18200,
+      "bracket2": 45000,
+      "bracket3": 135000,
+      "bracket4": 190000,
+      "rate2": 0.15,
+      "rate3": 0.3,
+      "rate4": 0.37,
+      "rate5": 0.45,
+      "medicare_full_from": 35014,
+      "medicare_shade_from": 28011,
+      "help_threshold": 69528
     },
     "NZ": {
       "year": "2026-27",
@@ -354,6 +365,7 @@
     }
   },
   "changelog": [
+    "2026.09.24 – AU: ATO 2026-27 brackets + Medicare from rates",
     "2026.09.24 – CA: CPP YMPE/YAMPE + EI max from CRA rates",
     "2026.09.24 – US: IRS 2026 std deduction + SS wage base $184500 from rates",
     "2026.09.24 – ES: SS max base 5101.20 + employee rates from rates",
