@@ -212,11 +212,12 @@ function calcGermany(monthlyGross) {
     }
 
     function calcFrance(monthlyGross) {
-      // Official 2026: URSSAF/CLEISS cotisations + barème IR + décote + plafonnement QF
-      const PMSS = 4005; // plafond mensuel SS 2026
+      // URSSAF/CLEISS 2026 cotisations salariales + barème IR 2026 + décote + QF
       const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      const PMSS = R('FR', 'pass_monthly', 4005);
 
       const isCadre = document.getElementById('frCadre')?.value === '1';
+      const alsace = document.getElementById('frAlsace')?.value === '1';
       const mutuelleRaw = document.getElementById('frMutuelle')?.value;
       const mutuelle = (mutuelleRaw !== '' && mutuelleRaw != null && !isNaN(parseFloat(mutuelleRaw)))
         ? parseFloat(mutuelleRaw) : 0;
@@ -224,79 +225,88 @@ function calcGermany(monthlyGross) {
       const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
         ? parseFloat(otherRaw) : 0;
 
-      // Tranches
       const t1 = Math.min(monthlyGross, PMSS);
       const t2 = Math.max(0, Math.min(monthlyGross, PMSS * 8) - PMSS);
 
-      // Cotisations salariales obligatoires
-      const vieillessePlaf = t1 * 0.0690;
-      const vieillesseDeplaf = monthlyGross * 0.0040;
-      const agircT1 = t1 * 0.0315;
-      const cegT1 = t1 * 0.0086;   // CEG salarié T1
-      const agircT2 = t2 * 0.0864;
-      const cegT2 = t2 * 0.0108;   // CEG salarié T2
-      const cet = (monthlyGross > PMSS) ? (t1 + t2) * 0.0014 : 0;
-      const apec = isCadre ? Math.min(monthlyGross, PMSS * 4) * 0.00024 : 0;
+      const vieillessePlaf = t1 * R('FR', 'vieillesse_plafonnee_employee', 0.069);
+      const vieillesseDeplaf = monthlyGross * R('FR', 'vieillesse_deplafonnee_employee', 0.004);
+      const agircT1 = t1 * R('FR', 'agirc_t1_employee', 0.0315);
+      const cegT1 = t1 * R('FR', 'ceg_t1_employee', 0.0086);
+      const agircT2 = t2 * R('FR', 'agirc_t2_employee', 0.0864);
+      const cegT2 = t2 * R('FR', 'ceg_t2_employee', 0.0108);
+      const cet = (monthlyGross > PMSS) ? (t1 + t2) * R('FR', 'cet_employee', 0.0014) : 0;
+      const apec = isCadre ? Math.min(monthlyGross, PMSS * 4) * R('FR', 'apec_employee', 0.00024) : 0;
+      const maladieAM = alsace ? monthlyGross * R('FR', 'maladie_alsace_moselle', 0.013) : 0;
 
-      // CSG/CRDS sur 98,25 % (abattement 1,75 %, plafonné 4 PMSS)
-      const csgBase = Math.min(monthlyGross * 0.9825, 4 * PMSS * 0.9825);
-      const csgDeductible = csgBase * 0.0680;
-      const csgNonDed = csgBase * 0.0240;
-      const crds = csgBase * 0.0050;
+      const assiette = R('FR', 'csg_crds_assiette', 0.9825);
+      const csgCap = R('FR', 'csg_plafond_pass', 4) * PMSS * assiette;
+      const csgBase = Math.min(monthlyGross * assiette, csgCap);
+      const csgDeductible = csgBase * R('FR', 'csg_deductible', 0.068);
+      const csgNonDed = csgBase * R('FR', 'csg_non_deductible', 0.024);
+      const crds = csgBase * R('FR', 'crds', 0.005);
 
       const social = vieillessePlaf + vieillesseDeplaf + agircT1 + cegT1 + agircT2 + cegT2
-        + cet + apec + csgDeductible + csgNonDed + crds + mutuelle;
+        + cet + apec + maladieAM + csgDeductible + csgNonDed + crds + mutuelle;
       const netAvantImpot = monthlyGross - social - otherDed;
 
-      // Revenu imposable annuel (approx. fiche de paie → déclaration)
+      // Revenu imposable (approx. fiche → déclaration)
       const annualGross = monthlyGross * 12;
       const annualDeductibleSocial = (vieillessePlaf + vieillesseDeplaf + agircT1 + cegT1
-        + agircT2 + cegT2 + cet + apec + csgDeductible + mutuelle) * 12;
+        + agircT2 + cegT2 + cet + apec + maladieAM + csgDeductible + mutuelle) * 12;
       let revenuBrutFiscal = annualGross - annualDeductibleSocial;
-      // Abattement forfaitaire 10 % (min 509 €, max 14 555 € 2026)
-      const abattement10 = Math.min(Math.max(revenuBrutFiscal * 0.10, 509), 14555);
-      let revenuImposable = Math.max(0, revenuBrutFiscal - abattement10);
+      const abMin = R('FR', 'abattement10_min', 509);
+      const abMax = R('FR', 'abattement10_max', 14555);
+      const abattement10 = Math.min(Math.max(revenuBrutFiscal * 0.10, abMin), abMax);
+      const revenuImposable = Math.max(0, revenuBrutFiscal - abattement10);
 
-      const parts = parseFloat(document.getElementById('familyStatus')?.value) || 1;
-      const quotient = revenuImposable / parts;
+      const situation = document.getElementById('frSituation')?.value || '1';
+      const children = parseInt(document.getElementById('frChildren')?.value) || 0;
+      let parts = 1;
+      if (situation === '2') parts = 2;
+      if (children === 1) parts += 0.5;
+      else if (children === 2) parts += 1;
+      else if (children >= 3) parts += 1 + (children - 2);
 
-      // Barème IR 2026 (revenus 2025) – service-public
-      function taxOnQuotient(q) {
-        let t = 0;
-        if (q > 11600) t += (Math.min(q, 29579) - 11600) * 0.11;
-        if (q > 29579) t += (Math.min(q, 84577) - 29579) * 0.30;
-        if (q > 84577) t += (Math.min(q, 181917) - 84577) * 0.41;
-        if (q > 181917) t += (q - 181917) * 0.45;
-        return t;
-      }
+      const applyBareme = (qi) => {
+        const t1b = R('FR', 'ir_tranche1', 11600);
+        const t2b = R('FR', 'ir_tranche2', 29579);
+        const t3b = R('FR', 'ir_tranche3', 84577);
+        const t4b = R('FR', 'ir_tranche4', 181917);
+        let imp = 0;
+        if (qi > t1b) imp += (Math.min(qi, t2b) - t1b) * R('FR', 'ir_rate2', 0.11);
+        if (qi > t2b) imp += (Math.min(qi, t3b) - t2b) * R('FR', 'ir_rate3', 0.30);
+        if (qi > t3b) imp += (Math.min(qi, t4b) - t3b) * R('FR', 'ir_rate4', 0.41);
+        if (qi > t4b) imp += (qi - t4b) * R('FR', 'ir_rate5', 0.45);
+        return imp;
+      };
 
-      let impotAvecQF = taxOnQuotient(quotient) * parts;
-
-      // Plafonnement du quotient familial : 1 807 € par demi-part supplémentaire
-      const baseParts = parts >= 2 ? 2 : 1;
-      const extraHalfParts = Math.max(0, (parts - baseParts) * 2);
-      if (extraHalfParts > 0) {
-        const impotSansQF = taxOnQuotient(revenuImposable / baseParts) * baseParts;
+      const qi = revenuImposable / parts;
+      let impotAvecQF = applyBareme(qi) * parts;
+      // Plafonnement QF
+      if (parts > 1) {
+        const baseParts = situation === '2' ? 2 : 1;
+        const extraHalfParts = (parts - baseParts) * 2;
+        const impotSansQF = applyBareme(revenuImposable / baseParts) * baseParts;
         const avantage = impotSansQF - impotAvecQF;
-        const plafond = extraHalfParts * 1807;
+        const plafond = extraHalfParts * R('FR', 'qf_plafond_demi_part', 1807);
         if (avantage > plafond) impotAvecQF = impotSansQF - plafond;
       }
 
       // Décote 2026
       let decote = 0;
+      const dt = R('FR', 'decote_taux', 0.4525);
       if (parts <= 1.5) {
-        if (impotAvecQF < 1982) decote = Math.max(0, 897 - 0.4525 * impotAvecQF);
+        if (impotAvecQF < R('FR', 'decote_celib_seuil', 1982))
+          decote = Math.max(0, R('FR', 'decote_celib_base', 897) - dt * impotAvecQF);
       } else {
-        if (impotAvecQF < 3277) decote = Math.max(0, 1483 - 0.4525 * impotAvecQF);
+        if (impotAvecQF < R('FR', 'decote_couple_seuil', 3277))
+          decote = Math.max(0, R('FR', 'decote_couple_base', 1483) - dt * impotAvecQF);
       }
       const impotNet = Math.max(0, impotAvecQF - decote);
 
-      // PAS personnel si fourni (prioritaire pour le net mensuel)
       const pasInput = parseFloat(document.getElementById('frPasRate')?.value);
       let monthlyTax;
       if (!isNaN(pasInput) && pasInput >= 0) {
-        // Taux PAS appliqué sur une base proche du net imposable mensuel
-        // Approximation courante: net avant impôt (hors CSG non déductible déjà dans social)
         monthlyTax = Math.max(0, netAvantImpot) * (pasInput / 100);
       } else {
         monthlyTax = impotNet / 12;
@@ -315,18 +325,18 @@ function calcGermany(monthlyGross) {
           ['Vieillesse (plaf. + déplaf.)', r2(vieillessePlaf + vieillesseDeplaf)],
           ['Agirc-Arrco + CEG + CET' + (isCadre ? ' + APEC' : ''), r2(agircT1 + cegT1 + agircT2 + cegT2 + cet + apec)],
           ['CSG + CRDS', r2(csgDeductible + csgNonDed + crds)],
+          ['Maladie Alsace-Moselle', r2(maladieAM)],
           ['Mutuelle / prévoyance', r2(mutuelle)],
           ['Autres retenues', r2(otherDed)],
           ['Total cotisations + retenues', r2(social + otherDed)],
-          ['Net avant impôt', r2(netAvantImpot + otherDed - otherDed)],
+          ['Net avant impôt', r2(netAvantImpot)],
           ['IR / PAS', r2(monthlyTax)],
           ['Net à payer', r2(net)]
         ],
-        source: 'URSSAF/CLEISS 2026 cotisations + barème IR 2026 + décote + plafonnement QF. Enter PAS rate from impots.gouv for best monthly accuracy.'
+        source: 'URSSAF 2026 + barème IR 2026 + décote/QF. Enter PAS from impots.gouv for best monthly net.'
       };
     }
 
-    
     function calcItaly(monthlyGross) {
       // Agenzia Entrate / INPS 2026 – IRPEF 23/33/43 + detrazioni + addizionali user rates
       const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;

@@ -1,6 +1,6 @@
 {
   "version": "2026.09.24",
-  "updated": "2026-09-24T20:00:00Z",
+  "updated": "2026-09-24T21:00:00Z",
   "notes": "Auto-updated by update-rates.mjs. Calculators use these via R(country, key, fallback). Live scrape for UK/NL/US when available; DE from GKV 2026 statutory tables.",
   "sourcesChecked": [
     "GOV.UK income tax + NI 2026/27",
@@ -124,7 +124,7 @@
     },
     "FR": {
       "year": 2026,
-      "source": "URSSAF / CLEISS 2026",
+      "source": "URSSAF / CLEISS / Service-Public 2026",
       "pass_monthly": 4005,
       "csg": 0.092,
       "crds": 0.005,
@@ -134,7 +134,34 @@
       "fetchedAt": "2026-09-23T10:36:25.330Z",
       "pass_annual": 48060,
       "maladie_employee": 0,
-      "note": "Net payroll uses full cotisation stack in calc; these are key parameters"
+      "note": "Net payroll uses full cotisation stack in calc; these are key parameters",
+      "agirc_t1_employee": 0.0315,
+      "agirc_t2_employee": 0.0864,
+      "ceg_t1_employee": 0.0086,
+      "ceg_t2_employee": 0.0108,
+      "cet_employee": 0.0014,
+      "apec_employee": 0.00024,
+      "csg_deductible": 0.068,
+      "csg_non_deductible": 0.024,
+      "csg_plafond_pass": 4,
+      "maladie_alsace_moselle": 0.013,
+      "abattement10_min": 509,
+      "abattement10_max": 14555,
+      "ir_tranche1": 11600,
+      "ir_tranche2": 29579,
+      "ir_tranche3": 84577,
+      "ir_tranche4": 181917,
+      "ir_rate1": 0,
+      "ir_rate2": 0.11,
+      "ir_rate3": 0.3,
+      "ir_rate4": 0.41,
+      "ir_rate5": 0.45,
+      "qf_plafond_demi_part": 1807,
+      "decote_celib_seuil": 1982,
+      "decote_celib_base": 897,
+      "decote_couple_seuil": 3277,
+      "decote_couple_base": 1483,
+      "decote_taux": 0.4525
     },
     "IT": {
       "year": 2026,
@@ -246,6 +273,7 @@
     }
   },
   "changelog": [
+    "2026.09.24 – FR: URSSAF rates + IR 2026 barème + décote from rates.json",
     "2026.09.24 – UK: HMRC monthly NI + student loan thresholds, Scottish bands, rates-driven",
     "2026.09.24 – DE: midijob F, church/PV from rates",
     "2026.09.23 – Expanded updater all countries",
