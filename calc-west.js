@@ -1,6 +1,21 @@
+
+    /** Live rates from rates.json (window.TAX_RATES); fallback to hardcoded official defaults */
+    function R(country, key, fallback) {
+      try {
+        const pack = window.TAX_RATES && window.TAX_RATES.countries && window.TAX_RATES.countries[country];
+        if (pack && pack[key] != null && pack[key] !== '' && !Number.isNaN(Number(pack[key]))) {
+          return Number(pack[key]);
+        }
+      } catch (e) {}
+      return fallback;
+    }
+    window.R = R;
+
     function calcUK(monthlyGross) {
-      // HMRC PAYE 2026/27 – period-based NI + official bands
+      // HMRC PAYE 2026/27 – monthly NI + student loan (period method) + Scottish bands
       const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+      // HMRC student loan: floor to whole pounds (payroll spec)
+      const floorPound = (n) => Math.floor(Math.max(0, n) + 1e-9);
       const annual = monthlyGross * 12;
 
       // Pension: fixed £/month overrides %
@@ -18,23 +33,27 @@
       const payForNIMonthly = Math.max(0, monthlyGross - monthlyPension);
 
       // Personal Allowance
-      let pa = 12570;
-      if (document.getElementById('ukBlind')?.value === '1') pa += 3250;
-      if (document.getElementById('ukMarriage')?.value === '1') pa += 1260;
+      let pa = R('UK', 'personalAllowance', 12570);
+      if (document.getElementById('ukBlind')?.value === '1') pa += R('UK', 'blindAllowance', 3250);
+      if (document.getElementById('ukMarriage')?.value === '1') pa += R('UK', 'marriageAllowance', 1260);
 
       // Tax code override
       const taxCode = (document.getElementById('ukTaxCode')?.value || '').trim().toUpperCase();
-      if (taxCode === 'BR') pa = 0; // basic rate on all
+      if (taxCode === 'BR') pa = 0;
       else if (taxCode === '0T' || taxCode === 'D0' || taxCode === 'D1') pa = 0;
       else if (/^(\d+)L$/.test(taxCode)) {
-        pa = parseInt(taxCode) * 10; // 1257L → 12570
+        pa = parseInt(taxCode, 10) * 10; // 1257L → 12570
       } else if (/^S(\d+)L$/.test(taxCode)) {
-        pa = parseInt(taxCode.slice(1)) * 10; // Scottish
+        pa = parseInt(taxCode.slice(1), 10) * 10;
+      } else if (/^K(\d+)$/.test(taxCode)) {
+        // K codes: negative allowance (add to taxable) – approximate as pa=0 + extra
+        pa = 0;
       }
 
-      // PA taper over £100k adjusted net income
-      if (payForTaxAnnual > 100000) {
-        pa = Math.max(0, pa - (payForTaxAnnual - 100000) / 2);
+      // PA taper: £1 lost for every £2 over £100k adjusted net income
+      const taperFrom = R('UK', 'paTaperFrom', 100000);
+      if (payForTaxAnnual > taperFrom) {
+        pa = Math.max(0, pa - (payForTaxAnnual - taperFrom) / 2);
       }
 
       const region = document.getElementById('ukRegion')?.value || 'rUK';
@@ -42,20 +61,14 @@
       let tax = 0;
 
       if (region === 'Scotland') {
-        // gov.scot 2026/27 – bands on total income; taxable slices after PA
-        // Starter 19%: 12571–16537 → taxable 0–3967
-        // Basic 20%: 16538–29526 → 3968–16956
-        // Intermediate 21%: 29527–43662 → 16957–31092
-        // Higher 42%: 43663–75000 → 31093–62430
-        // Advanced 45%: 75001–125140 → 62431–112570
-        // Top 48%: over 125140
+        // gov.scot / GOV.UK 2026/27 – slices of income after PA
         const bands = [
-          [3967, 0.19],
-          [16956, 0.20],
-          [31092, 0.21],
-          [62430, 0.42],
-          [112570, 0.45],
-          [Infinity, 0.48]
+          [R('UK', 'scot_starter_to', 3967), R('UK', 'scot_starter_rate', 0.19)],
+          [R('UK', 'scot_basic_to', 16956), R('UK', 'scot_basic_rate', 0.20)],
+          [R('UK', 'scot_inter_to', 31092), R('UK', 'scot_inter_rate', 0.21)],
+          [R('UK', 'scot_higher_to', 62430), R('UK', 'scot_higher_rate', 0.42)],
+          [R('UK', 'scot_advanced_to', 112570), R('UK', 'scot_advanced_rate', 0.45)],
+          [Infinity, R('UK', 'scot_top_rate', 0.48)]
         ];
         let remaining = taxable, prev = 0;
         for (const [limit, rate] of bands) {
@@ -66,66 +79,67 @@
           if (remaining <= 0) break;
         }
       } else {
-        // England / Wales / NI 2026/27
-        // When PA=12570: basic on first 37700 of taxable, higher to 125140-pa, etc.
-        // If tax code BR: 20% on all taxable (pa already 0)
+        // England / Wales / NI
         if (taxCode === 'BR') {
-          tax = taxable * 0.20;
+          tax = taxable * R('UK', 'basicRate', 0.20);
         } else if (taxCode === 'D0') {
-          tax = taxable * 0.40;
+          tax = taxable * R('UK', 'higherRate', 0.40);
         } else if (taxCode === 'D1') {
-          tax = taxable * 0.45;
+          tax = taxable * R('UK', 'additionalRate', 0.45);
         } else {
-          const higherStart = Math.max(0, 50270 - pa);
-          const additionalStart = Math.max(0, 125140 - pa);
-          if (taxable > 0) tax += Math.min(taxable, higherStart) * 0.20;
-          if (taxable > higherStart) tax += (Math.min(taxable, additionalStart) - higherStart) * 0.40;
-          if (taxable > additionalStart) tax += (taxable - additionalStart) * 0.45;
+          const higherAnnual = R('UK', 'higherThresholdAnnual', 50270);
+          const addAnnual = R('UK', 'additionalRateThreshold', 125140);
+          const higherStart = Math.max(0, higherAnnual - pa);
+          const additionalStart = Math.max(0, addAnnual - pa);
+          if (taxable > 0) tax += Math.min(taxable, higherStart) * R('UK', 'basicRate', 0.20);
+          if (taxable > higherStart) tax += (Math.min(taxable, additionalStart) - higherStart) * R('UK', 'higherRate', 0.40);
+          if (taxable > additionalStart) tax += (taxable - additionalStart) * R('UK', 'additionalRate', 0.45);
         }
       }
 
-      // Employee Class 1 NI – monthly thresholds (PAYE-accurate)
-      // PT £1,048/mo, UEL £4,189/mo  |  rates 8% then 2%
+      // Employee Class 1 NI – monthly thresholds (HMRC PAYE)
       const spa = document.getElementById('ukSPA')?.value === '1';
       let monthlyNI = 0;
       if (!spa) {
-        const PT = 1048, UEL = 4189;
+        const PT = R('UK', 'niPT_monthly', 1048);
+        const UEL = R('UK', 'niUEL_monthly', 4189);
         if (payForNIMonthly > PT) {
-          monthlyNI += (Math.min(payForNIMonthly, UEL) - PT) * 0.08;
-          if (payForNIMonthly > UEL) monthlyNI += (payForNIMonthly - UEL) * 0.02;
+          monthlyNI += (Math.min(payForNIMonthly, UEL) - PT) * R('UK', 'niPrimary', 0.08);
+          if (payForNIMonthly > UEL) monthlyNI += (payForNIMonthly - UEL) * R('UK', 'niUpper', 0.02);
         }
       }
+      monthlyNI = r2(monthlyNI);
 
-      // Student Loan – on gross (HMRC), monthly approximation
+      // Student Loan – HMRC period method: monthly threshold, floor to £
       const studentPlan = document.getElementById('ukStudent')?.value || 'none';
-      const thresholds = {
-        plan1: { t: 26900, r: 0.09 },
-        plan2: { t: 29385, r: 0.09 },
-        plan4: { t: 33795, r: 0.09 },
-        plan5: { t: 25000, r: 0.09 },
-        pg: { t: 21000, r: 0.06 }
+      const slMap = {
+        plan1: { m: R('UK', 'studentPlan1_monthly', 2241.66), r: R('UK', 'studentRate', 0.09) },
+        plan2: { m: R('UK', 'studentPlan2_monthly', 2448.75), r: R('UK', 'studentRate', 0.09) },
+        plan4: { m: R('UK', 'studentPlan4_monthly', 2816.25), r: R('UK', 'studentRate', 0.09) },
+        plan5: { m: R('UK', 'studentPlan5_monthly', 2083.33), r: R('UK', 'studentRate', 0.09) },
+        pg:    { m: R('UK', 'studentPG_monthly', 1750), r: R('UK', 'studentPGRate', 0.06) }
       };
-      let studentLoanAnnual = 0;
-      if (studentPlan !== 'none' && thresholds[studentPlan]) {
-        const { t, r } = thresholds[studentPlan];
-        if (annual > t) studentLoanAnnual = (annual - t) * r;
+      let monthlySL = 0;
+      if (studentPlan !== 'none' && slMap[studentPlan]) {
+        const { m, r } = slMap[studentPlan];
+        // Earnings for SL = NI-able earnings (Class 1) in the period
+        const e = payForNIMonthly;
+        if (e > m) monthlySL = floorPound((e - m) * r);
       }
-      const monthlySL = studentLoanAnnual / 12;
 
-      // Other deductions from payslip
       const otherRaw = document.getElementById('ukOtherDed')?.value;
       const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
         ? parseFloat(otherRaw) : 0;
 
-      const monthlyTax = tax / 12;
+      const monthlyTax = r2(tax / 12);
       const net = monthlyGross - monthlyTax - monthlyNI - monthlySL - monthlyPension - otherDed;
 
       const rows = [
         ['Gross pay', r2(monthlyGross)],
         ['Pension (employee)', r2(monthlyPension)],
         ['Personal Allowance (annual)', r2(pa)],
-        ['Income Tax (PAYE)', r2(monthlyTax)],
-        ['National Insurance', r2(monthlyNI)]
+        ['Income Tax (PAYE)', monthlyTax],
+        ['National Insurance', monthlyNI]
       ];
       if (monthlySL > 0) rows.push(['Student Loan', r2(monthlySL)]);
       if (otherDed > 0) rows.push(['Other deductions', r2(otherDed)]);
@@ -133,14 +147,14 @@
 
       return {
         social: r2(monthlyNI + monthlySL),
-        tax: r2(monthlyTax),
+        tax: monthlyTax,
         soli: 0,
         church: 0,
         net: r2(net),
         rows,
         source: region === 'Scotland'
-          ? 'gov.scot 2026/27 bands + HMRC NI monthly thresholds + Student Loan'
-          : 'HMRC 2026/27 PAYE + NI PT £1048/UEL £4189 + tax code support'
+          ? 'gov.scot 2026/27 + HMRC NI monthly + Student Loan period method'
+          : 'HMRC 2026/27 PAYE + NI PT/UEL monthly + Student Loan (floor £)'
       };
     }
 
@@ -215,8 +229,8 @@
 
       // FICA on gross wages (401k still subject to FICA in traditional plans)
       const ssWageBase = 184500;
-      const ss = Math.min(annual, ssWageBase) * 0.062;
-      const medicare = annual * 0.0145;
+      const ss = Math.min(annual, ssWageBase) * R('US', 'ssRate', 0.062);
+      const medicare = annual * R('US', 'medicare', 0.0145);
       let addMedicare = 0;
       let addThresh = 200000;
       if (filing === 'mfj') addThresh = 250000;
@@ -296,7 +310,7 @@
       const prov = document.getElementById('caProvince')?.value || 'ON';
       const isQC = prov === 'QC';
       const ympe = 74600, exemption = 3500, yampe = 85000;
-      const pensRate = isQC ? 0.063 : 0.0595;
+      const pensRate = isQC ? 0.063 : R('CA', 'cppRate', 0.0595);
       const pensMax = isQC ? 4479.30 : 4230.45;
       let cppBase = Math.max(0, Math.min(annual, ympe) - exemption) * pensRate;
       cppBase = Math.min(cppBase, pensMax);
@@ -413,7 +427,7 @@
       // ONSS 13.07% — ouvriers on 108% of gross
       const isWorker = document.getElementById('beWorker')?.value === 'worker';
       const onssBase = isWorker ? annual * 1.08 : annual;
-      let onss = onssBase * 0.1307;
+      let onss = onssBase * R('BE', 'onssEmployee', 0.1307);
 
       // Work bonus (werkbonus / bonus à l'emploi) 2026 – reduces personal ONSS
       const S = monthlyGross;

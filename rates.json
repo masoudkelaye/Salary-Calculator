@@ -1,6 +1,6 @@
 {
   "version": "2026.09.24",
-  "updated": "2026-09-24T14:50:00Z",
+  "updated": "2026-09-24T20:00:00Z",
   "notes": "Auto-updated by update-rates.mjs. Calculators use these via R(country, key, fallback). Live scrape for UK/NL/US when available; DE from GKV 2026 statutory tables.",
   "sourcesChecked": [
     "GOV.UK income tax + NI 2026/27",
@@ -39,7 +39,7 @@
     },
     "UK": {
       "year": "2026/27",
-      "source": "https://www.gov.uk/income-tax-rates",
+      "source": "HMRC rates and thresholds employers 2026 to 2027",
       "personalAllowance": 12570,
       "basicRate": 0.2,
       "higherRate": 0.4,
@@ -52,7 +52,35 @@
       "niUEL_weekly": 967,
       "fetchedAt": "2026-09-23T10:36:23.365Z",
       "niPT_monthly": 1048,
-      "niUEL_monthly": 4189
+      "niUEL_monthly": 4189,
+      "paTaperFrom": 100000,
+      "higherThresholdAnnual": 50270,
+      "niLEL_monthly": 559,
+      "blindAllowance": 3250,
+      "marriageAllowance": 1260,
+      "studentPlan1_annual": 26900,
+      "studentPlan1_monthly": 2241.66,
+      "studentPlan2_annual": 29385,
+      "studentPlan2_monthly": 2448.75,
+      "studentPlan4_annual": 33795,
+      "studentPlan4_monthly": 2816.25,
+      "studentPlan5_annual": 25000,
+      "studentPlan5_monthly": 2083.33,
+      "studentPG_annual": 21000,
+      "studentPG_monthly": 1750,
+      "studentRate": 0.09,
+      "studentPGRate": 0.06,
+      "scot_starter_to": 3967,
+      "scot_basic_to": 16956,
+      "scot_inter_to": 31092,
+      "scot_higher_to": 62430,
+      "scot_advanced_to": 112570,
+      "scot_starter_rate": 0.19,
+      "scot_basic_rate": 0.2,
+      "scot_inter_rate": 0.21,
+      "scot_higher_rate": 0.42,
+      "scot_advanced_rate": 0.45,
+      "scot_top_rate": 0.48
     },
     "NL": {
       "year": 2026,
@@ -218,7 +246,8 @@
     }
   },
   "changelog": [
-    "2026.09.24 – DE: midijob BE from F/G, PV/church from rates, cent-rounding SV",
+    "2026.09.24 – UK: HMRC monthly NI + student loan thresholds, Scottish bands, rates-driven",
+    "2026.09.24 – DE: midijob F, church/PV from rates",
     "2026.09.23 – Expanded updater all countries",
     "2026.09.21 – Refresh from official public sources"
   ]
