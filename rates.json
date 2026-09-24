@@ -261,10 +261,22 @@
     "ES": {
       "year": 2026,
       "ssEmployeeApprox": 0.065,
-      "source": "Seguridad Social / AEAT 2026",
+      "source": "Seguridad Social Orden PJC/297/2026 + AEAT IRPF",
       "fetchedAt": "2026-09-23T10:36:25.330Z",
       "ssMaxBase_month": 5101.2,
-      "note": "IRPF is progressive by autonomous community; user can override communal rate"
+      "note": "IRPF is progressive by autonomous community; user can override communal rate",
+      "cc_employee": 0.047,
+      "desempleo_indef": 0.0155,
+      "desempleo_temp": 0.016,
+      "fp_employee": 0.001,
+      "mei_employee": 0.0015,
+      "minimo_personal": 5550,
+      "kid1": 2400,
+      "kid2": 2700,
+      "kid3": 4000,
+      "kid_extra": 4500,
+      "reduc_base": 2000,
+      "reduc_low": 7375
     },
     "IR": {
       "year": 1405,
@@ -327,6 +339,7 @@
     }
   },
   "changelog": [
+    "2026.09.24 – ES: SS max base 5101.20 + employee rates from rates",
     "2026.09.24 – BE: ONSS 13.07% + IPP brackets + allowance from rates",
     "2026.09.24 – IT: IRPEF 23/33/43 + INPS + detrazioni from rates",
     "2026.09.24 – NL: full Belastingdienst 2026 schijven + AHK + arbeidskorting from rates",

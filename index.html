@@ -2017,27 +2017,27 @@ window.papCalculate = papCalculate;
       // Employee SS 2026
       // Contingencias comunes 4.70% + Desempleo 1.55%/1.60% + FP 0.10% + MEI 0.15%
       const isTemp = document.getElementById('esContract')?.value === 'temp';
-      const desempleo = isTemp ? 0.0160 : 0.0155;
-      const employeeRate = 0.0470 + desempleo + 0.0010 + 0.0015; // ~6.50% or 6.55%
-      const maxBaseMonth = 5101.20;
+      const desempleo = isTemp ? R('ES', 'desempleo_temp', 0.0160) : R('ES', 'desempleo_indef', 0.0155);
+      const employeeRate = R('ES', 'cc_employee', 0.0470) + desempleo + R('ES', 'fp_employee', 0.0010) + R('ES', 'mei_employee', 0.0015);
+      const maxBaseMonth = R('ES', 'ssMaxBase_month', 5101.20);
       const ssBaseAnnual = Math.min(annual, maxBaseMonth * 12);
       const ss = ssBaseAnnual * employeeRate;
       const ssMonthly = ss / pays;
 
       // Reducción por rendimientos del trabajo (approx art. 20 LIRPF)
       // Simplified: 2,000 base; higher for lower incomes
-      let reducTrabajo = 2000;
+      let reducTrabajo = R('ES', 'reduc_base', 2000);
       const rendNeto = annual - ss;
-      if (rendNeto <= 13115) reducTrabajo = 7375;
+      if (rendNeto <= 13115) reducTrabajo = R('ES', 'reduc_low', 7375);
       else if (rendNeto < 16825) reducTrabajo = 7375 - (rendNeto - 13115) * 1.9863;
 
       // Mínimo personal y familiar 2026
       const kids = parseInt(document.getElementById('esKids')?.value) || 0;
-      let minimo = 5550;
-      if (kids >= 1) minimo += 2400;
-      if (kids >= 2) minimo += 2700;
-      if (kids >= 3) minimo += 4000;
-      if (kids > 3) minimo += (kids - 3) * 4500;
+      let minimo = R('ES', 'minimo_personal', 5550);
+      if (kids >= 1) minimo += R('ES', 'kid1', 2400);
+      if (kids >= 2) minimo += R('ES', 'kid2', 2700);
+      if (kids >= 3) minimo += R('ES', 'kid3', 4000);
+      if (kids > 3) minimo += (kids - 3) * R('ES', 'kid_extra', 4500);
 
       // Base liquidable approx
       let taxable = Math.max(0, annual - ss - reducTrabajo);
