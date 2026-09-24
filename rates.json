@@ -378,10 +378,27 @@
       "year": 2026,
       "source": "Skatteetaten 2026",
       "fetchedAt": "2026-09-23T10:36:25.331Z",
-      "note": "Trygdeavgift + bracket tax; user can override"
+      "note": "Trygdeavgift + bracket tax; user can override",
+      "ordinary_rate": 0.22,
+      "minstefradrag_pct": 0.46,
+      "minstefradrag_max": 95700,
+      "personfradrag": 114540,
+      "trygdeavgift": 0.076,
+      "trygd_floor": 99650,
+      "trinn1": 226100,
+      "trinn2": 318300,
+      "trinn3": 725050,
+      "trinn4": 980100,
+      "trinn5": 1467200,
+      "trinn_r1": 0.017,
+      "trinn_r2": 0.04,
+      "trinn_r3": 0.137,
+      "trinn_r4": 0.168,
+      "trinn_r5": 0.178
     }
   },
   "changelog": [
+    "2026.09.24 – NO: trinnskatt + trygdeavgift + minstefradrag from rates",
     "2026.09.24 – SE: skiktgräns 643k + kommun default from rates",
     "2026.09.24 – NZ: IRD brackets + ACC 1.75% cap from rates",
     "2026.09.24 – AU: ATO 2026-27 brackets + Medicare from rates",

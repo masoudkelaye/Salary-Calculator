@@ -2405,32 +2405,32 @@ window.papCalculate = papCalculate;
     }
 
     function calcNorway(monthlyGross) {
-      // Skatteetaten 2026 – 22% alminnelig + trinnskatt + trygdeavgift 7.6%
+      // Skatteetaten 2026 – 22% alminnelig + trinnskatt + trygdeavgift
       const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
       const annual = monthlyGross * 12;
 
-      // Minstefradrag 46% max 95,700
-      const minste = Math.min(annual * 0.46, 95700);
-      // Personfradrag 88,250
-      const person = 88250;
+      const minste = Math.min(annual * R('NO', 'minstefradrag_pct', 0.46), R('NO', 'minstefradrag_max', 95700));
+      const person = R('NO', 'personfradrag', 114540);
       const ordinaryBase = Math.max(0, annual - minste - person);
-      const ordinaryTax = ordinaryBase * 0.22;
+      const ordinaryTax = ordinaryBase * R('NO', 'ordinary_rate', 0.22);
 
-      // Trygdeavgift 7.6% on gross (with low-income phase-in)
       let trygd = 0;
-      if (annual > 99650) {
-        trygd = annual * 0.076;
-        const cap = (annual - 99650) * 0.25;
+      const floor = R('NO', 'trygd_floor', 99650);
+      if (annual > floor) {
+        trygd = annual * R('NO', 'trygdeavgift', 0.076);
+        const cap = (annual - floor) * 0.25;
         trygd = Math.min(trygd, cap);
       }
 
-      // Trinnskatt on gross personinntekt
       let trinn = 0;
-      if (annual > 226100) trinn += Math.min(annual - 226100, 318300 - 226100) * 0.017;
-      if (annual > 318300) trinn += Math.min(annual - 318300, 725050 - 318300) * 0.04;
-      if (annual > 725050) trinn += Math.min(annual - 725050, 980100 - 725050) * 0.137;
-      if (annual > 980100) trinn += Math.min(annual - 980100, 1467200 - 980100) * 0.168;
-      if (annual > 1467200) trinn += (annual - 1467200) * 0.178;
+      const t1 = R('NO', 'trinn1', 226100), t2 = R('NO', 'trinn2', 318300);
+      const t3 = R('NO', 'trinn3', 725050), t4 = R('NO', 'trinn4', 980100);
+      const t5 = R('NO', 'trinn5', 1467200);
+      if (annual > t1) trinn += Math.min(annual - t1, t2 - t1) * R('NO', 'trinn_r1', 0.017);
+      if (annual > t2) trinn += Math.min(annual - t2, t3 - t2) * R('NO', 'trinn_r2', 0.04);
+      if (annual > t3) trinn += Math.min(annual - t3, t4 - t3) * R('NO', 'trinn_r3', 0.137);
+      if (annual > t4) trinn += Math.min(annual - t4, t5 - t4) * R('NO', 'trinn_r4', 0.168);
+      if (annual > t5) trinn += (annual - t5) * R('NO', 'trinn_r5', 0.178);
 
       const otherRaw = document.getElementById('noOtherDed')?.value;
       const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
@@ -2453,7 +2453,7 @@ window.papCalculate = papCalculate;
           ['Other deductions', r2(otherDed)],
           ['Net / Netto', r2(net)]
         ],
-        source: 'Skatteetaten 2026 – 22% + trinnskatt + trygdeavgift 7.6%'
+        source: 'Skatteetaten 2026 – 22% + trinnskatt + trygdeavgift 7.6% (rates.json)'
       };
     }
 
