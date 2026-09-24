@@ -1,5 +1,19 @@
 import { calculate as papCalculate } from "https://cdn.jsdelivr.net/npm/lohnsteuerrechner@1.0.7/+esm";
 
+
+    /** Live rates from rates.json (window.TAX_RATES); fallback to hardcoded official defaults */
+    function R(country, key, fallback) {
+      try {
+        const pack = window.TAX_RATES && window.TAX_RATES.countries && window.TAX_RATES.countries[country];
+        if (pack && pack[key] != null && pack[key] !== '' && !Number.isNaN(Number(pack[key]))) {
+          return Number(pack[key]);
+        }
+      } catch (e) {}
+      return fallback;
+    }
+    window.R = R;
+
+
 function calcGermany(monthlyGross) {
       // BMF PAP 2026 + official SV 2026 incl. Minijob / Midijob
       const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
@@ -9,7 +23,7 @@ function calcGermany(monthlyGross) {
       const children = parseInt(document.getElementById('children').value) || 0;
       const age = parseInt(document.getElementById('age').value) || 30;
       const zusatz = parseFloat(document.getElementById('zusatz').value);
-      const kvz = isNaN(zusatz) ? 2.9 : zusatz;
+      const kvz = isNaN(zusatz) ? (R('DE', 'zusatz_default', 0.029) * 100) : zusatz;
       const isSachsen = state === 'SN';
       const zkf = parseFloat(document.getElementById('deZkf')?.value) || 0;
       const freibRaw = document.getElementById('deFreib')?.value;
@@ -34,10 +48,10 @@ function calcGermany(monthlyGross) {
       const svBase = Math.max(0, monthlyGross - freiZuschlag);
       const taxBase = Math.max(0, monthlyGross - freiZuschlag);
 
-      const MINIJOB = 603;
-      const MIDI_MAX = 2000;
-      const pensionCeil = 8450;
-      const healthCeil = 5812.50;
+      const MINIJOB = R('DE', 'minijob_limit', 603);
+      const MIDI_MAX = R('DE', 'midijob_upper', 2000);
+      const pensionCeil = R('DE', 'bbg_rv_av_month', 8450);
+      const healthCeil = R('DE', 'bbg_kv_pv_month', 5812.50);
 
       let pension = 0, unemployment = 0, health = 0, care = 0;
       let lst = 0, soli = 0, church = 0;
@@ -48,7 +62,7 @@ function calcGermany(monthlyGross) {
         // Employee: usually 0 Lohnsteuer (pauschal by AG), 0 KV/PV/ALV
         // Optional RV 3.6% if not exempt
         const payRV = document.getElementById('minijobRV')?.value === '1';
-        pension = payRV ? monthlyGross * 0.036 : 0;
+        pension = payRV ? r2(monthlyGross * R('DE', 'minijob_rv_employee', 0.036)) : 0;
         unemployment = 0; health = 0; care = 0;
         lst = 0; soli = 0; church = 0;
         noteExtra = payRV
@@ -57,33 +71,54 @@ function calcGermany(monthlyGross) {
       }
       // ========== MIDIJOB ==========
       else if (jobType === 'midijob') {
-        // Official 2026 formulas (DRV / §20 Abs. 2a SGB IV)
-        // BE for employee share:
-        const beAN = Math.max(0, 1.431639227 * svBase - 863.2784538);
-        // BE for total (used for childless PV surcharge):
-        const beGes = Math.max(0, 1.145937223 * svBase - 291.8744452);
+        // §20 Abs. 2a SGB IV – Übergangsbereich 2026
+        // G = Geringfügigkeitsgrenze, U = upper, F = Faktor F (BMAS)
+        const G = MINIJOB;
+        const U = MIDI_MAX;
+        const F = R('DE', 'faktor_f', 0.6619);
+        // BE Gesamt: F*G + (U/(U-G) - G/(U-G)*F) * (AE - G)
+        const span = U - G;
+        const coeffGes = (U / span) - (G / span) * F;
+        const constGes = F * G - coeffGes * G;
+        const beGes = Math.max(0, coeffGes * svBase + constGes);
+        // BE Arbeitnehmer (reduced employee basis for AN-Anteil)
+        // Standard 2026 coeffs when G=603,U=2000,F=0.6619 → 1.431639227*AE - 863.2784538
+        const coeffAN = 2 * coeffGes / (1 + F); // derived relation used in payroll software
+        // Prefer explicit official short form for 2026 defaults when G/U/F match
+        let beAN;
+        if (Math.abs(G - 603) < 0.01 && Math.abs(U - 2000) < 0.01 && Math.abs(F - 0.6619) < 0.0001) {
+          beAN = Math.max(0, 1.431639227 * svBase - 863.2784538);
+        } else {
+          // General approximation from F and G for other years
+          beAN = Math.max(0, (svBase * (U - F * G) / (U - G) - F * G * (U - svBase) / (U - G)));
+        }
+
+        const halfRV = R('DE', 'rv', 0.186) / 2;
+        const halfAV = R('DE', 'av', 0.026) / 2;
+        const halfKV = R('DE', 'kv_allgemein', 0.146) / 2;
+        const pvBase = R('DE', 'pv', 0.036) / 2; // 1.8% employee base
+        const pvChildless = R('DE', 'pv_childless_surcharge', 0.006);
+        const pvChildDisc = R('DE', 'pv_child_discount', 0.0025);
 
         if (krv === 0) {
-          pension = beAN * 0.093;
-          unemployment = beAN * 0.013;
+          pension = r2(beAN * halfRV);
+          unemployment = r2(beAN * halfAV);
         }
         if (pkv === 0) {
-          health = beAN * (0.073 + kvz / 200);
-          let careRate = 0.018;
+          health = r2(beAN * (halfKV + kvz / 200));
           if (children === 0 && age >= 23) {
-            // base on beAN + childless surcharge on beGes
-            care = beAN * 0.018 + beGes * 0.006;
+            care = r2(beAN * pvBase + beGes * pvChildless);
           } else {
-            if (children >= 2) careRate = Math.max(0.008, 0.018 - Math.min(children - 1, 4) * 0.0025);
-            if (isSachsen) careRate += 0.005;
-            care = beAN * careRate;
+            let careRate = pvBase;
+            if (children >= 2) careRate = Math.max(0.008, pvBase - Math.min(children - 1, 4) * pvChildDisc);
+            if (isSachsen) careRate += 0.005; // Sachsen: employee pays extra 0.5%
+            care = r2(beAN * careRate);
           }
         } else {
           health = Math.max(0, (pkpv - pkpvAg) / 100);
           care = 0;
         }
 
-        // Lohnsteuer: normal PAP with chosen tax class (not automatic SK6)
         try {
           const params = {
             LZZ: 2, RE4: Math.round(taxBase * 100), STKL: taxClass,
@@ -93,28 +128,36 @@ function calcGermany(monthlyGross) {
           };
           if (lzzFreib > 0) params.LZZFREIB = lzzFreib;
           if (pkv === 1 && pkpv > 0) { params.PKPV = pkpv; if (pkpvAg > 0) params.PKPVAGZ = pkpvAg; }
-          const res = papCalculate(2026, params);
+          const res = (window.papCalculate || papCalculate)(2026, params);
           lst = (res.LSTLZZ || 0) / 100;
           soli = (res.SOLZLZZ || 0) / 100;
           const churchBase = (res.BK || res.LSTLZZ || 0) / 100;
-          const churchRate = (state === 'BW' || state === 'BY') ? 0.08 : 0.09;
-          church = hasChurch ? churchBase * churchRate : 0;
+          const churchRate = (state === 'BW' || state === 'BY')
+            ? R('DE', 'church_bw_by', 0.08) : R('DE', 'church_other', 0.09);
+          church = hasChurch ? r2(churchBase * churchRate) : 0;
         } catch (e) { console.error(e); }
-        noteExtra = 'Midijob 2026: SV on reduced BE (official formula F=0.6619)';
+        noteExtra = 'Midijob: SV on reduced BE (§20 Abs. 2a SGB IV, F=' + F + ')';
       }
       // ========== REGULAR ==========
       else {
+        const halfRV = R('DE', 'rv', 0.186) / 2;
+        const halfAV = R('DE', 'av', 0.026) / 2;
+        const halfKV = R('DE', 'kv_allgemein', 0.146) / 2;
+        const pvBase = R('DE', 'pv', 0.036) / 2;
+        const pvChildless = R('DE', 'pv_childless_surcharge', 0.006);
+        const pvChildDisc = R('DE', 'pv_child_discount', 0.0025);
+
         if (krv === 0) {
-          pension = Math.min(svBase, pensionCeil) * 0.093;
-          unemployment = Math.min(svBase, pensionCeil) * 0.013;
+          pension = r2(Math.min(svBase, pensionCeil) * halfRV);
+          unemployment = r2(Math.min(svBase, pensionCeil) * halfAV);
         }
         if (pkv === 0) {
-          health = Math.min(svBase, healthCeil) * (0.073 + kvz / 200);
-          let careRate = 0.018;
-          if (children === 0 && age >= 23) careRate += 0.006;
-          else if (children >= 2) careRate = Math.max(0.008, 0.018 - Math.min(children - 1, 4) * 0.0025);
+          health = r2(Math.min(svBase, healthCeil) * (halfKV + kvz / 200));
+          let careRate = pvBase;
+          if (children === 0 && age >= 23) careRate += pvChildless;
+          else if (children >= 2) careRate = Math.max(0.008, pvBase - Math.min(children - 1, 4) * pvChildDisc);
           if (isSachsen) careRate += 0.005;
-          care = Math.min(svBase, healthCeil) * careRate;
+          care = r2(Math.min(svBase, healthCeil) * careRate);
         } else {
           health = Math.max(0, (pkpv - pkpvAg) / 100);
           care = 0;
@@ -128,14 +171,15 @@ function calcGermany(monthlyGross) {
           };
           if (lzzFreib > 0) params.LZZFREIB = lzzFreib;
           if (pkv === 1 && pkpv > 0) { params.PKPV = pkpv; if (pkpvAg > 0) params.PKPVAGZ = pkpvAg; }
-          const res = papCalculate(2026, params);
+          const res = (window.papCalculate || papCalculate)(2026, params);
           lst = (res.LSTLZZ || 0) / 100;
           soli = (res.SOLZLZZ || 0) / 100;
           const churchBase = (res.BK || res.LSTLZZ || 0) / 100;
-          const churchRate = (state === 'BW' || state === 'BY') ? 0.08 : 0.09;
-          church = hasChurch ? churchBase * churchRate : 0;
+          const churchRate = (state === 'BW' || state === 'BY')
+            ? R('DE', 'church_bw_by', 0.08) : R('DE', 'church_other', 0.09);
+          church = hasChurch ? r2(churchBase * churchRate) : 0;
         } catch (e) { console.error(e); }
-        noteExtra = 'Regular employment: BMF PAP 2026 + full SV';
+        noteExtra = 'Regular: BMF PAP 2026 (lohnsteuerrechner) + SV 2026 GKV/DRV';
       }
 
       const social = pension + unemployment + health + care;

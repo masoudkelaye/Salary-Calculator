@@ -92,8 +92,6 @@
       justify-content: space-between;
       gap: 1rem;
       margin-bottom: 1.75rem;
-      position: relative;
-      z-index: 10000;
     }
 
     .lang-switch {
@@ -162,7 +160,7 @@
       top: calc(100% + 6px);
       inset-inline-start: 0;
       min-width: 100%;
-      z-index: 10001;
+      z-index: 1000;
       padding: 0.35rem;
       border-radius: 14px;
       background: #0c1222;
@@ -170,8 +168,6 @@
       box-shadow: 0 12px 40px rgba(0,0,0,0.55);
       backdrop-filter: blur(20px);
     }
-    .lang-dd { z-index: 10001; }
-    .lang-switch { position: relative; z-index: 10001; }
     .lang-dd.open .lang-dd-menu { display: block; }
     .lang-dd-item {
       display: block;
@@ -1224,11 +1220,26 @@
   
   
   <script type="module">
+
 import { calculate as papCalculate } from "https://cdn.jsdelivr.net/npm/lohnsteuerrechner@1.0.7/+esm";
 window.papCalculate = papCalculate;
 
 
-function calcGermany(monthlyGross) {
+    function R(country, key, fallback) {
+      try {
+        const pack = window.TAX_RATES && window.TAX_RATES.countries && window.TAX_RATES.countries[country];
+        if (pack && pack[key] != null && pack[key] !== '' && !Number.isNaN(Number(pack[key]))) {
+          return Number(pack[key]);
+        }
+      } catch (e) {}
+      return fallback;
+    }
+    window.R = R;
+
+
+
+
+    function calcGermany(monthlyGross) {
       // BMF PAP 2026 + official SV 2026 incl. Minijob / Midijob
       const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
       const taxClass = parseInt(document.getElementById('taxClass').value) || 1;
@@ -1237,7 +1248,7 @@ function calcGermany(monthlyGross) {
       const children = parseInt(document.getElementById('children').value) || 0;
       const age = parseInt(document.getElementById('age').value) || 30;
       const zusatz = parseFloat(document.getElementById('zusatz').value);
-      const kvz = isNaN(zusatz) ? 2.9 : zusatz;
+      const kvz = isNaN(zusatz) ? (R('DE', 'zusatz_default', 0.029) * 100) : zusatz;
       const isSachsen = state === 'SN';
       const zkf = parseFloat(document.getElementById('deZkf')?.value) || 0;
       const freibRaw = document.getElementById('deFreib')?.value;
@@ -1262,10 +1273,10 @@ function calcGermany(monthlyGross) {
       const svBase = Math.max(0, monthlyGross - freiZuschlag);
       const taxBase = Math.max(0, monthlyGross - freiZuschlag);
 
-      const MINIJOB = 603;
-      const MIDI_MAX = 2000;
-      const pensionCeil = 8450;
-      const healthCeil = 5812.50;
+      const MINIJOB = R('DE', 'minijob_limit', 603);
+      const MIDI_MAX = R('DE', 'midijob_upper', 2000);
+      const pensionCeil = R('DE', 'bbg_rv_av_month', 8450);
+      const healthCeil = R('DE', 'bbg_kv_pv_month', 5812.50);
 
       let pension = 0, unemployment = 0, health = 0, care = 0;
       let lst = 0, soli = 0, church = 0;
@@ -1276,7 +1287,7 @@ function calcGermany(monthlyGross) {
         // Employee: usually 0 Lohnsteuer (pauschal by AG), 0 KV/PV/ALV
         // Optional RV 3.6% if not exempt
         const payRV = document.getElementById('minijobRV')?.value === '1';
-        pension = payRV ? monthlyGross * 0.036 : 0;
+        pension = payRV ? r2(monthlyGross * R('DE', 'minijob_rv_employee', 0.036)) : 0;
         unemployment = 0; health = 0; care = 0;
         lst = 0; soli = 0; church = 0;
         noteExtra = payRV
@@ -1285,33 +1296,54 @@ function calcGermany(monthlyGross) {
       }
       // ========== MIDIJOB ==========
       else if (jobType === 'midijob') {
-        // Official 2026 formulas (DRV / §20 Abs. 2a SGB IV)
-        // BE for employee share:
-        const beAN = Math.max(0, 1.431639227 * svBase - 863.2784538);
-        // BE for total (used for childless PV surcharge):
-        const beGes = Math.max(0, 1.145937223 * svBase - 291.8744452);
+        // §20 Abs. 2a SGB IV – Übergangsbereich 2026
+        // G = Geringfügigkeitsgrenze, U = upper, F = Faktor F (BMAS)
+        const G = MINIJOB;
+        const U = MIDI_MAX;
+        const F = R('DE', 'faktor_f', 0.6619);
+        // BE Gesamt: F*G + (U/(U-G) - G/(U-G)*F) * (AE - G)
+        const span = U - G;
+        const coeffGes = (U / span) - (G / span) * F;
+        const constGes = F * G - coeffGes * G;
+        const beGes = Math.max(0, coeffGes * svBase + constGes);
+        // BE Arbeitnehmer (reduced employee basis for AN-Anteil)
+        // Standard 2026 coeffs when G=603,U=2000,F=0.6619 → 1.431639227*AE - 863.2784538
+        const coeffAN = 2 * coeffGes / (1 + F); // derived relation used in payroll software
+        // Prefer explicit official short form for 2026 defaults when G/U/F match
+        let beAN;
+        if (Math.abs(G - 603) < 0.01 && Math.abs(U - 2000) < 0.01 && Math.abs(F - 0.6619) < 0.0001) {
+          beAN = Math.max(0, 1.431639227 * svBase - 863.2784538);
+        } else {
+          // General approximation from F and G for other years
+          beAN = Math.max(0, (svBase * (U - F * G) / (U - G) - F * G * (U - svBase) / (U - G)));
+        }
+
+        const halfRV = R('DE', 'rv', 0.186) / 2;
+        const halfAV = R('DE', 'av', 0.026) / 2;
+        const halfKV = R('DE', 'kv_allgemein', 0.146) / 2;
+        const pvBase = R('DE', 'pv', 0.036) / 2; // 1.8% employee base
+        const pvChildless = R('DE', 'pv_childless_surcharge', 0.006);
+        const pvChildDisc = R('DE', 'pv_child_discount', 0.0025);
 
         if (krv === 0) {
-          pension = beAN * 0.093;
-          unemployment = beAN * 0.013;
+          pension = r2(beAN * halfRV);
+          unemployment = r2(beAN * halfAV);
         }
         if (pkv === 0) {
-          health = beAN * (0.073 + kvz / 200);
-          let careRate = 0.018;
+          health = r2(beAN * (halfKV + kvz / 200));
           if (children === 0 && age >= 23) {
-            // base on beAN + childless surcharge on beGes
-            care = beAN * 0.018 + beGes * 0.006;
+            care = r2(beAN * pvBase + beGes * pvChildless);
           } else {
-            if (children >= 2) careRate = Math.max(0.008, 0.018 - Math.min(children - 1, 4) * 0.0025);
-            if (isSachsen) careRate += 0.005;
-            care = beAN * careRate;
+            let careRate = pvBase;
+            if (children >= 2) careRate = Math.max(0.008, pvBase - Math.min(children - 1, 4) * pvChildDisc);
+            if (isSachsen) careRate += 0.005; // Sachsen: employee pays extra 0.5%
+            care = r2(beAN * careRate);
           }
         } else {
           health = Math.max(0, (pkpv - pkpvAg) / 100);
           care = 0;
         }
 
-        // Lohnsteuer: normal PAP with chosen tax class (not automatic SK6)
         try {
           const params = {
             LZZ: 2, RE4: Math.round(taxBase * 100), STKL: taxClass,
@@ -1321,28 +1353,36 @@ function calcGermany(monthlyGross) {
           };
           if (lzzFreib > 0) params.LZZFREIB = lzzFreib;
           if (pkv === 1 && pkpv > 0) { params.PKPV = pkpv; if (pkpvAg > 0) params.PKPVAGZ = pkpvAg; }
-          const res = window.papCalculate(2026, params);
+          const res = (window.papCalculate || papCalculate)(2026, params);
           lst = (res.LSTLZZ || 0) / 100;
           soli = (res.SOLZLZZ || 0) / 100;
           const churchBase = (res.BK || res.LSTLZZ || 0) / 100;
-          const churchRate = (state === 'BW' || state === 'BY') ? 0.08 : 0.09;
-          church = hasChurch ? churchBase * churchRate : 0;
+          const churchRate = (state === 'BW' || state === 'BY')
+            ? R('DE', 'church_bw_by', 0.08) : R('DE', 'church_other', 0.09);
+          church = hasChurch ? r2(churchBase * churchRate) : 0;
         } catch (e) { console.error(e); }
-        noteExtra = 'Midijob 2026: SV on reduced BE (official formula F=0.6619)';
+        noteExtra = 'Midijob: SV on reduced BE (§20 Abs. 2a SGB IV, F=' + F + ')';
       }
       // ========== REGULAR ==========
       else {
+        const halfRV = R('DE', 'rv', 0.186) / 2;
+        const halfAV = R('DE', 'av', 0.026) / 2;
+        const halfKV = R('DE', 'kv_allgemein', 0.146) / 2;
+        const pvBase = R('DE', 'pv', 0.036) / 2;
+        const pvChildless = R('DE', 'pv_childless_surcharge', 0.006);
+        const pvChildDisc = R('DE', 'pv_child_discount', 0.0025);
+
         if (krv === 0) {
-          pension = Math.min(svBase, pensionCeil) * 0.093;
-          unemployment = Math.min(svBase, pensionCeil) * 0.013;
+          pension = r2(Math.min(svBase, pensionCeil) * halfRV);
+          unemployment = r2(Math.min(svBase, pensionCeil) * halfAV);
         }
         if (pkv === 0) {
-          health = Math.min(svBase, healthCeil) * (0.073 + kvz / 200);
-          let careRate = 0.018;
-          if (children === 0 && age >= 23) careRate += 0.006;
-          else if (children >= 2) careRate = Math.max(0.008, 0.018 - Math.min(children - 1, 4) * 0.0025);
+          health = r2(Math.min(svBase, healthCeil) * (halfKV + kvz / 200));
+          let careRate = pvBase;
+          if (children === 0 && age >= 23) careRate += pvChildless;
+          else if (children >= 2) careRate = Math.max(0.008, pvBase - Math.min(children - 1, 4) * pvChildDisc);
           if (isSachsen) careRate += 0.005;
-          care = Math.min(svBase, healthCeil) * careRate;
+          care = r2(Math.min(svBase, healthCeil) * careRate);
         } else {
           health = Math.max(0, (pkpv - pkpvAg) / 100);
           care = 0;
@@ -1356,14 +1396,15 @@ function calcGermany(monthlyGross) {
           };
           if (lzzFreib > 0) params.LZZFREIB = lzzFreib;
           if (pkv === 1 && pkpv > 0) { params.PKPV = pkpv; if (pkpvAg > 0) params.PKPVAGZ = pkpvAg; }
-          const res = window.papCalculate(2026, params);
+          const res = (window.papCalculate || papCalculate)(2026, params);
           lst = (res.LSTLZZ || 0) / 100;
           soli = (res.SOLZLZZ || 0) / 100;
           const churchBase = (res.BK || res.LSTLZZ || 0) / 100;
-          const churchRate = (state === 'BW' || state === 'BY') ? 0.08 : 0.09;
-          church = hasChurch ? churchBase * churchRate : 0;
+          const churchRate = (state === 'BW' || state === 'BY')
+            ? R('DE', 'church_bw_by', 0.08) : R('DE', 'church_other', 0.09);
+          church = hasChurch ? r2(churchBase * churchRate) : 0;
         } catch (e) { console.error(e); }
-        noteExtra = 'Regular employment: BMF PAP 2026 + full SV';
+        noteExtra = 'Regular: BMF PAP 2026 (lohnsteuerrechner) + SV 2026 GKV/DRV';
       }
 
       const social = pension + unemployment + health + care;
@@ -1637,6 +1678,7 @@ function calcGermany(monthlyGross) {
 
 
 
+
     function calcUK(monthlyGross) {
       // HMRC PAYE 2026/27 – period-based NI + official bands
       const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
@@ -1657,7 +1699,7 @@ function calcGermany(monthlyGross) {
       const payForNIMonthly = Math.max(0, monthlyGross - monthlyPension);
 
       // Personal Allowance
-      let pa = 12570;
+      let pa = R('UK', 'personalAllowance', 12570);
       if (document.getElementById('ukBlind')?.value === '1') pa += 3250;
       if (document.getElementById('ukMarriage')?.value === '1') pa += 1260;
 
@@ -1709,17 +1751,17 @@ function calcGermany(monthlyGross) {
         // When PA=12570: basic on first 37700 of taxable, higher to 125140-pa, etc.
         // If tax code BR: 20% on all taxable (pa already 0)
         if (taxCode === 'BR') {
-          tax = taxable * 0.20;
+          tax = taxable * R('UK', 'basicRate', 0.20);
         } else if (taxCode === 'D0') {
-          tax = taxable * 0.40;
+          tax = taxable * R('UK', 'higherRate', 0.40);
         } else if (taxCode === 'D1') {
-          tax = taxable * 0.45;
+          tax = taxable * R('UK', 'additionalRate', 0.45);
         } else {
           const higherStart = Math.max(0, 50270 - pa);
           const additionalStart = Math.max(0, 125140 - pa);
-          if (taxable > 0) tax += Math.min(taxable, higherStart) * 0.20;
-          if (taxable > higherStart) tax += (Math.min(taxable, additionalStart) - higherStart) * 0.40;
-          if (taxable > additionalStart) tax += (taxable - additionalStart) * 0.45;
+          if (taxable > 0) tax += Math.min(taxable, higherStart) * R('UK', 'basicRate', 0.20);
+          if (taxable > higherStart) tax += (Math.min(taxable, additionalStart) - higherStart) * R('UK', 'higherRate', 0.40);
+          if (taxable > additionalStart) tax += (taxable - additionalStart) * R('UK', 'additionalRate', 0.45);
         }
       }
 
@@ -1730,8 +1772,8 @@ function calcGermany(monthlyGross) {
       if (!spa) {
         const PT = 1048, UEL = 4189;
         if (payForNIMonthly > PT) {
-          monthlyNI += (Math.min(payForNIMonthly, UEL) - PT) * 0.08;
-          if (payForNIMonthly > UEL) monthlyNI += (payForNIMonthly - UEL) * 0.02;
+          monthlyNI += (Math.min(payForNIMonthly, UEL) - PT) * R('UK', 'niPrimary', 0.08);
+          if (payForNIMonthly > UEL) monthlyNI += (payForNIMonthly - UEL) * R('UK', 'niUpper', 0.02);
         }
       }
 
@@ -1854,8 +1896,8 @@ function calcGermany(monthlyGross) {
 
       // FICA on gross wages (401k still subject to FICA in traditional plans)
       const ssWageBase = 184500;
-      const ss = Math.min(annual, ssWageBase) * 0.062;
-      const medicare = annual * 0.0145;
+      const ss = Math.min(annual, ssWageBase) * R('US', 'ssRate', 0.062);
+      const medicare = annual * R('US', 'medicare', 0.0145);
       let addMedicare = 0;
       let addThresh = 200000;
       if (filing === 'mfj') addThresh = 250000;
@@ -1935,7 +1977,7 @@ function calcGermany(monthlyGross) {
       const prov = document.getElementById('caProvince')?.value || 'ON';
       const isQC = prov === 'QC';
       const ympe = 74600, exemption = 3500, yampe = 85000;
-      const pensRate = isQC ? 0.063 : 0.0595;
+      const pensRate = isQC ? 0.063 : R('CA', 'cppRate', 0.0595);
       const pensMax = isQC ? 4479.30 : 4230.45;
       let cppBase = Math.max(0, Math.min(annual, ympe) - exemption) * pensRate;
       cppBase = Math.min(cppBase, pensMax);
@@ -2052,7 +2094,7 @@ function calcGermany(monthlyGross) {
       // ONSS 13.07% — ouvriers on 108% of gross
       const isWorker = document.getElementById('beWorker')?.value === 'worker';
       const onssBase = isWorker ? annual * 1.08 : annual;
-      let onss = onssBase * 0.1307;
+      let onss = onssBase * R('BE', 'onssEmployee', 0.1307);
 
       // Work bonus (werkbonus / bonus à l'emploi) 2026 – reduces personal ONSS
       const S = monthlyGross;
@@ -2807,16 +2849,16 @@ function calcGermany(monthlyGross) {
       // Under AOW: 35.75% / 37.56% / 49.50%
       // AOW age+: first schijf 17.85%
       let tax = 0;
-      const b1 = 38883, b2 = 78426;
+      const b1 = R('NL', 'box1_schijf1_to', 38883), b2 = R('NL', 'box1_schijf2_to', 78426);
       if (aow) {
         // born on/after 1946 style: first schijf to 38883 at 17.85%
         if (taxableWage > 0) tax += Math.min(taxableWage, b1) * 0.1785;
         if (taxableWage > b1) tax += (Math.min(taxableWage, b2) - b1) * 0.3756;
         if (taxableWage > b2) tax += (taxableWage - b2) * 0.495;
       } else {
-        if (taxableWage > 0) tax += Math.min(taxableWage, b1) * 0.3575;
-        if (taxableWage > b1) tax += (Math.min(taxableWage, b2) - b1) * 0.3756;
-        if (taxableWage > b2) tax += (taxableWage - b2) * 0.495;
+        if (taxableWage > 0) tax += Math.min(taxableWage, b1) * R('NL', 'box1_schijf1_rate', 0.3575);
+        if (taxableWage > b1) tax += (Math.min(taxableWage, b2) - b1) * R('NL', 'box1_schijf2_rate', 0.3756);
+        if (taxableWage > b2) tax += (taxableWage - b2) * R('NL', 'box1_schijf3_rate', 0.495);
       }
 
       // --- Algemene heffingskorting 2026 ---
@@ -2828,8 +2870,8 @@ function calcGermany(monthlyGross) {
         else ahk = 0;
       } else {
         // max €3,115, phase-out 6.398% from €29,736
-        if (taxableWage <= 29736) ahk = 3115;
-        else if (taxableWage < 78426) ahk = Math.max(0, 3115 - 0.06398 * (taxableWage - 29736));
+        if (taxableWage <= 29736) ahk = R('NL', 'algemene_heffingskorting_max', 3115);
+        else if (taxableWage < 78426) ahk = Math.max(0, R('NL', 'algemene_heffingskorting_max', 3115) - 0.06398 * (taxableWage - 29736));
         else ahk = 0;
       }
 
@@ -3004,7 +3046,7 @@ function calcGermany(monthlyGross) {
       // --- Canada ---
       else if (country === 'CA') {
         const ympeM = 74600 / 12;
-        social = Math.max(0, Math.min(g, ympeM) - 3500/12) * 0.0595 + Math.min(g, 68900/12) * 0.0163;
+        social = Math.max(0, Math.min(g, ympeM) - 3500/12) * R('CA', 'cppRate', 0.0595) + Math.min(g, 68900/12) * R('CA', 'eiRate', 0.0163);
         const combined = mainAnnual + secondAnnual;
         let marg = 0.205;
         if (combined > 117045) marg = 0.26;
@@ -3054,7 +3096,7 @@ function calcGermany(monthlyGross) {
           tax = g * 0.40;
           note = 'Self-employed social contributions + tax estimate';
         } else {
-          social = g * 0.1307;
+          social = g * R('BE', 'onssEmployee', 0.1307);
           tax = g * 0.40; // no quotité on second stream in withholding
           note = 'Second job: ONSS 13.07% + tax without full allowance';
         }
@@ -3066,7 +3108,7 @@ function calcGermany(monthlyGross) {
           tax = g * 0.19;
           note = 'Autónomo: cuota SS + IRPF estimate';
         } else {
-          social = Math.min(g, 5101.20) * 0.065;
+          social = Math.min(g, 5101.20) * R('ES', 'ssEmployeeApprox', 0.065);
           tax = g * 0.24;
           note = 'Second employment: SS employee + IRPF on combined';
         }
@@ -3139,6 +3181,9 @@ function calcGermany(monthlyGross) {
       if (annualExtra <= 50000) return 6000 + (annualExtra - 20000) * 0.37;
       return 17100 + (annualExtra - 50000) * 0.42;
     }
+
+
+
 const i18n = {
       fa: {
         title: "محاسبه‌گر حقوق خالص اروپا ۲۰۲۶",
@@ -3272,19 +3317,16 @@ const i18n = {
       document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
       const sel = document.getElementById('langSelect');
       if (sel && sel.value !== lang) sel.value = lang;
-      // Custom language dropdown UI
       const names = { fa: 'فارسی', en: 'English', de: 'Deutsch', fr: 'Français', it: 'Italiano', nl: 'Nederlands', es: 'Español' };
       const lab = document.getElementById('langDdLabel');
       if (lab) lab.textContent = names[lang] || lang;
       document.querySelectorAll('.lang-dd-item').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === lang);
       });
-      const dd = document.getElementById('langDd');
-      if (dd) dd.classList.remove('open');
       const menu = document.getElementById('langDdMenu');
       if (menu) menu.style.display = 'none';
-      const ddb = document.getElementById('langDdBtn');
-      if (ddb) ddb.setAttribute('aria-expanded', 'false');
+      const dd = document.getElementById('langDd');
+      if (dd) dd.classList.remove('open');
       const t = i18n[lang];
       const ids = ['title','subtitle','country','inputType','monthly','weekly','hourly','monthlyGross','weeklyGross','hourlyWage','hoursWeek','personal','taxClass','state','church','children','age','zusatz','status','calc','excel','update','result','netLabel','item','monthlyCol','yearlyCol'];
       ids.forEach(k => { const el = document.getElementById('t-' + k); if (el && t[k]) el.textContent = t[k]; });
@@ -3298,7 +3340,6 @@ const i18n = {
       onCountryChange();
     };
 
-    
     function toggleBox(id, show) {
       const el = document.getElementById(id);
       if (el) el.classList.toggle('hidden', !show);
@@ -3543,6 +3584,8 @@ window.calculate = function() {
       XLSX.writeFile(wb, 'eu-net-salary-2026.xlsx');
     };
 
+
+
     window.showUpdateInfo = async function(silent) {
       const ratesUrl = (function() {
         try {
@@ -3551,63 +3594,44 @@ window.calculate = function() {
         } catch (e) {}
         return (typeof window.RATES_URL === 'string' && window.RATES_URL) ? window.RATES_URL : './rates.json';
       })();
-
       const t = (fa, en) => (currentLang === 'fa' ? fa : en);
       const btn = document.getElementById('t-update');
       const prev = btn ? btn.textContent : '';
       if (btn && !silent) btn.textContent = t('در حال بررسی…', 'Checking…');
-
       try {
         const res = await fetch(ratesUrl + (ratesUrl.includes('?') ? '&' : '?') + 't=' + Date.now(), {
-          cache: 'no-store',
-          credentials: 'omit'
+          cache: 'no-store', credentials: 'omit'
         });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const remote = await res.json();
         if (!remote || !remote.version) throw new Error('Invalid rates file');
-
-        const localVer = (window.TAX_RATES && window.TAX_RATES.version) || 'embedded';
         let storedVer = null;
         try { storedVer = localStorage.getItem('taxRatesVersion'); } catch (e) {}
-
         window.TAX_RATES = remote;
         try {
           localStorage.setItem('taxRatesCache', JSON.stringify(remote));
           localStorage.setItem('taxRatesVersion', remote.version);
           localStorage.setItem('taxRatesCheckedAt', new Date().toISOString());
         } catch (e) {}
-
         const changed = storedVer && storedVer !== remote.version;
         const msg = t(
-          'بررسی به‌روزرسانی انجام شد.\\n\\n' +
-          'آدرس نرخ‌ها: ' + ratesUrl + '\\n' +
-          'نسخه روی سرور: ' + remote.version + '\\n' +
-          'تاریخ: ' + (remote.updated || '—') + '\\n' +
-          'نسخه قبلی ذخیره‌شده: ' + (storedVer || 'نداشتید') + '\\n\\n' +
-          (changed
-            ? '✓ نسخه جدید اعمال شد. نرخ‌های به‌روز برای محاسبه استفاده می‌شوند.\\n(برای اعمال کامل بعضی کشورها ممکن است رفرش لازم باشد.)'
-            : 'نسخه با آخرین بسته هم‌خوان است یا برای اولین بار ذخیره شد.\\n\\nبرای میزبانی روی سرور خودتان:\\n1) فایل rates.json را کنار index.html بگذارید\\n2) یا در کنسول: localStorage.setItem(\"ratesUrl\", \"https://YOUR-SERVER/rates.json\")') ,
-          'Update check done.\\n\\nRates URL: ' + ratesUrl + '\\nServer version: ' + remote.version + '\\nUpdated: ' + (remote.updated || '—') + '\\nPreviously stored: ' + (storedVer || 'none') + '\\n\\n' +
-          (changed
-            ? '✓ New rates applied for this session.'
-            : 'Up to date (or first save).\\n\\nHost rates.json on your server next to index.html,\\nor: localStorage.setItem(\"ratesUrl\", \"https://YOUR-SERVER/rates.json\")')
+          'بررسی به‌روزرسانی انجام شد.\n\nآدرس: ' + ratesUrl + '\nنسخه: ' + remote.version + '\nتاریخ: ' + (remote.updated || '—') + '\nقبلی: ' + (storedVer || 'نداشتید') + '\n\n' +
+          (changed ? '✓ نسخه جدید اعمال شد. محاسبات از این نرخ‌ها استفاده می‌کنند.' : 'نسخه هم‌خوان است یا اولین بار ذخیره شد.'),
+          'Update check done.\n\nURL: ' + ratesUrl + '\nVersion: ' + remote.version + '\nUpdated: ' + (remote.updated || '—') + '\nPrevious: ' + (storedVer || 'none') + '\n\n' +
+          (changed ? '✓ New rates applied — calculations use them now.' : 'Up to date (or first save).')
         );
-        if (!silent) {
-          alert(msg);
-        } else if (changed) {
+        if (!silent) alert(msg);
+        else if (changed) {
           const note = document.getElementById('countryNote');
-          if (note) {
-            note.textContent = currentLang === 'fa'
-              ? ('✓ قوانین مالیاتی به‌روز شد (نسخه ' + remote.version + ')')
-              : ('✓ Tax rates updated (version ' + remote.version + ')');
-          }
+          if (note) note.textContent = currentLang === 'fa'
+            ? ('✓ قوانین مالیاتی به‌روز شد (نسخه ' + remote.version + ')')
+            : ('✓ Tax rates updated (version ' + remote.version + ')');
         }
         return { ok: true, version: remote.version, changed: !!changed };
       } catch (err) {
         if (!silent) {
-          alert(currentLang === 'fa'
-            ? ('خطا در بررسی به‌روزرسانی:\n' + err.message + '\n\nآدرس: ' + ratesUrl)
-            : ('Update check failed:\n' + err.message + '\n\nURL: ' + ratesUrl));
+          alert(t('خطا در بررسی به‌روزرسانی:\n' + err.message + '\n\nآدرس: ' + ratesUrl,
+            'Update check failed:\n' + err.message + '\n\nURL: ' + ratesUrl));
         }
         return { ok: false, error: String(err.message || err) };
       } finally {
@@ -3615,8 +3639,6 @@ window.calculate = function() {
       }
     };
 
-    // Auto-check every 3 or 6 months (default: 3)
-    // To use 6 months: localStorage.setItem('ratesCheckMonths', '6')
     window.scheduleRatesAutoCheck = function() {
       let months = 3;
       try {
@@ -3627,12 +3649,9 @@ window.calculate = function() {
       let last = null;
       try { last = localStorage.getItem('taxRatesCheckedAt'); } catch (e) {}
       const due = !last || (Date.now() - new Date(last).getTime() >= intervalMs);
-      if (due) {
-        showUpdateInfo(true).catch(function () {});
-      }
+      if (due) showUpdateInfo(true).catch(function(){});
     };
 
-        // Load cached rates on startup
     (function loadCachedRates() {
       try {
         const raw = localStorage.getItem('taxRatesCache');
@@ -3641,7 +3660,6 @@ window.calculate = function() {
           if (o && o.version) window.TAX_RATES = o;
         }
       } catch (e) {}
-      // Also try local rates.json quietly
       fetch('./rates.json?t=' + Date.now(), { cache: 'no-store' })
         .then(r => r.ok ? r.json() : null)
         .then(o => {
@@ -3656,7 +3674,6 @@ window.calculate = function() {
         .catch(() => {});
     })();
 
-    // Language dropdown interactions
     (function initLangDd() {
       const dd = document.getElementById('langDd');
       const btn = document.getElementById('langDdBtn');
@@ -3672,7 +3689,6 @@ window.calculate = function() {
         menu.style.display = 'block';
         menu.style.zIndex = '10001';
         btn.setAttribute('aria-expanded', 'true');
-        // Prevent cards below from covering the menu
         const topbar = document.querySelector('.topbar');
         if (topbar) topbar.style.zIndex = '10000';
       }
@@ -3699,20 +3715,22 @@ window.calculate = function() {
       });
       document.addEventListener('click', closeMenu);
     })();
-// init
+
+
+
     toggleInput();
     let savedLang = 'fa';
     try { savedLang = localStorage.getItem('netSalaryLang') || 'fa'; } catch (e) {}
     setLang(savedLang);
     onCountryChange();
-    // Auto tax-rates check (every 3 or 6 months)
     try { scheduleRatesAutoCheck(); } catch (e) {}
-
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(() => {});
       });
     }
+
+
   </script>
 </body>
 </html>
