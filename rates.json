@@ -386,7 +386,14 @@
       "year": 2026,
       "pensionEmployeeMin": 0.04,
       "source": "Skatturinn 2026",
-      "fetchedAt": "2026-09-23T10:36:25.331Z"
+      "fetchedAt": "2026-09-23T10:36:25.331Z",
+      "b1": 498122,
+      "b2": 1398450,
+      "r1": 0.3149,
+      "r2": 0.3799,
+      "r3": 0.4629,
+      "personal_credit_month": 72492,
+      "pension_default": 0.04
     },
     "SE": {
       "year": 2026,
@@ -423,6 +430,7 @@
     }
   },
   "changelog": [
+    "2026.09.24 – IS: brackets + personal credit from rates",
     "2026.09.24 – FI: TyEL + state brackets from rates",
     "2026.09.24 – DK: AM 8% + bund/mellem/topskat from rates",
     "2026.09.24 – NO: trinnskatt + trygdeavgift + minstefradrag from rates",

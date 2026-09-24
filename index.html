@@ -2586,14 +2586,14 @@ window.papCalculate = papCalculate;
       const pension = monthly * penRate;
       const taxBase = Math.max(0, monthly - pension);
 
-      // Combined tax brackets (state + municipal) on monthly tax base
+      // Combined tax brackets from rates.json
+      const b1 = R('IS', 'b1', 498122), b2 = R('IS', 'b2', 1398450);
       let tax = 0;
-      if (taxBase > 0) tax += Math.min(taxBase, 498122) * 0.3149;
-      if (taxBase > 498122) tax += Math.min(taxBase - 498122, 1398450 - 498122) * 0.3799;
-      if (taxBase > 1398450) tax += (taxBase - 1398450) * 0.4629;
+      if (taxBase > 0) tax += Math.min(taxBase, b1) * R('IS', 'r1', 0.3149);
+      if (taxBase > b1) tax += Math.min(taxBase - b1, b2 - b1) * R('IS', 'r2', 0.3799);
+      if (taxBase > b2) tax += (taxBase - b2) * R('IS', 'r3', 0.4629);
 
-      // Personal tax credit 72,492 ISK/month
-      const credit = 72492;
+      const credit = R('IS', 'personal_credit_month', 72492);
       tax = Math.max(0, tax - credit);
 
       const otherRaw = document.getElementById('isOtherDed')?.value;
