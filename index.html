@@ -2298,26 +2298,27 @@ window.papCalculate = papCalculate;
       const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
       const annual = monthlyGross * 12;
 
-      // Income tax brackets (unchanged 2026–27)
+      // Income tax brackets 2026–27 from rates.json
+      const b1 = R('NZ', 'b1', 15600), b2 = R('NZ', 'b2', 53500);
+      const b3 = R('NZ', 'b3', 78100), b4 = R('NZ', 'b4', 180000);
       let tax = 0;
-      if (annual > 0) tax += Math.min(annual, 15600) * 0.105;
-      if (annual > 15600) tax += Math.min(annual - 15600, 53500 - 15600) * 0.175;
-      if (annual > 53500) tax += Math.min(annual - 53500, 78100 - 53500) * 0.30;
-      if (annual > 78100) tax += Math.min(annual - 78100, 180000 - 78100) * 0.33;
-      if (annual > 180000) tax += (annual - 180000) * 0.39;
+      if (annual > 0) tax += Math.min(annual, b1) * R('NZ', 'r1', 0.105);
+      if (annual > b1) tax += Math.min(annual - b1, b2 - b1) * R('NZ', 'r2', 0.175);
+      if (annual > b2) tax += Math.min(annual - b2, b3 - b2) * R('NZ', 'r3', 0.30);
+      if (annual > b3) tax += Math.min(annual - b3, b4 - b3) * R('NZ', 'r4', 0.33);
+      if (annual > b4) tax += (annual - b4) * R('NZ', 'r5', 0.39);
 
-      // ACC earner levy 1.75%, cap $156,641
-      const accCap = 156641;
-      const acc = Math.min(annual, accCap) * 0.0175;
+      // ACC earner levy
+      const accCap = R('NZ', 'acc_cap', 156641);
+      const acc = Math.min(annual, accCap) * R('NZ', 'acc', 0.0175);
 
-      // KiwiSaver employee
       const ksRate = parseFloat(document.getElementById('nzKs')?.value) || 0;
       const kiwi = annual * (ksRate / 100);
 
-      // Student loan 12% above $24,128
       let student = 0;
-      if (document.getElementById('nzStudent')?.value === '1' && annual > 24128) {
-        student = (annual - 24128) * 0.12;
+      const stTh = R('NZ', 'student_threshold', 24128);
+      if (document.getElementById('nzStudent')?.value === '1' && annual > stTh) {
+        student = (annual - stTh) * R('NZ', 'student_rate', 0.12);
       }
 
       const otherRaw = document.getElementById('nzOtherDed')?.value;

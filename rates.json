@@ -330,7 +330,19 @@
       "year": "2026-27",
       "acc": 0.0175,
       "source": "IRD 2026-27",
-      "fetchedAt": "2026-09-23T10:36:25.331Z"
+      "fetchedAt": "2026-09-23T10:36:25.331Z",
+      "acc_cap": 156641,
+      "b1": 15600,
+      "b2": 53500,
+      "b3": 78100,
+      "b4": 180000,
+      "r1": 0.105,
+      "r2": 0.175,
+      "r3": 0.3,
+      "r4": 0.33,
+      "r5": 0.39,
+      "student_threshold": 24128,
+      "student_rate": 0.12
     },
     "DK": {
       "year": 2026,
@@ -365,6 +377,7 @@
     }
   },
   "changelog": [
+    "2026.09.24 – NZ: IRD brackets + ACC 1.75% cap from rates",
     "2026.09.24 – AU: ATO 2026-27 brackets + Medicare from rates",
     "2026.09.24 – CA: CPP YMPE/YAMPE + EI max from CRA rates",
     "2026.09.24 – US: IRS 2026 std deduction + SS wage base $184500 from rates",
