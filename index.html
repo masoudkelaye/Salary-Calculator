@@ -2147,11 +2147,11 @@ window.papCalculate = papCalculate;
       let insBase = (insRaw !== '' && insRaw != null && !isNaN(parseFloat(insRaw)))
         ? parseFloat(insRaw) : monthlyGross;
       // سقف تقریبی مشمول بیمه (۷× حداقل — ۱۴۰۴ حدود ۷۵ میلیون، ۱۴۰۵ بالاتر)
-      const ceil = year === '1405' ? 120000000 : 75000000;
+      const ceil = year === '1405' ? R('IR', 'insurance_ceiling_approx_1405', 120000000) : 75000000;
       insBase = Math.min(insBase, ceil);
 
       // سهم بیمه‌شده ۷٪
-      const insurance = insBase * 0.07;
+      const insurance = insBase * R('IR', 'employee_insurance_rate', 0.07);
 
       // پایه مشمول مالیات: ناخالص − بیمه سهم کارگر (معاف ماده ۹۱)
       const taxBaseMonthly = Math.max(0, monthlyGross - insurance);
