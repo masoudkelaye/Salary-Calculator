@@ -2462,42 +2462,37 @@ window.papCalculate = papCalculate;
       const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
       const annual = monthlyGross * 12;
 
-      // AM-bidrag 8% on gross
-      const am = annual * 0.08;
+      // AM-bidrag on gross
+      const am = annual * R('DK', 'am_bidrag', 0.08);
       const afterAm = annual - am;
 
-      // Personfradrag 54,100
-      const personFradrag = 54100;
+      const personFradrag = R('DK', 'personfradrag', 54100);
       const taxable = Math.max(0, afterAm - personFradrag);
 
-      // Bundskat 12.01% on taxable (personal income after AM, approx on afterAm - person)
-      const bund = Math.max(0, afterAm - personFradrag) * 0.1201;
+      const bund = Math.max(0, afterAm - personFradrag) * R('DK', 'bundskat', 0.1201);
 
-      // Mellemskat 7.5% above 641,200 after AM
       let mellem = 0;
-      if (afterAm > 641200) mellem = (afterAm - 641200) * 0.075;
+      const mellemFrom = R('DK', 'mellemskat_from', 641200);
+      if (afterAm > mellemFrom) mellem = (afterAm - mellemFrom) * R('DK', 'mellemskat_rate', 0.075);
 
-      // Topskat 7.5% above 777,900 after AM
       let top = 0;
-      if (afterAm > 777900) top = (afterAm - 777900) * 0.075;
+      const topFrom = R('DK', 'topskat_from', 777900);
+      if (afterAm > topFrom) top = (afterAm - topFrom) * R('DK', 'topskat_rate', 0.075);
 
-      // Top-topskat 5% above 2,592,700 after AM
       let toptop = 0;
-      if (afterAm > 2592700) toptop = (afterAm - 2592700) * 0.05;
+      const toptopFrom = R('DK', 'toptop_from', 2592700);
+      if (afterAm > toptopFrom) toptop = (afterAm - toptopFrom) * R('DK', 'toptop_rate', 0.05);
 
-      // Municipal tax on taxable income
       const komRaw = document.getElementById('dkKommune')?.value;
       const komRate = (komRaw !== '' && komRaw != null && !isNaN(parseFloat(komRaw)))
-        ? parseFloat(komRaw) / 100 : 0.2505;
+        ? parseFloat(komRaw) / 100 : R('DK', 'kommune_default', 0.2505);
       const munTax = taxable * komRate;
 
-      // Church tax optional
       const churchRate = parseFloat(document.getElementById('dkChurch')?.value) || 0;
       const church = taxable * (churchRate / 100);
 
-      // Beskæftigelsesfradrag approx (reduces tax)
-      let besk = Math.min(63300, annual * 0.1275);
-      const beskCredit = besk * (komRate + 0.1201); // rough value of deduction
+      let besk = Math.min(R('DK', 'besk_max', 63300), annual * R('DK', 'besk_pct', 0.1275));
+      const beskCredit = besk * (komRate + R('DK', 'bundskat', 0.1201));
 
       const otherRaw = document.getElementById('dkOtherDed')?.value;
       const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))

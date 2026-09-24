@@ -348,7 +348,19 @@
       "year": 2026,
       "amBidrag": 0.08,
       "source": "SKAT 2026",
-      "fetchedAt": "2026-09-23T10:36:25.331Z"
+      "fetchedAt": "2026-09-23T10:36:25.331Z",
+      "am_bidrag": 0.08,
+      "personfradrag": 54100,
+      "bundskat": 0.1201,
+      "mellemskat_from": 641200,
+      "mellemskat_rate": 0.075,
+      "topskat_from": 777900,
+      "topskat_rate": 0.075,
+      "toptop_from": 2592700,
+      "toptop_rate": 0.05,
+      "kommune_default": 0.2505,
+      "besk_pct": 0.1275,
+      "besk_max": 63300
     },
     "FI": {
       "year": 2026,
@@ -398,6 +410,7 @@
     }
   },
   "changelog": [
+    "2026.09.24 – DK: AM 8% + bund/mellem/topskat from rates",
     "2026.09.24 – NO: trinnskatt + trygdeavgift + minstefradrag from rates",
     "2026.09.24 – SE: skiktgräns 643k + kommun default from rates",
     "2026.09.24 – NZ: IRD brackets + ACC 1.75% cap from rates",
