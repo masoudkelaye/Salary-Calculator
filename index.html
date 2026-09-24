@@ -2623,8 +2623,8 @@ window.papCalculate = papCalculate;
       const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
       const gross = monthlyGross;
 
-      const pit = gross * 0.18;
-      const military = gross * 0.05;
+      const pit = gross * R('UA', 'pit', 0.18);
+      const military = gross * R('UA', 'military_levy', 0.05);
       // USC 22% is employer-only – not deducted from employee
 
       const otherRaw = document.getElementById('uaOtherDed')?.value;

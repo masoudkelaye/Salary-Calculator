@@ -310,8 +310,10 @@
       "year": 2026,
       "pit": 0.18,
       "military": 0.05,
-      "source": "statutory flat rates UA",
-      "fetchedAt": "2026-09-23T10:36:25.330Z"
+      "source": "Tax Code of Ukraine 2026",
+      "fetchedAt": "2026-09-23T10:36:25.330Z",
+      "military_levy": 0.05,
+      "usc_employer": 0.22
     },
     "AU": {
       "year": "2026-27",
@@ -435,6 +437,7 @@
     }
   },
   "changelog": [
+    "2026.09.24 – UA: PIT 18% + military 5% from rates",
     "2026.09.24 – IR: 1405 insurance 7% + tax exemption from rates",
     "2026.09.24 – IS: brackets + personal credit from rates",
     "2026.09.24 – FI: TyEL + state brackets from rates",
