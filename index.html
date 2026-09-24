@@ -1804,28 +1804,33 @@ window.papCalculate = papCalculate;
       }
 
       // BPA 2026: $16,452 → $14,829 phase-out $181,440–$258,482
-      let bpa = 16452;
-      if (taxableBase > 258482) bpa = 14829;
+      let bpa = R('CA', 'bpa', 16452);
+      const bpaMin = R('CA', 'bpaMin', 14829);
+      if (taxableBase > 258482) bpa = bpaMin;
       else if (taxableBase > 181440) {
-        bpa = 16452 - (16452 - 14829) * ((taxableBase - 181440) / (258482 - 181440));
+        bpa = bpa - (bpa - bpaMin) * ((taxableBase - 181440) / (258482 - 181440));
       }
       const bpaCredit = bpa * 0.14;
-      const ceaCredit = 1501 * 0.14; // Canada Employment Amount
+      const ceaCredit = R('CA', 'cea', 1501) * 0.14;
       federal = Math.max(0, federal - bpaCredit - ceaCredit);
 
       // CPP / QPP + EI 2026
       const prov = document.getElementById('caProvince')?.value || 'ON';
       const isQC = prov === 'QC';
-      const ympe = 74600, exemption = 3500, yampe = 85000;
-      const pensRate = isQC ? 0.063 : R('CA', 'cppRate', 0.0595);
-      const pensMax = isQC ? 4479.30 : 4230.45;
+      const ympe = R('CA', 'cppYMPE', 74600);
+      const exemption = R('CA', 'cppBasicExemption', 3500);
+      const yampe = R('CA', 'cppYAMPE', 85000);
+      const pensRate = isQC ? R('CA', 'qppRate', 0.063) : R('CA', 'cppRate', 0.0595);
+      const pensMax = isQC ? R('CA', 'qppMaxEmployee', 4479.30) : R('CA', 'cppMaxEmployee', 4230.45);
       let cppBase = Math.max(0, Math.min(annual, ympe) - exemption) * pensRate;
       cppBase = Math.min(cppBase, pensMax);
-      const cpp2 = annual > ympe ? Math.min((Math.min(annual, yampe) - ympe) * 0.04, 416) : 0;
+      const cpp2 = annual > ympe
+        ? Math.min((Math.min(annual, yampe) - ympe) * R('CA', 'cpp2Rate', 0.04), R('CA', 'cpp2Max', 416))
+        : 0;
       const cppTotal = cppBase + cpp2;
 
-      let ei = Math.min(annual, 68900) * (isQC ? 0.0130 : 0.0163);
-      if (isQC) ei += Math.min(annual, 103000) * 0.00430; // QPIP approx
+      let ei = Math.min(annual, R('CA', 'eiMaxInsurable', 68900)) * (isQC ? R('CA', 'eiRateQC', 0.0130) : R('CA', 'eiRate', 0.0163));
+      if (isQC) ei += Math.min(annual, R('CA', 'qpipMaxInsurable', 103000)) * R('CA', 'qpipRate', 0.00430);
 
       // Provincial tax
       const t = taxableBase;

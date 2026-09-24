@@ -154,7 +154,17 @@
       "eiMaxInsurable": 68900,
       "eiMaxEmployee": 1123.07,
       "fetchedAt": "2026-09-23T10:36:25.330Z",
-      "qppRate": 0.063
+      "qppRate": 0.063,
+      "cppYAMPE": 85000,
+      "cpp2Rate": 0.04,
+      "cpp2Max": 416,
+      "qppMaxEmployee": 4479.3,
+      "eiRateQC": 0.013,
+      "qpipRate": 0.0043,
+      "qpipMaxInsurable": 103000,
+      "bpa": 16452,
+      "bpaMin": 14829,
+      "cea": 1501
     },
     "FR": {
       "year": 2026,
@@ -344,6 +354,7 @@
     }
   },
   "changelog": [
+    "2026.09.24 – CA: CPP YMPE/YAMPE + EI max from CRA rates",
     "2026.09.24 – US: IRS 2026 std deduction + SS wage base $184500 from rates",
     "2026.09.24 – ES: SS max base 5101.20 + employee rates from rates",
     "2026.09.24 – BE: ONSS 13.07% + IPP brackets + allowance from rates",
