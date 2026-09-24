@@ -2527,24 +2527,24 @@ window.papCalculate = papCalculate;
       const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
       const annual = monthlyGross * 12;
 
-      // Employee social: TyEL 7.30% + unemployment 0.89% + health ~1.10% ≈ 9.29%
-      const ssRate = 0.0730 + 0.0089 + 0.0110;
+      // Employee social: TyEL + unemployment + health
+      const ssRate = R('FI', 'tyel', 0.0730) + R('FI', 'unemployment', 0.0089) + R('FI', 'health', 0.0110);
       const social = annual * ssRate;
 
-      // Taxable for income tax ≈ gross - employee pension (simplified)
-      const taxable = Math.max(0, annual - annual * 0.073);
+      const taxable = Math.max(0, annual - annual * R('FI', 'tyel', 0.0730));
 
-      // State tax progressive (PwC-style 2026)
+      // State tax progressive 2026
+      const b1 = R('FI', 'state_b1', 21200), b2 = R('FI', 'state_b2', 32600);
+      const b3 = R('FI', 'state_b3', 40100), b4 = R('FI', 'state_b4', 52100);
       let state = 0;
-      if (taxable > 21200) state += Math.min(taxable - 21200, 32600 - 21200) * 0.1264;
-      if (taxable > 32600) state += Math.min(taxable - 32600, 40100 - 32600) * 0.1900;
-      if (taxable > 40100) state += Math.min(taxable - 40100, 52100 - 40100) * 0.3025;
-      if (taxable > 52100) state += (taxable - 52100) * 0.3750;
+      if (taxable > b1) state += Math.min(taxable - b1, b2 - b1) * R('FI', 'state_r1', 0.1264);
+      if (taxable > b2) state += Math.min(taxable - b2, b3 - b2) * R('FI', 'state_r2', 0.1900);
+      if (taxable > b3) state += Math.min(taxable - b3, b4 - b3) * R('FI', 'state_r3', 0.3025);
+      if (taxable > b4) state += (taxable - b4) * R('FI', 'state_r5', 0.3750);
 
-      // Municipal tax
       const munRaw = document.getElementById('fiMun')?.value;
       const munRate = (munRaw !== '' && munRaw != null && !isNaN(parseFloat(munRaw)))
-        ? parseFloat(munRaw) / 100 : 0.0757;
+        ? parseFloat(munRaw) / 100 : R('FI', 'mun_default', 0.0750);
       const munTax = taxable * munRate;
 
       // Church tax optional

@@ -367,7 +367,20 @@
       "tyelEmployee": 0.073,
       "source": "Vero / TyEL 2026",
       "fetchedAt": "2026-09-23T10:36:25.331Z",
-      "note": "Municipal tax varies by city — user enters rate"
+      "note": "Municipal tax varies by city — user enters rate",
+      "tyel": 0.073,
+      "unemployment": 0.0089,
+      "health": 0.011,
+      "mun_default": 0.075,
+      "state_b1": 21200,
+      "state_b2": 32600,
+      "state_b3": 40100,
+      "state_b4": 52100,
+      "state_r1": 0.1264,
+      "state_r2": 0.19,
+      "state_r3": 0.3025,
+      "state_r4": 0.3325,
+      "state_r5": 0.375
     },
     "IS": {
       "year": 2026,
@@ -410,6 +423,7 @@
     }
   },
   "changelog": [
+    "2026.09.24 – FI: TyEL + state brackets from rates",
     "2026.09.24 – DK: AM 8% + bund/mellem/topskat from rates",
     "2026.09.24 – NO: trinnskatt + trygdeavgift + minstefradrag from rates",
     "2026.09.24 – SE: skiktgräns 643k + kommun default from rates",
