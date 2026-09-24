@@ -2363,12 +2363,13 @@ window.papCalculate = papCalculate;
       // Municipal tax
       const komRaw = document.getElementById('seKommune')?.value;
       const komRate = (komRaw !== '' && komRaw != null && !isNaN(parseFloat(komRaw)))
-        ? parseFloat(komRaw) / 100 : 0.3238;
+        ? parseFloat(komRaw) / 100 : R('SE', 'kommun_default', 0.3238);
       let munTax = taxable * komRate;
 
-      // State tax 20% above skiktgräns 643,000
+      // State tax 20% above skiktgräns
       let stateTax = 0;
-      if (taxable > 643000) stateTax = (taxable - 643000) * 0.20;
+      const skikt = R('SE', 'skiktgrans', 643000);
+      if (taxable > skikt) stateTax = (taxable - skikt) * R('SE', 'state_rate', 0.20);
 
       // Jobbskatteavdrag (earned income tax credit) – approx max ~38,900
       let jsa = 0;

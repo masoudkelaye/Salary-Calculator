@@ -367,7 +367,12 @@
       "year": 2026,
       "source": "Skatteverket 2026",
       "fetchedAt": "2026-09-23T10:36:25.331Z",
-      "note": "Municipal + state tax; user enters kommunalskatt %"
+      "note": "Municipal + state tax; user enters kommunalskatt %",
+      "skiktgrans": 643000,
+      "state_rate": 0.2,
+      "kommun_default": 0.3238,
+      "grund_min": 17400,
+      "grund_max": 45600
     },
     "NO": {
       "year": 2026,
@@ -377,6 +382,7 @@
     }
   },
   "changelog": [
+    "2026.09.24 – SE: skiktgräns 643k + kommun default from rates",
     "2026.09.24 – NZ: IRD brackets + ACC 1.75% cap from rates",
     "2026.09.24 – AU: ATO 2026-27 brackets + Medicare from rates",
     "2026.09.24 – CA: CPP YMPE/YAMPE + EI max from CRA rates",
