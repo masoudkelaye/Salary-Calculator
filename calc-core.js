@@ -338,42 +338,43 @@ function calcGermany(monthlyGross) {
     }
 
     function calcItaly(monthlyGross) {
-      // Agenzia Entrate / INPS 2026 – IRPEF 23/33/43 + detrazioni + addizionali user rates
+      // Agenzia Entrate / INPS 2026 – IRPEF 23/33/43 + detrazioni + addizionali
       const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
       const annualGross = monthlyGross * 12;
 
-      // --- INPS IVS dipendente 2026 ---
-      // 9.19% fino a massimale; +1% oltre prima fascia pensionabile
-      const massimale = 122295;
-      const primaFascia = 56224;
-      let inpsAnnual = Math.min(annualGross, massimale) * 0.0919;
+      const massimale = R('IT', 'inps_massimale', 122295);
+      const primaFascia = R('IT', 'inps_prima_fascia', 56224);
+      const inpsRate = R('IT', 'inps_rate', 0.0919);
+      let inpsAnnual = Math.min(annualGross, massimale) * inpsRate;
       if (annualGross > primaFascia) {
-        inpsAnnual += (Math.min(annualGross, massimale) - primaFascia) * 0.01;
+        inpsAnnual += (Math.min(annualGross, massimale) - primaFascia) * R('IT', 'inps_extra', 0.01);
       }
       const inpsMonthly = inpsAnnual / 12;
 
-      // Reddito imponibile IRPEF
       const taxable = Math.max(0, annualGross - inpsAnnual);
 
-      // --- IRPEF lorda 2026 (L. 199/2025) ---
+      const b1 = R('IT', 'irpef_b1', 28000);
+      const b2 = R('IT', 'irpef_b2', 50000);
       let irpefLorda = 0;
-      if (taxable > 0) irpefLorda += Math.min(taxable, 28000) * 0.23;
-      if (taxable > 28000) irpefLorda += (Math.min(taxable, 50000) - 28000) * 0.33;
-      if (taxable > 50000) irpefLorda += (taxable - 50000) * 0.43;
+      if (taxable > 0) irpefLorda += Math.min(taxable, b1) * R('IT', 'irpef_r1', 0.23);
+      if (taxable > b1) irpefLorda += (Math.min(taxable, b2) - b1) * R('IT', 'irpef_r2', 0.33);
+      if (taxable > b2) irpefLorda += (taxable - b2) * R('IT', 'irpef_r3', 0.43);
 
-      // --- Detrazione lavoro dipendente (art. 13 TUIR) ---
+      // Detrazione lavoro dipendente
       let detrLav = 0;
+      const dmax = R('IT', 'detr_lav_max', 1955);
+      const dmid = R('IT', 'detr_lav_mid', 1910);
+      const dextra = R('IT', 'detr_lav_extra', 1190);
       if (taxable <= 15000) {
-        detrLav = 1955; // min garantito 690 indeterminato
-      } else if (taxable <= 28000) {
-        detrLav = 1910 + 1190 * ((28000 - taxable) / 13000);
-      } else if (taxable <= 50000) {
-        detrLav = 1910 * ((50000 - taxable) / 22000);
+        detrLav = dmax;
+      } else if (taxable <= b1) {
+        detrLav = dmid + dextra * ((b1 - taxable) / 13000);
+      } else if (taxable <= b2) {
+        detrLav = dmid * ((b2 - taxable) / 22000);
       }
-      if (taxable >= 25000 && taxable <= 35000) detrLav += 65;
+      if (taxable >= 25000 && taxable <= 35000) detrLav += R('IT', 'detr_lav_bonus', 65);
       detrLav = Math.max(0, detrLav);
 
-      // --- Detrazione coniuge a carico (art. 12) ---
       let detrConiuge = 0;
       const spouse = document.getElementById('itSpouse')?.value === '1';
       if (spouse && taxable < 80000) {
@@ -382,42 +383,21 @@ function calcGermany(monthlyGross) {
         else detrConiuge = 690 * ((80000 - taxable) / 40000);
       }
 
-      // --- Figli: Assegno Unico usually replaces; residual only if user claims ---
       const kids = parseInt(document.getElementById('itKids')?.value) || 0;
-      const assegno = document.getElementById('itAssegno')?.value !== '0';
       let detrFigli = 0;
-      if (kids > 0 && !assegno && taxable < 95000) {
-        const perChild = taxable <= 15000 ? 1220
-          : (taxable <= 40000 ? 950 : 950 * Math.max(0, (95000 - taxable) / 55000));
-        detrFigli = perChild * kids;
+      // Assegno Unico replaces most child detrazioni; residual optional
+      if (kids > 0 && document.getElementById('itFigliDetr')?.value === '1') {
+        detrFigli = Math.min(kids, 4) * 950 * Math.max(0, 1 - taxable / 95000);
       }
 
-      const totalDetr = detrLav + detrConiuge + detrFigli;
-      const irpefNetta = Math.max(0, irpefLorda - totalDetr);
+      const irpefNetta = Math.max(0, irpefLorda - detrLav - detrConiuge - detrFigli);
 
-      // --- Trattamento integrativo (ex bonus Renzi) ---
-      let trattamento = 0;
-      if (taxable <= 15000 && irpefLorda > 0) {
-        trattamento = Math.min(1200, Math.max(0, irpefLorda - totalDetr + 1200));
-        // Simplification: up to €100/month if capacity
-        if (irpefNetta <= 0) trattamento = Math.min(1200, 1200);
-        else trattamento = Math.min(1200, 1200);
-      }
-      // Standard: €1,200/year if reddito <= 15k and IRPEF capacity
-      if (taxable <= 15000) {
-        trattamento = 1200;
-      } else {
-        trattamento = 0;
-      }
-
-      // --- Addizionali (user rates preferred) ---
       const regRaw = document.getElementById('itRegRate')?.value;
       const comRaw = document.getElementById('itComRate')?.value;
       const regRate = (regRaw !== '' && regRaw != null && !isNaN(parseFloat(regRaw)))
-        ? parseFloat(regRaw) / 100 : 0.0173;
+        ? parseFloat(regRaw) / 100 : R('IT', 'add_reg_default', 0.0173);
       const comRate = (comRaw !== '' && comRaw != null && !isNaN(parseFloat(comRaw)))
-        ? parseFloat(comRaw) / 100 : 0.006;
-      // Addizionali only if IRPEF due (when detrazioni wipe IRPEF, addizionali often zero)
+        ? parseFloat(comRaw) / 100 : R('IT', 'add_com_default', 0.006);
       const addBase = irpefNetta > 0 ? taxable : 0;
       const addReg = addBase * regRate;
       const addCom = addBase * comRate;
@@ -426,10 +406,9 @@ function calcGermany(monthlyGross) {
       const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
         ? parseFloat(otherRaw) : 0;
 
-      const annualTax = Math.max(0, irpefNetta + addReg + addCom) - (taxable <= 15000 ? Math.min(trattamento, Math.max(0, irpefNetta + addReg + addCom)) : 0);
-      // Trattamento is added to net, not only reducing tax
+      const sogliaT = R('IT', 'trattamento_soglia', 15000);
+      const monthlyTrattamento = (taxable <= sogliaT) ? R('IT', 'trattamento_mensile', 100) : 0;
       const monthlyTax = Math.max(0, irpefNetta + addReg + addCom) / 12;
-      const monthlyTrattamento = (taxable <= 15000 ? 100 : 0); // €100/month typical
       const net = monthlyGross - inpsMonthly - monthlyTax + monthlyTrattamento - otherDed;
 
       const usedUserRates = (regRaw !== '' && regRaw != null && regRaw !== '') ||
@@ -455,11 +434,13 @@ function calcGermany(monthlyGross) {
           ['Netto', r2(net)]
         ],
         source: usedUserRates
-          ? 'IRPEF 23/33/43 + INPS + detrazioni 2026 + addizionali da CU → massima accuratezza'
+          ? 'IRPEF 23/33/43 + INPS + detrazioni 2026 + addizionali da CU'
           : 'IRPEF+INPS+detrazioni 2026 + addizionali medie (inserisci % dal CU per 100%)'
       };
     }
 
+
+export
 
 
 export { calcGermany, calcFrance, calcItaly };

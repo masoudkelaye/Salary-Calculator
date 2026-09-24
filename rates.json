@@ -200,13 +200,30 @@
         0.43
       ],
       "inps_employee_approx": 0.0919,
-      "source": "Agenzia delle Entrate / INPS 2026",
+      "source": "Agenzia Entrate / INPS / Legge Bilancio 2026",
       "fetchedAt": "2026-09-23T10:36:25.330Z",
       "irpef_brackets": [
         28000,
         50000,
         null
-      ]
+      ],
+      "irpef_b1": 28000,
+      "irpef_b2": 50000,
+      "irpef_r1": 0.23,
+      "irpef_r2": 0.33,
+      "irpef_r3": 0.43,
+      "inps_rate": 0.0919,
+      "inps_extra": 0.01,
+      "inps_prima_fascia": 56224,
+      "inps_massimale": 122295,
+      "detr_lav_max": 1955,
+      "detr_lav_mid": 1910,
+      "detr_lav_extra": 1190,
+      "detr_lav_bonus": 65,
+      "trattamento_mensile": 100,
+      "trattamento_soglia": 15000,
+      "add_reg_default": 0.0173,
+      "add_com_default": 0.006
     },
     "BE": {
       "year": 2026,
@@ -302,6 +319,7 @@
     }
   },
   "changelog": [
+    "2026.09.24 – IT: IRPEF 23/33/43 + INPS + detrazioni from rates",
     "2026.09.24 – NL: full Belastingdienst 2026 schijven + AHK + arbeidskorting from rates",
     "2026.09.24 – FR: URSSAF rates + IR 2026 barème + décote from rates.json",
     "2026.09.24 – UK: HMRC monthly NI + student loan thresholds, Scottish bands, rates-driven",
