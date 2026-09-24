@@ -1,6 +1,20 @@
 import { calculate as papCalculate } from "https://cdn.jsdelivr.net/npm/lohnsteuerrechner@1.0.7/+esm";
 
 
+    /** Live rates from rates.json (window.TAX_RATES); fallback to hardcoded official defaults */
+    function R(country, key, fallback) {
+      try {
+        const pack = window.TAX_RATES && window.TAX_RATES.countries && window.TAX_RATES.countries[country];
+        if (pack && pack[key] != null && pack[key] !== '' && !Number.isNaN(Number(pack[key]))) {
+          return Number(pack[key]);
+        }
+      } catch (e) {}
+      return fallback;
+    }
+    window.R = R;
+
+
+
     function calcAustralia(monthlyGross) {
       // ATO resident rates FY 2026–27 + Medicare levy 2%
       const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
@@ -427,7 +441,7 @@ import { calculate as papCalculate } from "https://cdn.jsdelivr.net/npm/lohnsteu
     }
 
     function calcNetherlands(monthlyGross) {
-      // Belastingdienst 2026 – Box 1 + heffingskortingen official
+      // Belastingdienst 2026 – Box 1 + heffingskortingen (official tables)
       const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
       let annual = monthlyGross * 12;
 
@@ -438,7 +452,6 @@ import { calculate as papCalculate } from "https://cdn.jsdelivr.net/npm/lohnsteu
       const otherDed = (otherRaw !== '' && otherRaw != null && !isNaN(parseFloat(otherRaw)))
         ? parseFloat(otherRaw) : 0;
 
-      // 30% ruling: 30% of wage is tax-free (employer applies on payslip)
       let taxableWage = annual;
       let freePart = 0;
       if (ruling30) {
@@ -446,68 +459,74 @@ import { calculate as papCalculate } from "https://cdn.jsdelivr.net/npm/lohnsteu
         taxableWage = annual * 0.70;
       }
 
-      // Box 1 rates 2026
-      // Under AOW: 35.75% / 37.56% / 49.50%
-      // AOW age+: first schijf 17.85%
+      const b1 = R('NL', 'box1_schijf1_to', 38883);
+      const b2 = R('NL', 'box1_schijf2_to', 78426);
       let tax = 0;
-      const b1 = 38883, b2 = 78426;
       if (aow) {
-        // born on/after 1946 style: first schijf to 38883 at 17.85%
-        if (taxableWage > 0) tax += Math.min(taxableWage, b1) * 0.1785;
-        if (taxableWage > b1) tax += (Math.min(taxableWage, b2) - b1) * 0.3756;
-        if (taxableWage > b2) tax += (taxableWage - b2) * 0.495;
+        const r1 = R('NL', 'box1_schijf1_rate_aow', 0.1785);
+        if (taxableWage > 0) tax += Math.min(taxableWage, b1) * r1;
+        if (taxableWage > b1) tax += (Math.min(taxableWage, b2) - b1) * R('NL', 'box1_schijf2_rate', 0.3756);
+        if (taxableWage > b2) tax += (taxableWage - b2) * R('NL', 'box1_schijf3_rate', 0.495);
       } else {
-        if (taxableWage > 0) tax += Math.min(taxableWage, b1) * 0.3575;
-        if (taxableWage > b1) tax += (Math.min(taxableWage, b2) - b1) * 0.3756;
-        if (taxableWage > b2) tax += (taxableWage - b2) * 0.495;
+        if (taxableWage > 0) tax += Math.min(taxableWage, b1) * R('NL', 'box1_schijf1_rate', 0.3575);
+        if (taxableWage > b1) tax += (Math.min(taxableWage, b2) - b1) * R('NL', 'box1_schijf2_rate', 0.3756);
+        if (taxableWage > b2) tax += (taxableWage - b2) * R('NL', 'box1_schijf3_rate', 0.495);
       }
 
-      // --- Algemene heffingskorting 2026 ---
+      // Algemene heffingskorting
+      const ahkFrom = R('NL', 'algemene_heffingskorting_phase_from', 29736);
+      const ahkTo = R('NL', 'algemene_heffingskorting_phase_to', 78426);
       let ahk = 0;
       if (aow) {
-        // max €1,556, phase-out 3.195% from €29,736 to €78,426
-        if (taxableWage <= 29736) ahk = 1556;
-        else if (taxableWage < 78426) ahk = Math.max(0, 1556 - 0.03195 * (taxableWage - 29736));
-        else ahk = 0;
+        const maxA = R('NL', 'algemene_heffingskorting_max_aow', 1556);
+        const pctA = R('NL', 'algemene_heffingskorting_phase_pct_aow', 0.03195);
+        if (taxableWage <= ahkFrom) ahk = maxA;
+        else if (taxableWage < ahkTo) ahk = Math.max(0, maxA - pctA * (taxableWage - ahkFrom));
       } else {
-        // max €3,115, phase-out 6.398% from €29,736
-        if (taxableWage <= 29736) ahk = 3115;
-        else if (taxableWage < 78426) ahk = Math.max(0, 3115 - 0.06398 * (taxableWage - 29736));
-        else ahk = 0;
+        const maxA = R('NL', 'algemene_heffingskorting_max', 3115);
+        const pctA = R('NL', 'algemene_heffingskorting_phase_pct', 0.06398);
+        if (taxableWage <= ahkFrom) ahk = maxA;
+        else if (taxableWage < ahkTo) ahk = Math.max(0, maxA - pctA * (taxableWage - ahkFrom));
       }
 
-      // --- Arbeidskorting 2026 (on arbeidsinkomen = taxable wage for employees) ---
+      // Arbeidskorting
+      const ai = taxableWage;
+      const ak1 = R('NL', 'ak_b1', 11965);
+      const ak2 = R('NL', 'ak_b2', 25845);
+      const ak3 = R('NL', 'ak_b3', 45592);
+      const ak4 = R('NL', 'ak_b4', 132920);
       let ak = 0;
-      const ai = taxableWage; // arbeidsinkomen
       if (!aow) {
-        if (ai <= 11965) ak = 0.08324 * ai;
-        else if (ai <= 25845) ak = 996 + 0.31009 * (ai - 11965);
-        else if (ai <= 45592) ak = 5300 + 0.01950 * (ai - 25845);
-        else if (ai < 132920) ak = Math.max(0, 5685 - 0.06510 * (ai - 45592));
-        else ak = 0;
-        ak = Math.min(ak, 5685);
+        if (ai <= ak1) ak = R('NL', 'ak_p1', 0.08324) * ai;
+        else if (ai <= ak2) ak = R('NL', 'ak_fixed1', 996) + R('NL', 'ak_p2', 0.31009) * (ai - ak1);
+        else if (ai <= ak3) ak = R('NL', 'ak_fixed2', 5300) + R('NL', 'ak_p3', 0.01950) * (ai - ak2);
+        else if (ai < ak4) ak = Math.max(0, R('NL', 'ak_max', 5685) - R('NL', 'ak_p4', 0.06510) * (ai - ak3));
+        ak = Math.min(ak, R('NL', 'ak_max', 5685));
       } else {
-        // roughly half for AOW age
-        if (ai <= 11965) ak = 0.04156 * ai;
-        else if (ai <= 25845) ak = 498 + 0.15483 * (ai - 11965);
-        else if (ai <= 45592) ak = 2650 + 0.00975 * (ai - 25845);
-        else if (ai < 132920) ak = Math.max(0, 2840 - 0.03250 * (ai - 45592));
-        else ak = 0;
-        ak = Math.min(ak, 2840);
+        if (ai <= ak1) ak = R('NL', 'ak_p1_aow', 0.04156) * ai;
+        else if (ai <= ak2) ak = R('NL', 'ak_fixed1_aow', 498) + R('NL', 'ak_p2_aow', 0.15483) * (ai - ak1);
+        else if (ai <= ak3) ak = R('NL', 'ak_fixed2_aow', 2647) + R('NL', 'ak_p3_aow', 0.00974) * (ai - ak2);
+        else if (ai < ak4) ak = Math.max(0, R('NL', 'ak_max_aow', 2840) - R('NL', 'ak_p4_aow', 0.03250) * (ai - ak3));
+        ak = Math.min(ak, R('NL', 'ak_max_aow', 2840));
       }
 
-      // --- Inkomensafhankelijke combinatiekorting ---
+      // IACK
       let iackAmt = 0;
       if (iack && !aow) {
-        if (ai > 6239 && ai < 32710) iackAmt = 0.1145 * (ai - 6239);
-        else if (ai >= 32710) iackAmt = 3032;
+        const ifrom = R('NL', 'iack_from', 6239);
+        const ito = R('NL', 'iack_to', 32710);
+        if (ai > ifrom && ai < ito) iackAmt = R('NL', 'iack_pct', 0.1145) * (ai - ifrom);
+        else if (ai >= ito) iackAmt = R('NL', 'iack_max', 3032);
       }
 
-      // --- Ouderenkorting if AOW ---
+      // Ouderenkorting
       let ouderen = 0;
       if (aow) {
-        if (taxableWage <= 46002) ouderen = 2067;
-        else if (taxableWage < 59782) ouderen = Math.max(0, 2067 - 0.15 * (taxableWage - 46002));
+        const om = R('NL', 'ouderen_max', 2067);
+        const ofr = R('NL', 'ouderen_from', 46002);
+        const oto = R('NL', 'ouderen_to', 59782);
+        if (taxableWage <= ofr) ouderen = om;
+        else if (taxableWage < oto) ouderen = Math.max(0, om - R('NL', 'ouderen_pct', 0.15) * (taxableWage - ofr));
       }
 
       const totalCredits = ahk + ak + iackAmt + ouderen;
@@ -516,7 +535,7 @@ import { calculate as papCalculate } from "https://cdn.jsdelivr.net/npm/lohnsteu
       const net = monthlyGross - monthlyTax - otherDed;
 
       return {
-        social: 0, // NL payroll: social is inside Box 1 rate (volksverzekeringen)
+        social: 0,
         tax: r2(monthlyTax),
         soli: 0,
         church: 0,
@@ -533,7 +552,7 @@ import { calculate as papCalculate } from "https://cdn.jsdelivr.net/npm/lohnsteu
           ['Other deductions', r2(otherDed)],
           ['Net / Nettoloon', r2(net)]
         ],
-        source: 'Belastingdienst 2026 Box 1 + AHK + arbeidskorting + optional 30% ruling / IACK / AOW'
+        source: 'Belastingdienst 2026 Box 1 + AHK + arbeidskorting tables (rates.json)'
       };
     }
 
@@ -647,7 +666,7 @@ import { calculate as papCalculate } from "https://cdn.jsdelivr.net/npm/lohnsteu
       // --- Canada ---
       else if (country === 'CA') {
         const ympeM = 74600 / 12;
-        social = Math.max(0, Math.min(g, ympeM) - 3500/12) * 0.0595 + Math.min(g, 68900/12) * 0.0163;
+        social = Math.max(0, Math.min(g, ympeM) - 3500/12) * R('CA', 'cppRate', 0.0595) + Math.min(g, 68900/12) * R('CA', 'eiRate', 0.0163);
         const combined = mainAnnual + secondAnnual;
         let marg = 0.205;
         if (combined > 117045) marg = 0.26;
@@ -697,7 +716,7 @@ import { calculate as papCalculate } from "https://cdn.jsdelivr.net/npm/lohnsteu
           tax = g * 0.40;
           note = 'Self-employed social contributions + tax estimate';
         } else {
-          social = g * 0.1307;
+          social = g * R('BE', 'onssEmployee', 0.1307);
           tax = g * 0.40; // no quotité on second stream in withholding
           note = 'Second job: ONSS 13.07% + tax without full allowance';
         }
@@ -709,7 +728,7 @@ import { calculate as papCalculate } from "https://cdn.jsdelivr.net/npm/lohnsteu
           tax = g * 0.19;
           note = 'Autónomo: cuota SS + IRPF estimate';
         } else {
-          social = Math.min(g, 5101.20) * 0.065;
+          social = Math.min(g, 5101.20) * R('ES', 'ssEmployeeApprox', 0.065);
           tax = g * 0.24;
           note = 'Second employment: SS employee + IRPF on combined';
         }
