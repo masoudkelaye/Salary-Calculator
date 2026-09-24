@@ -1930,12 +1930,11 @@ window.papCalculate = papCalculate;
       const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
       const annual = monthlyGross * 12;
 
-      // ONSS 13.07% — ouvriers on 108% of gross
       const isWorker = document.getElementById('beWorker')?.value === 'worker';
       const onssBase = isWorker ? annual * 1.08 : annual;
       let onss = onssBase * R('BE', 'onssEmployee', 0.1307);
 
-      // Work bonus (werkbonus / bonus à l'emploi) 2026 – reduces personal ONSS
+      // Work bonus (werkbonus) 2026 – reduces personal ONSS
       const S = monthlyGross;
       let bonusB = 0, bonusA = 0;
       if (S <= 2300.62) bonusB = 171.99;
@@ -1950,8 +1949,6 @@ window.papCalculate = papCalculate;
       onss = Math.max(0, onss - workBonus * 12);
       const onssMonthly = onss / 12;
 
-      // Special social security contribution (bijzondere bijdrage) – approx monthly
-      // Simplified scale based on net taxable approx; typical €0–€50+/month
       let specialSS = 0;
       const netLike = monthlyGross - onssMonthly;
       if (netLike > 1850 && netLike <= 2100) specialSS = 9.30;
@@ -1960,46 +1957,29 @@ window.papCalculate = papCalculate;
       else if (netLike > 2600 && netLike <= 2900) specialSS = 37.20;
       else if (netLike > 2900) specialSS = Math.min(60, 37.20 + (netLike - 2900) * 0.01);
 
-      // Professional expenses forfait 30% capped €6,070 (2026)
-      const fraisPro = Math.min(annual * 0.30, 6070);
-
-      // Taxable for PB
+      const fraisPro = Math.min(annual * R('BE', 'frais_pro_rate', 0.30), R('BE', 'frais_pro_cap', 6070));
       let taxable = Math.max(0, annual - onss - fraisPro);
 
-      // Tax-free allowance (belastingvrije som) ~€11,180 + children
       const kids = parseInt(document.getElementById('beKids')?.value) || 0;
-      let free = 11180;
-      if (kids >= 1) free += 2130;
-      if (kids >= 2) free += 3000;
-      if (kids >= 3) free += 6310;
-      if (kids >= 4) free += 7070;
-      if (kids > 4) free += (kids - 4) * 7070;
+      let free = R('BE', 'personalAllowance', 11180);
+      if (kids >= 1) free += R('BE', 'child1', 2130);
+      if (kids >= 2) free += R('BE', 'child2', 3000);
+      if (kids >= 3) free += R('BE', 'child3', 6310);
+      if (kids >= 4) free += R('BE', 'child4', 7070);
+      if (kids > 4) free += (kids - 4) * R('BE', 'child_extra', 7070);
 
-      // Federal brackets 2026
-      const brackets = [
-        [16720, 0.25], [29510, 0.40], [51070, 0.45], [Infinity, 0.50]
-      ];
-      let tax = 0, prev = 0, rem = taxable;
-      for (const [lim, rate] of brackets) {
-        const slice = Math.min(rem, lim - prev);
-        if (slice > 0) tax += slice * rate;
-        rem -= slice; prev = lim;
-        if (rem <= 0) break;
-      }
-      // Credit for tax-free amount
-      let freeTax = 0, prev2 = 0, rem2 = free;
-      for (const [lim, rate] of brackets) {
-        const slice = Math.min(rem2, lim - prev2);
-        if (slice > 0) freeTax += slice * rate;
-        rem2 -= slice; prev2 = lim;
-        if (rem2 <= 0) break;
-      }
-      tax = Math.max(0, tax - freeTax);
+      // IPP brackets 2026 (assessment year 2027)
+      const b1 = 16720, b2 = 29510, b3 = 51070;
+      let tax = 0;
+      const afterFree = Math.max(0, taxable - free);
+      if (afterFree > 0) tax += Math.min(afterFree, b1) * 0.25;
+      if (afterFree > b1) tax += (Math.min(afterFree, b2) - b1) * 0.40;
+      if (afterFree > b2) tax += (Math.min(afterFree, b3) - b2) * 0.45;
+      if (afterFree > b3) tax += (afterFree - b3) * 0.50;
 
-      // Communal tax % of federal tax
       const comRaw = document.getElementById('beCommuneRate')?.value;
       const comRate = (comRaw !== '' && comRaw != null && !isNaN(parseFloat(comRaw)))
-        ? parseFloat(comRaw) / 100 : 0.07;
+        ? parseFloat(comRaw) / 100 : R('BE', 'communal_default', 0.07);
       const communal = tax * comRate;
 
       const otherRaw = document.getElementById('beOtherDed')?.value;
@@ -2008,8 +1988,6 @@ window.papCalculate = papCalculate;
 
       const monthlyTax = (tax + communal) / 12;
       const net = monthlyGross - onssMonthly - specialSS - monthlyTax - otherDed;
-
-      const usedUser = comRaw !== '' && comRaw != null;
 
       return {
         social: r2(onssMonthly + specialSS),
@@ -2026,9 +2004,7 @@ window.papCalculate = papCalculate;
           ['Other deductions', r2(otherDed)],
           ['Netto', r2(net)]
         ],
-        source: usedUser
-          ? 'SPF Finances 2026 + ONSS 13.07% + work bonus + communal from you'
-          : 'SPF Finances 2026 + ONSS 13.07% + work bonus + communal 7% avg'
+        source: (comRaw ? 'SPF Finances 2026 + ONSS + communal from you' : 'SPF Finances 2026 + ONSS + communal 7% avg')
       };
     }
 
