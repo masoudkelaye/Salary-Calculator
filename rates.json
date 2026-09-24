@@ -128,7 +128,7 @@
     },
     "US": {
       "year": 2026,
-      "source": "IRS TY 2026 verified",
+      "source": "IRS Rev. Proc. 2025-32 + SSA 2026",
       "ssRate": 0.062,
       "medicare": 0.0145,
       "ssWageBase": 184500,
@@ -136,7 +136,12 @@
       "standardDeduction_mfj": 32200,
       "fetchedAt": "2026-09-23T10:36:25.277Z",
       "additionalMedicare": 0.009,
-      "standardDeduction_hoh": 24150
+      "standardDeduction_hoh": 24150,
+      "stdDed_extra_single": 2050,
+      "stdDed_extra_mfj": 1650,
+      "addlMed_single": 200000,
+      "addlMed_mfj": 250000,
+      "addlMed_mfs": 125000
     },
     "CA": {
       "year": 2026,
@@ -339,6 +344,7 @@
     }
   },
   "changelog": [
+    "2026.09.24 – US: IRS 2026 std deduction + SS wage base $184500 from rates",
     "2026.09.24 – ES: SS max base 5101.20 + employee rates from rates",
     "2026.09.24 – BE: ONSS 13.07% + IPP brackets + allowance from rates",
     "2026.09.24 – IT: IRPEF 23/33/43 + INPS + detrazioni from rates",

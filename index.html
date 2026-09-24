@@ -1692,14 +1692,15 @@ window.papCalculate = papCalculate;
       // Federal taxable wages (401k + HSA reduce federal taxable)
       const wagesForTax = Math.max(0, annual - k401 - hsa);
 
-      // Standard deduction 2026
-      let stdDed = 16100;
-      if (filing === 'mfj') stdDed = 32200;
-      else if (filing === 'hoh') stdDed = 24150;
+      // Standard deduction 2026 (Rev. Proc. 2025-32)
+      let stdDed = R('US', 'standardDeduction_single', 16100);
+      if (filing === 'mfj') stdDed = R('US', 'standardDeduction_mfj', 32200);
+      else if (filing === 'hoh') stdDed = R('US', 'standardDeduction_hoh', 24150);
 
       const ageBlind = parseInt(document.getElementById('usAgeBlind')?.value) || 0;
       if (ageBlind > 0) {
-        const per = (filing === 'single' || filing === 'hoh' || filing === 'mfs') ? 2050 : 1650;
+        const per = (filing === 'single' || filing === 'hoh' || filing === 'mfs')
+          ? R('US', 'stdDed_extra_single', 2050) : R('US', 'stdDed_extra_mfj', 1650);
         stdDed += per * Math.min(ageBlind, filing === 'mfj' ? 2 : 1);
       }
 
@@ -1734,7 +1735,7 @@ window.papCalculate = papCalculate;
       }
 
       // FICA on gross wages (401k still subject to FICA in traditional plans)
-      const ssWageBase = 184500;
+      const ssWageBase = R('US', 'ssWageBase', 184500);
       const ss = Math.min(annual, ssWageBase) * R('US', 'ssRate', 0.062);
       const medicare = annual * R('US', 'medicare', 0.0145);
       let addMedicare = 0;
