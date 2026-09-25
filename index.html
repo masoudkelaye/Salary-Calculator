@@ -92,6 +92,9 @@
       justify-content: space-between;
       gap: 1rem;
       margin-bottom: 1.75rem;
+      position: relative;
+      z-index: 5000;
+      overflow: visible;
     }
 
     .lang-switch {
@@ -106,6 +109,9 @@
       -webkit-backdrop-filter: blur(var(--blur));
       box-shadow: var(--shadow);
       min-width: 0;
+      position: relative;
+      z-index: 5001;
+      overflow: visible;
     }
 
     .lang-switch .lang-label {
@@ -156,16 +162,16 @@
     }
     .lang-dd-menu {
       display: none;
-      position: absolute;
-      top: calc(100% + 6px);
-      inset-inline-start: 0;
-      min-width: 100%;
-      z-index: 1000;
-      padding: 0.35rem;
+      position: fixed; /* fixed so never clipped by cards */
+      z-index: 99999 !important;
+      min-width: 11rem;
+      max-height: min(70vh, 28rem);
+      overflow-y: auto;
+      padding: 0.4rem;
       border-radius: 14px;
       background: #0c1222;
-      border: 1px solid rgba(255,255,255,0.14);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.25);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.75);
       backdrop-filter: blur(20px);
     }
     .lang-dd.open .lang-dd-menu { display: block; }
@@ -220,6 +226,8 @@
 
     /* Liquid glass card */
     .card {
+      /* allow language menu to paint above cards */
+      /* overflow stays default */
       background: var(--glass);
       border: 1px solid var(--glass-border);
       border-radius: var(--radius);
@@ -3276,7 +3284,7 @@ const i18n = {
       if (disc && t.disclaimer) disc.innerHTML = t.disclaimer;
       const langLab = document.getElementById('t-langLabel');
       if (langLab) {
-        langLab.textContent = ({ fa: 'زبان', en: 'Language', de: 'Sprache', fr: 'Langue', it: 'Lingua', nl: 'Taal', es: 'Idioma' })[lang] || 'Language';
+        langLab.textContent = ({ fa: 'زبان', en: 'Language', de: 'Sprache', fr: 'Langue', it: 'Lingua', nl: 'Taal', es: 'Idioma', he: 'שפה' })[lang] || 'Language';
       }
       try { localStorage.setItem('netSalaryLang', lang); } catch (e) {}
       onCountryChange();
@@ -3628,6 +3636,27 @@ window.calculate = function() {
       const btn = document.getElementById('langDdBtn');
       const menu = document.getElementById('langDdMenu');
       if (!dd || !btn || !menu) return;
+
+      // Move menu to body so no parent (card/app) can cover it
+      if (menu.parentElement !== document.body) {
+        document.body.appendChild(menu);
+      }
+
+      function positionMenu() {
+        const r = btn.getBoundingClientRect();
+        const menuW = Math.max(r.width, 176);
+        let left = r.left;
+        // keep on screen
+        if (left + menuW > window.innerWidth - 8) left = window.innerWidth - menuW - 8;
+        if (left < 8) left = 8;
+        menu.style.position = 'fixed';
+        menu.style.top = (r.bottom + 6) + 'px';
+        menu.style.left = left + 'px';
+        menu.style.right = 'auto';
+        menu.style.width = menuW + 'px';
+        menu.style.zIndex = '99999';
+      }
+
       function closeMenu() {
         dd.classList.remove('open');
         menu.style.display = 'none';
@@ -3635,11 +3664,9 @@ window.calculate = function() {
       }
       function openMenu() {
         dd.classList.add('open');
+        positionMenu();
         menu.style.display = 'block';
-        menu.style.zIndex = '10001';
         btn.setAttribute('aria-expanded', 'true');
-        const topbar = document.querySelector('.topbar');
-        if (topbar) topbar.style.zIndex = '10000';
       }
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -3658,20 +3685,109 @@ window.calculate = function() {
           item.style.color = '#38bdf8';
         });
         item.addEventListener('mouseleave', () => {
-          item.style.background = '#1e293b';
-          item.style.color = '#f8fafc';
+          const isActive = item.classList.contains('active');
+          item.style.background = isActive ? 'rgba(56, 189, 248, 0.22)' : '#1e293b';
+          item.style.color = isActive ? '#7dd3fc' : '#f8fafc';
         });
       });
       document.addEventListener('click', closeMenu);
+      window.addEventListener('resize', () => { if (dd.classList.contains('open')) positionMenu(); });
+      window.addEventListener('scroll', () => { if (dd.classList.contains('open')) positionMenu(); }, true);
     })();
 
 
 
     toggleInput();
-    let savedLang = 'fa';
-    try { savedLang = localStorage.getItem('netSalaryLang') || 'fa'; } catch (e) {}
-    setLang(savedLang);
-    onCountryChange();
+
+    function detectLangFromBrowser() {
+      const supported = ['fa','en','de','fr','it','nl','es','he'];
+      try {
+        const list = (navigator.languages && navigator.languages.length)
+          ? navigator.languages : [navigator.language || navigator.userLanguage || 'en'];
+        for (const raw of list) {
+          const code = String(raw || '').toLowerCase().split('-')[0];
+          if (supported.includes(code)) return code;
+          if (code === 'iw') return 'he';
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    function detectLangFromLocaleRegion() {
+      // timezone / locale region as soft geo signal (no permission needed)
+      try {
+        const loc = Intl.DateTimeFormat().resolvedOptions().locale || '';
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+        const region = (loc.split('-')[1] || '').toUpperCase();
+        const map = {
+          IR: 'fa', DE: 'de', AT: 'de', CH: 'de',
+          FR: 'fr', BE: 'fr', IT: 'it', NL: 'nl',
+          ES: 'es', MX: 'es', AR: 'es', CO: 'es',
+          IL: 'he', GB: 'en', US: 'en', AU: 'en', CA: 'en', NZ: 'en'
+        };
+        if (map[region]) return map[region];
+        if (/Tehran|Iran/i.test(tz)) return 'fa';
+        if (/Berlin|Vienna|Zurich|Germany|Austria/i.test(tz)) return 'de';
+        if (/Paris|France/i.test(tz)) return 'fr';
+        if (/Rome|Italy/i.test(tz)) return 'it';
+        if (/Amsterdam|Brussels|Netherlands/i.test(tz)) return 'nl';
+        if (/Madrid|Spain/i.test(tz)) return 'es';
+        if (/Jerusalem|Tel_Aviv|Israel/i.test(tz)) return 'he';
+      } catch (e) {}
+      return null;
+    }
+
+    async function detectLangFromGeo() {
+      // Optional IP geo (fast timeout). Failures are ignored.
+      const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const t = setTimeout(() => { try { ctrl && ctrl.abort(); } catch (e) {} }, 2500);
+      try {
+        const res = await fetch('https://ipapi.co/json/', {
+          signal: ctrl ? ctrl.signal : undefined,
+          headers: { Accept: 'application/json' }
+        });
+        if (!res.ok) return null;
+        const data = await res.json();
+        const cc = String(data.country_code || data.country || '').toUpperCase();
+        const map = {
+          IR: 'fa', DE: 'de', AT: 'de', CH: 'de',
+          FR: 'fr', BE: 'fr', IT: 'it', NL: 'nl',
+          ES: 'es', MX: 'es', IL: 'he',
+          GB: 'en', US: 'en', AU: 'en', CA: 'en', NZ: 'en'
+        };
+        return map[cc] || null;
+      } catch (e) {
+        return null;
+      } finally {
+        clearTimeout(t);
+      }
+    }
+
+    async function bootLanguage() {
+      let saved = null;
+      try { saved = localStorage.getItem('netSalaryLang'); } catch (e) {}
+      // User already chose → respect it
+      if (saved) {
+        setLang(saved);
+        onCountryChange();
+        return;
+      }
+      // 1) browser language  2) timezone/region  3) IP country  4) English
+      let lang = detectLangFromBrowser() || detectLangFromLocaleRegion() || 'en';
+      setLang(lang);
+      onCountryChange();
+      // refine with geo if still default-ish (non-blocking)
+      detectLangFromGeo().then((geoLang) => {
+        if (!geoLang) return;
+        let again = null;
+        try { again = localStorage.getItem('netSalaryLang'); } catch (e) {}
+        // only auto-switch if user has not manually chosen yet
+        if (again) return;
+        setLang(geoLang);
+        onCountryChange();
+      });
+    }
+    bootLanguage();
     try { scheduleRatesAutoCheck(); } catch (e) {}
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
